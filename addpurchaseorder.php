@@ -50,7 +50,7 @@
 		$password = trim($_POST['password']);
 		$role = $_POST['role'];
 		
-		$result = $user->check($username);
+		$result = $user->check($_POST['username']);
 		if ($result) {
 			$user->register($username, $password, $role);
 			$Success = 1;
@@ -72,14 +72,14 @@
 			include('sidebar.php');
 		?>
 		<script>
-			document.getElementById('adduser.php').setAttribute("class", "current-page");
+			document.getElementById('addpurchaseorder.php').setAttribute("class", "current-page");
 		</script>
         <!-- page content -->
         <div class="right_col" role="main">
           <div class="">
             <div class="page-title">
               <div class="title_left">
-                <h3>User Management</h3>
+                <h3>Asset Management</h3>
               </div>
             </div>
             <div class="clearfix"></div>
@@ -89,7 +89,7 @@
               <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel">
                   <div class="x_title">
-                    <h2>Add User</h2>
+                    <h2>Add Purchase Order</h2>
                     
                     <div class="clearfix"></div>
                   </div>
@@ -107,36 +107,26 @@
                   </div>';}
 				  ?>
                     <br />
-                    <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post">
-
-                      <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="username">Username <span class="required">*</span>
-                        </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" id="username" class="form-control col-md-7 col-xs-12 required"  name="username" data-validate-length-range="6">
-                        </div>
-                      </div>
-                      <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="password">Password <span class="required">*</span>
-                        </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="password" id="password" name="password" data-validate-length-range="6" class="form-control col-md-7 col-xs-12 required">
-                        </div>
-                      </div>
-                      <div class="item form-group">
-                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">Confirm Password <span class="required">*</span></label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input id="password2" class="form-control col-md-7 col-xs-12 required" type="password" data-validate-linked="password">
-                        </div>
-                      </div>
+                    <form id="demo-form2" enctype="multipart/form-data" class="form-horizontal form-label-left" method="post">
 					  <div class="item form-group">
-                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">User Role<span class="required">*</span></label>
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="username">Purchase Order ID <span class="required">*</span>
+                        </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <select class="form-control required" name="role">
-                            <option value="">Choose option</option>
-                            <option value="user">User</option>
-                            <option value="admin">Admin</option>
-                          </select>
+                          <input type="text" id="orderid" class="form-control col-md-7 col-xs-12 required"  name="orderid">
+                        </div>
+                      </div>	
+                      <div class="item form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="vendor">Vendor <span class="required">*</span>
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input type="text" id="vendor" class="form-control col-md-7 col-xs-12 required"  name="vendor">
+                        </div>
+                      </div>
+                      <div class="item form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Purchase Order File
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input type="text" id="price" name="price" class="form-control col-md-7 col-xs-12 required">
                         </div>
                       </div>
                       <div class="item form-group">

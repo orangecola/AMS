@@ -31,32 +31,25 @@
     <!-- Custom Theme Style -->
     <link href="build/css/custom.min.css" rel="stylesheet">
   </head>
-	<?php 
-	include_once('config.php');
-	if(!($_SESSION['role'] == 'admin'))
-		  {
-			 header('Location: logout.php');
-		  }
-	?>
+	<?php include_once('config.php');?>
   <body class="nav-md footer_fixed">
     <div class="container body">
       <div class="main_container">
         <?php
 			include('sidebar.php');
 			
-			
-			
-			$result = $user->getUsers();
+			$result = $user->getLog();
 		?>
+
 		<script>
-		document.getElementById('userlist.php').setAttribute("class", "current-page");
+			document.getElementById('notificationlist.php').setAttribute("class", "current-page");
 		</script>
         <!-- page content -->
         <div class="right_col" role="main">
           <div class="">
             <div class="page-title">
               <div class="title_left">
-                <h3>User Management</h3>
+                <h3>View logs</h3>
               </div>
             </div>
             <div class="clearfix"></div>
@@ -64,16 +57,16 @@
 				<div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel">
                   <div class="x_title">
-				  <h2>View Users</h2>
+				  <h2>Logs</h2>
                     <div class="clearfix"></div>
                   </div>
                   <div class="x_content">
                     <table id="datatable" class="table table-striped table-bordered">
                       <thead>
                         <tr>
-                          <th>Username</th>
-                          <th>Role</th>
-                          <th>Status</th>
+                          <th>Asset ID</th>
+                          <th>Email Address</th>
+                          <th>Time before expiry</th>
 						  <th>Actions</th>
                         </tr>
                       </thead>
@@ -83,10 +76,10 @@
 						<?php 
 							foreach($result as $row) {
 								echo '<tr>';
-								echo "<td>{$row['username']}</td>";
-								echo "<td>{$row['role']}</td>";
-								echo "<td>{$row['status']}</td>";
-								echo "<td><a href=\"edituser.php?id={$row['user_ID']}\" class=\"btn btn-info btn-xs\"><i class='fa fa-edit'></i>Edit</a></td>";
+								echo "<td>{$row['time']}</td>";
+								echo "<td>{$row['user']}</td>";
+								echo "<td>{$row['log']}</td>";
+								echo "<td><a href='#' class=\"btn btn-info btn-xs\"><i class=\"fa fa-pencil\"></i> Edit </a><a href='#' class='btn btn-danger btn-xs'><i class='fa fa-trash-o'></i> Delete </a></td>";
 								echo '</tr>';
 							}
 						?>
@@ -163,6 +156,5 @@
 	
     <!-- Custom Theme Scripts -->
     <script src="build/js/custom.min.js"></script>
-	
   </body>
 </html>

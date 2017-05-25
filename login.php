@@ -23,7 +23,7 @@
 	include_once('config.php');
 	//Redirect user to dashboard if logged in
 	if (isset($_SESSION['user_ID'])) {
-		header('Location: editassets.php');
+		header('Location: assetlist.php');
 	}
 	$Login_Failed=0;
 	
@@ -37,7 +37,7 @@
 		$result = $user->login($username, $password);
 		
 		if ($result) {
-			header("Location: editassets.php");
+			header("Location: assetlist.php");
 		}
 		else {
 			$Login_Failed = 1;
