@@ -50,81 +50,44 @@
 	}
 	
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-		$assetid 		= trim($_POST['assetid']);
-		$description	= trim($_POST['description']);
-		$quantity		= trim($_POST['quantity']);
-		$price			= trim($_POST['price']);
-		$crtrno			= trim($_POST['crtrno']);
-		$pono			= trim($_POST['pono']);
-		$release		= trim($_POST['release']);
-		$expirydate		= trim($_POST['expirydate']);
-		$remarks		= trim($_POST['remarks']);
-		$class			= trim($_POST['class']);
-		$brand			= trim($_POST['brand']);
-		$auditdate		= trim($_POST['auditdate']);
-		$component		= trim($_POST['component']);
-		$label			= trim($_POST['label']);
-		$serial			= trim($_POST['serial']);
-		$location		= trim($_POST['location']);
-		$status			= trim($_POST['status']);
-		$replacing		= trim($_POST['replacing']);
+		$candidate['asset_ID'] 			= trim($_POST['assetid']);
+		$candidate['description']		= trim($_POST['description']);
+		$candidate['quantity']			= trim($_POST['quantity']);
+		$candidate['price']				= trim($_POST['price']);
+		$candidate['crtrno']			= trim($_POST['crtrno']);
+		$candidate['purchaseorder_id']	= trim($_POST['pono']);
+		$candidate['release_version']	= trim($_POST['release']);
+		$candidate['expirydate']		= trim($_POST['expirydate']);
+		$candidate['remarks']			= trim($_POST['remarks']);
+		
+		$candidate['class']				= trim($_POST['class']);
+		$candidate['brand']				= trim($_POST['brand']);
+		$candidate['audit_date']		= trim($_POST['auditdate']);
+		$candidate['component']			= trim($_POST['component']);
+		$candidate['label']				= trim($_POST['label']);
+		$candidate['serial']			= trim($_POST['serial']);
+		$candidate['location']			= trim($_POST['location']);
+		$candidate['status']			= trim($_POST['status']);
+		$candidate['replacing']			= trim($_POST['replacing']);
 		
 		$same = true;
 		//Similarility Check
-		if ($assetid == $result[1]['asset_ID']) {
-			$same = false;
+		foreach ($user->assetFields as $value) {
+			if ($candidate[$value] != $result[1][$value]) {
+				$same = false;
+				break;
+			}
 		}
-		else if ($description == $result[1]['description']) {
-			$same = false;
+		unset($value);
+		
+		foreach ($user->hardwareFields as $value) {
+			
+			if ($candidate[$value] != $result[1][$value]) {
+				$same = false;
+				break;
+			}
 		}
-		else if ($quantity == $result[1]['quantity']) {
-			$same = false;
-		}
-		else if ($price == $result[1]['price']) {
-			$same = false;
-		}
-		else if ($crtrno == $result[1]['crtrno']) {
-			$same = false;
-		}
-		else if ($pono == $result[1]['purchaseorder_id']) {
-			$same = false;
-		}
-		else if ($release == $result[1]['release_version']) {
-			$same = false;
-		}
-		else if ($expirydate == $result[1]['expirydate']) {
-			$same = false;
-		}
-		else if ($remarks == $result[1]['remarks']) {
-			$same = false;
-		}
-		else if ($class == $result[1]['class']) {
-			$same = false;
-		}
-		else if ($brand == $result[1]['brand']) {
-			$same = false;
-		}
-		else if ($auditdate == $result[1]['audit_date']) {
-			$same = false;
-		}
-		else if ($component == $result[1]['component']) {
-			$same = false;
-		}
-		else if ($label == $result[1]['label']) {
-			$same = false;
-		}
-		else if ($serial == $result[1]['serial']) {
-			$same = false;
-		}
-		else if ($location == $result[1]['location']) {
-			$same = false;
-		}
-		else if ($status == $result[1]['status']) {
-			$same = false;
-		}
-		else if ($replacing == $result[1]['replacing']) {
-			$same = false;
-		}
+		unset($value);
 		
 		if ($same) {
 			$NoChanges = 1;
@@ -132,17 +95,17 @@
 		
 		//Check price if it is integer / double
 		//Check quantity if it is an integer
-		if (!(($user->validatesAsInt($price) or $user->validatesAsDouble($price)) and $user->validatesAsInt($quantity))) {
+		if (!(($user->validatesAsInt($candidate['price']) or $user->validatesAsDouble($candidate['price'])) and $user->validatesAsInt($candidate['quantity']))) {
 			$NumberError = 1;
 		}
 		
 		//Check Dates
-		if (!($user->check_date($expirydate))) {
+		if (!($user->check_date($candidate['expirydate']))) {
 				$DateError = 1;
 		}
 		
 		if (!$same and $DateError == 0 and $NumberError == 0) {
-			$user->editHardware($result[1], $assetid, $description, $quantity, $price, $crtrno, $pono, $release, $expirydate, $remarks, $class, $brand, $auditdate, $component, $label, $serial, $location, $status, $replacing);
+			$user->editHardware($result[1], $candidate);
 			$result = $user->getHardware($_GET['id']);
 			$Success = 1;
 		}
@@ -359,25 +322,25 @@
 
         <script>
 			function reset() {
-				document.getElementsByName("assetid")[0].setAttribute("value", "<?php echo $result[1]['asset_ID'];?>");
-				document.getElementsByName("description")[0].innerHTML = "<?php echo str_replace(array("\r\n"), '\n', $result[1]['description']);?>";
-				document.getElementsByName("quantity")[0].setAttribute("value", "<?php echo $result[1]['quantity'];?>");
-				document.getElementsByName("price")[0].setAttribute("value", "<?php echo $result[1]['price'];?>");
-				document.getElementsByName("crtrno")[0].setAttribute("value", "<?php echo $result[1]['crtrno'];?>");
-				document.getElementsByName("pono")[0].setAttribute("value", "<?php echo $result[1]['purchaseorder_id'];?>");
-				document.getElementsByName("release")[0].setAttribute("value", "<?php echo $result[1]['release_version'];?>");
-				document.getElementsByName("expirydate")[0].setAttribute("value", "<?php echo $result[1]['expirydate'];?>");
-				document.getElementsByName("remarks")[0].innerHTML = "<?php echo str_replace(array("\r", "\n"), '\\n', $result[1]['remarks']);?>";
+				document.getElementsByName("assetid")[0].setAttribute("value", <?php echo json_encode($result[1]['asset_ID']);?>);
+				document.getElementsByName("description")[0].innerHTML = <?php echo json_encode($result[1]['description']);?>;
+				document.getElementsByName("quantity")[0].setAttribute("value", <?php echo json_encode($result[1]['quantity']);?>);
+				document.getElementsByName("price")[0].setAttribute("value", <?php echo json_encode($result[1]['price']);?>);
+				document.getElementsByName("crtrno")[0].setAttribute("value", <?php echo json_encode($result[1]['crtrno']);?>);
+				document.getElementsByName("pono")[0].setAttribute("value", <?php echo json_encode($result[1]['purchaseorder_id']);?>);
+				document.getElementsByName("release")[0].setAttribute("value", <?php echo json_encode($result[1]['release_version']);?>);
+				document.getElementsByName("expirydate")[0].setAttribute("value", <?php echo json_encode($result[1]['expirydate']);?>);
+				document.getElementsByName("remarks")[0].innerHTML = <?php echo json_encode($result[1]['remarks']);?>;
 				
-				document.getElementsByName("class")[0].setAttribute("value", "<?php echo $result[1]['class'];?>");
-				document.getElementsByName("brand")[0].setAttribute("value", "<?php echo $result[1]['brand'];?>");
-				document.getElementsByName("auditdate")[0].setAttribute("value", "<?php echo $result[1]['audit_date'];?>");
-				document.getElementsByName("component")[0].setAttribute("value", "<?php echo $result[1]['component'];?>");
-				document.getElementsByName("label")[0].setAttribute("value", "<?php echo $result[1]['label'];?>");
-				document.getElementsByName("serial")[0].setAttribute("value", "<?php echo $result[1]['serial'];?>");
-				document.getElementsByName("location")[0].setAttribute("value", "<?php echo $result[1]['location'];?>");
-				document.getElementsByName("status")[0].setAttribute("value", "<?php echo $result[1]['status'];?>");
-				document.getElementsByName("replacing")[0].setAttribute("value", "<?php echo $result[1]['replacing'];?>");
+				document.getElementsByName("class")[0].setAttribute("value", <?php echo json_encode($result[1]['class']);?>);
+				document.getElementsByName("brand")[0].setAttribute("value", <?php echo json_encode($result[1]['brand']);?>);
+				document.getElementsByName("auditdate")[0].setAttribute("value", <?php echo json_encode($result[1]['audit_date']);?>);
+				document.getElementsByName("component")[0].setAttribute("value", <?php echo json_encode($result[1]['component']);?>);
+				document.getElementsByName("label")[0].setAttribute("value", <?php echo json_encode($result[1]['label']);?>);
+				document.getElementsByName("serial")[0].setAttribute("value", <?php echo json_encode($result[1]['serial']);?>);
+				document.getElementsByName("location")[0].setAttribute("value", <?php echo json_encode($result[1]['location']);?>);
+				document.getElementsByName("status")[0].setAttribute("value", <?php echo json_encode($result[1]['status']);?>);
+				document.getElementsByName("replacing")[0].setAttribute("value", <?php echo json_encode($result[1]['replacing']);?>);
 			}
 			reset();
 		</script>    

@@ -51,79 +51,43 @@
 	
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		
-		$assetid 		= trim($_POST['assetid']);
-		$description	= trim($_POST['description']);
-		$quantity		= trim($_POST['quantity']);
-		$price			= trim($_POST['price']);
-		$crtrno			= trim($_POST['crtrno']);
-		$pono			= trim($_POST['pono']);
-		$release		= trim($_POST['release']);
-		$expirydate		= trim($_POST['expirydate']);
-		$remarks		= trim($_POST['remarks']);
-		
-		$vendor			= trim($_POST['vendor']);
-		$procure		= trim($_POST['procure']);
-		$shortname		= trim($_POST['shortname']);
-		$purpose		= trim($_POST['purpose']);
-		$contracttype	= trim($_POST['contracttype']);
-		$startdate		= trim($_POST['startdate']);
-		$license		= trim($_POST['license']);
-		$verification	= trim($_POST['verification']);
+		$candidate['asset_ID']				= trim($_POST['assetid']);
+		$candidate['description']			= trim($_POST['description']);
+		$candidate['quantity']				= trim($_POST['quantity']);
+		$candidate['price']					= trim($_POST['price']);
+		$candidate['crtrno']				= trim($_POST['crtrno']);
+		$candidate['purchaseorder_id']		= trim($_POST['pono']);
+		$candidate['release_version']		= trim($_POST['release']);
+		$candidate['expirydate']			= trim($_POST['expirydate']);
+		$candidate['remarks']				= trim($_POST['remarks']);
+			
+		$candidate['vendor']				= trim($_POST['vendor']);
+		$candidate['procured_from']			= trim($_POST['procure']);
+		$candidate['shortname']				= trim($_POST['shortname']);
+		$candidate['purpose']				= trim($_POST['purpose']);
+		$candidate['contract_type']			= trim($_POST['contracttype']);
+		$candidate['start_date']			= trim($_POST['startdate']);
+		$candidate['license_explanation']	= trim($_POST['license']);
+		$candidate['verification']			= trim($_POST['verification']);
 		
 		$same = true;
 		//Similarility Check
-		if ($assetid != $result[1]['asset_ID']) {
-			$same = false;
+		foreach ($user->assetFields as $value) {
+			if ($candidate[$value] != $result[1][$value]) {
+				$same = false;
+				break;
+			}
 		}
-		else if ($description != $result[1]['description']) {
-			$same = false;
-		}
-		else if ($quantity != $result[1]['quantity']) {
-			$same = false;
-		}
-		else if ($price != $result[1]['price']) {
-			$same = false;
-		}
-		else if ($crtrno != $result[1]['crtrno']) {
-			$same = false;
-		}
-		else if ($pono != $result[1]['purchaseorder_id']) {
-			$same = false;
-		}
-		else if ($release != $result[1]['release_version']) {
-			$same = false;
-		}
-		else if ($expirydate != $result[1]['expirydate']) {
-			$same = false;
-		}
-		else if ($remarks != $result[1]['remarks']) {
-			$same = false;
-		}
+		unset($value);
 		
-		else if ($vendor != $result[1]['vendor']) {
-			$same = false;
+		foreach ($user->softwareFields as $value) {
+			
+			if ($candidate[$value] != $result[1][$value]) {
+				$same = false;
+				break;
+			}
 		}
-		else if ($procure != $result[1]['procured_from']) {
-			$same = false;
-		}
-		else if ($shortname != $result[1]['shortname']) {
-			$same = false;
-		}
-		else if ($purpose != $result[1]['purpose']) {
-			$same = false;
-		}
-		else if ($contracttype != $result[1]['contract_type']) {
-			$same = false;
-		}
-		else if ($startdate != $result[1]['start_date']) {
-			$same = false;
-		}
-		else if ($license != $result[1]['license_explanation']) {
-			$same = false;
-		}
-		else if ($verification != $result[1]['verification']) {
-			$same = false;
-		}
+		unset($value);
 		
 		if ($same) {
 			$NoChanges = 1;
@@ -131,18 +95,18 @@
 		
 		//Check price if it is integer / double
 		//Check quantity if it is an integer
-		if (!(($user->validatesAsInt($price) or $user->validatesAsDouble($price)) and $user->validatesAsInt($quantity))) {
+		if (!(($user->validatesAsInt($candidate['price']) or $user->validatesAsDouble($candidate['price'])) and $user->validatesAsInt($candidate['quantity']))) {
 			$NumberError = 1;
 		}
 		
 		//Check Dates
-		if (!($user->check_date($expirydate) and $user->check_date($startdate))) {
+		if (!($user->check_date($candidate['expirydate']) and $user->check_date($candidate['start_date']))) {
 				$DateError = 1;
 		}
 		
 		
 		if ($NoChanges == 0 and $DateError == 0 and $NumberError == 0) {
-			$user->editSoftware($result[1], $assetid, $description, $quantity, $price, $crtrno, $pono, $release, $expirydate, $remarks, $vendor, $procure, $shortname, $purpose, $contracttype, $license, $verification);
+			$user->editSoftware($result[1], $candidate);
 			$result = $user->getSoftware($_GET['id']);
 			$Success = 1;
 		}
@@ -204,7 +168,7 @@
 				  if ($Success == 1) {echo '<div class="alert alert-success alert-dismissible fade in" role="alert">
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
                     </button>
-                    <strong>Success</strong> Hardware edits successful
+                    <strong>Success</strong> Software edits successful
                   </div>';}
 				  
 				  ?>
@@ -260,7 +224,7 @@
                         </div>
                       </div>
 					  <div class="item form-group">
-					  <label class="control-label col-md 3 col-sm-3 col-xs-12">Expiry Date
+					  <label class="control-label col-md 3 col-sm-3 col-xs-12">License Expiry Date
 					  </label>
 					  <fieldset class="col-md-6 col-sm-6 col-xs-12">
                           <div class="control-group">
@@ -368,24 +332,24 @@
 
         <script>
 			function reset() {
-				document.getElementsByName("assetid")[0].setAttribute("value", "<?php echo $result[1]['asset_ID'];?>");
-				document.getElementsByName("description")[0].innerHTML = "<?php echo str_replace(array("\r\n"), '\n', $result[1]['description']);?>";
-				document.getElementsByName("quantity")[0].setAttribute("value", "<?php echo $result[1]['quantity'];?>");
-				document.getElementsByName("price")[0].setAttribute("value", "<?php echo $result[1]['price'];?>");
-				document.getElementsByName("crtrno")[0].setAttribute("value", "<?php echo $result[1]['crtrno'];?>");
-				document.getElementsByName("pono")[0].setAttribute("value", "<?php echo $result[1]['purchaseorder_id'];?>");
-				document.getElementsByName("release")[0].setAttribute("value", "<?php echo $result[1]['release_version'];?>");
-				document.getElementsByName("expirydate")[0].setAttribute("value", "<?php echo $result[1]['expirydate'];?>");
-				document.getElementsByName("remarks")[0].innerHTML = "<?php echo str_replace(array("\r", "\n"), '\\n', $result[1]['remarks']);?>";
+				document.getElementsByName("assetid")[0].setAttribute("value", <?php echo json_encode($result[1]['asset_ID']);?>);
+				document.getElementsByName("description")[0].innerHTML = <?php echo json_encode($result[1]['description']);?>;
+				document.getElementsByName("quantity")[0].setAttribute("value", <?php echo json_encode($result[1]['quantity']);?>);
+				document.getElementsByName("price")[0].setAttribute("value", <?php echo json_encode($result[1]['price']);?>);
+				document.getElementsByName("crtrno")[0].setAttribute("value", <?php echo json_encode($result[1]['crtrno']);?>);
+				document.getElementsByName("pono")[0].setAttribute("value", <?php echo json_encode($result[1]['purchaseorder_id']);?>);
+				document.getElementsByName("release")[0].setAttribute("value", <?php echo json_encode($result[1]['release_version']);?>);
+				document.getElementsByName("expirydate")[0].setAttribute("value", <?php echo json_encode($result[1]['expirydate']);?>);
+				document.getElementsByName("remarks")[0].innerHTML = <?php echo json_encode($result[1]['remarks']);?>;
 				
-				document.getElementsByName("vendor")[0].setAttribute("value", "<?php echo $result[1]['vendor'];?>");
-				document.getElementsByName("procure")[0].setAttribute("value", "<?php echo $result[1]['procured_from'];?>");
-				document.getElementsByName("shortname")[0].setAttribute("value", "<?php echo $result[1]['shortname'];?>");
-				document.getElementsByName("purpose")[0].setAttribute("value", "<?php echo $result[1]['purpose'];?>");
-				document.getElementById("<?php echo $result[1]['contract_type'];?>").setAttribute("selected", "selected");
-				document.getElementsByName("startdate")[0].setAttribute("value", "<?php echo $result[1]['start_date'];?>");
-				document.getElementsByName("license")[0].setAttribute("value", "<?php echo str_replace(array("\r", "\n"), '\\n',$result[1]['license_explanation']);?>");
-				document.getElementsByName("verification")[0].setAttribute("value", "<?php echo $result[1]['verification'];?>");
+				document.getElementsByName("vendor")[0].setAttribute("value", <?php echo json_encode($result[1]['vendor']);?>);
+				document.getElementsByName("procure")[0].setAttribute("value", <?php echo json_encode($result[1]['procured_from']);?>);
+				document.getElementsByName("shortname")[0].setAttribute("value", <?php echo json_encode($result[1]['shortname']);?>);
+				document.getElementsByName("purpose")[0].setAttribute("value", <?php echo json_encode($result[1]['purpose']);?>);
+				document.getElementById(<?php echo json_encode($result[1]['contract_type']);?>).setAttribute("selected", "selected");
+				document.getElementsByName("startdate")[0].setAttribute("value", <?php echo json_encode($result[1]['start_date']);?>);
+				document.getElementsByName("license")[0].setAttribute("value", <?php echo json_encode($result[1]['license_explanation']);?>);
+				document.getElementsByName("verification")[0].setAttribute("value", <?php echo json_encode($result[1]['verification']);?>);
 			}
 			reset();
 		</script>    

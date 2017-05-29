@@ -48,6 +48,7 @@
 	}
 	
 	$result = $user->getUser($_GET['id']);
+	$result['password'] = "";
 	
 	if (!$result[0]) {
 		header('Location: userlist.php');
@@ -57,28 +58,32 @@
 		
 	
 		
-		$username = trim($_POST['username']);
-		$password = trim($_POST['password']);
-		$role = trim($_POST['role']);
-		$status = trim($_POST['status']);
+		$candidate['username'] 	= trim($_POST['username']);
+		$candidate['password'] 	= trim($_POST['password']);
+		$candidate['role'] 		= trim($_POST['role']);
+		$candidate['status']	= trim($_POST['status']);
 		
+		$same = true;
 		
-		$sameusername = ($username == $result[1]['username']);
-		$samepassword = ($password == "");
-		$samerole = ($role == $result[1]['role']);
-		$samestatus = ($status == $result[1]['status']);
-
-		if  ($sameusername and $samepassword and $samerole and $samestatus) {
+		foreach ($user->userFields as $value) {
+			
+			if ($candidate[$value] != $result[1][$value]) {
+				$same = false;
+				break;
+			}
+		}
+		unset($value);
+		
+		if ($same) {
 			$noChanges = 1;
 		}
-		else if (!$user->check($username) and !$sameusername) {
+		else if (!$user->check($candidate['username']) and $candidate['username'] != $result[1]['username']) {
 			$usernameTaken = 1;
 		}
 		else {
-			$user->editUser($result[1], $username, $password, $role, $status);
-			$result[1]['username'] = $username;
-			$result[1]['role'] = $role;
-			$result[1]['status'] = $status;
+			$user->editUser($result[1], $candidate);
+			$result = $user->getUser($_GET['id']);
+			$result['password'] = "";
 			
 			$Success = 1;
 		}

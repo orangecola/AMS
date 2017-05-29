@@ -2,7 +2,10 @@
 class USER
 {
     private $db;
- 
+	public $softwareFields = array('vendor', 'procured_from', 'shortname', 'purpose', 'contract_type', 'start_date', 'license_explanation', 'verification');
+	public $assetFields = array('asset_ID', 'description', 'quantity', 'price', 'crtrno', 'purchaseorder_id', 'release_version', 'expirydate', 'remarks');
+	public $hardwareFields = array('class', 'brand', 'audit_date', 'component', 'label', 'serial', 'location', 'status', 'replacing'); 
+	public $userFields = array('username', 'password', 'role', 'status');
     function __construct($DB_con)
     {
       $this->db = $DB_con;
@@ -284,379 +287,135 @@ class USER
 		return $result;
 	}
 	
-	public function editUser($source, $username, $password, $role, $status) {
+	public function editUser($source, $candidate) {
 		//Updates the user based on the infomration provided
 		//There must be at least one item changed 
 		//For $username, $role, $status, it is checked against $source entry.
 		//If it is different, then it will add statements to update
 		//For password, "" is regarded as same
 		
-		//Flags to determine which fields have changed
-		$sameusername 			= ($username == $source['username']);
-		$samepassword 			= ($password == "");
-		$samerole 				= ($role == $source['role']);
-		$samestatus 			= ($status == $source['status']);
-		
-		
-		//Prepare SQL Statement
-		$sql 					= "UPDATE user SET ";
-		
-		//Part 1: Add field to update
-		//Part 2: Add a comma if there are still fields to add.
-		//Order: Username -> Password -> Role -> Status
-		if (!$sameusername) {
-			$sql .= "username=:username";
-
-			if (!$samepassword or !$samerole or !$samestatus) {
-				$sql .= ",";
-			}
-		}
-		if (!$samepassword) {
-			$sql .= "password=:password";
-
-			if (!$samerole or !$samestatus) {
-				$sql .= ",";
-			}
-		}
-		if (!$samerole) {
-			$sql .= "role=:role";
+		$sql = $this->prepareEditSQL($this->userFields, $source, $candidate);
+		if ($sql[0] != "") {
+			$sql[0] 				= "UPDATE user SET".$sql[0]." WHERE user_ID =:user_ID";
+			$sql[1][':user_ID'] 	= $source['user_ID'];
 			
-			if (!$samestatus) {
-				$sql .= ",";
-			}
+			$stmt					= $this->db->prepare($sql[0]);
+			$stmt->execute($sql[1]);
 		}
-		
-		if (!$samestatus) {
-			$sql .= "status=:status";
-		}
-		
-		//Ending
-		$sql .= " WHERE user_ID=:user_ID";
-		
-		$stmt=$this->db->prepare($sql);
-		if(!$sameusername) $stmt->bindValue(':username', $username);
-		if(!$samepassword) $stmt->bindValue(':password', password_hash($password, PASSWORD_DEFAULT));
-		if(!$samerole) $stmt->bindValue(':role', $role);
-		if(!$samestatus) $stmt->bindValue(':status', $status);
-		
-		$stmt->bindValue(':user_ID', $source['user_ID']);
-		$stmt->execute();
-		
-		if ($sameusername) {
+				
+		if ($source['username'] == $candidate['username']) {
 			$this->savelog($_SESSION['username'], "edited user {$source['username']}");
 		}
 		else {
-			$this->savelog($_SESSION['username'], "edited user {$source['username']} to {$username}");
+			$this->savelog($_SESSION['username'], "edited user {$source['username']} to {$candidate['username']}");
 		}
 	}
 	
-	public function editAsset($source, $assetid, $description, $quantity, $price, $crtrno, $pono, $release, $expirydate, $remarks){
-			
-		$sameid 						= ($source['asset_ID'] == $assetid);
-		$samedescription				= ($source['description'] == $description);
-		$samequantity					= ($source['quantity'] == $quantity);
-		$sameprice						= ($source['price'] == $price);
-		$samecrtrno						= ($source['crtrno'] == $crtrno);
-		$samepono						= ($source['purchaseorder_id'] == $pono);
-		$samerelease					= ($source['release_version'] == $release);
-		$sameexpirydate					= ($source['expirydate'] == $expirydate);
-		$sameremarks					= ($source['remarks'] == $remarks);
-			
-		if (!($sameid and $samedescription and $samequantity and $sameprice and $samecrtrno and $samepono and $samerelease and $sameexpirydate and $sameremarks)) {
-				
-		$sql 			= "UPDATE asset SET";
-		$assetarray 	= array();
-		
-			if (!$sameid) {
-				$sql 						.= ' asset_ID=:assetid ';
-				$assetarray[':assetid']		= $assetid;
+	public function allTrue($array) {
+		$result = true;
 
-				if (!($samedescription and $samequantity and $sameprice and $samecrtrno and $samepono and $samerelease and $sameexpirydate and $sameremarks)) {
-					$sql .= ',';
-				}			
-			}
+		foreach ($array as $key => $value) {
+			if ($value === false) {
+				$result = false;
+				break;
+			} 
+		}
+		
+		return $result;
+	}
+	
+	public function editAsset($source, $candidate){
+		
+		$sql = $this->prepareEditSQL($this->assetFields, $source, $candidate);
+		
+		if ($sql[0] != "") {
+			$sql[0] 				= "UPDATE asset SET".$sql[0]." WHERE asset_tag =:asset_tag";
+			$sql[1][':asset_tag'] 	= $source['asset_tag'];
 			
-			if (!$samedescription) {
-				$sql						.= ' description=:description ';
-				$assetarray[':description'] = $description;
-				
-				if (!($samequantity and $sameprice and $samecrtrno and $samepono and $samerelease and $sameexpirydate and $sameremarks)) {
-					$sql .= ',';
-				}
-			}
-			
-			if (!$samequantity) {
-				$sql						.= ' quantity=:quantity ';
-				$assetarray[':quantity'] 	= $quantity;
-				
-				if (!($sameprice and $samecrtrno and $samepono and $samerelease and $sameexpirydate and $sameremarks)) {
-					$sql .= ',';
-				}
-			}
-			
-			if (!$sameprice) {
-				$sql						.= ' price=:price ';
-				$assetarray[':price'] 		= $price;
-				
-				if (!($samecrtrno and $samepono and $samerelease and $sameexpirydate and $sameremarks)) {
-					$sql .= ',';
-				}
-			}
-			
-			if (!$samecrtrno) {
-				$sql						.= ' crtrno=:crtrno ';
-				$assetarray[':crtrno'] 		= $crtrno;
-				
-				if (!($samepono and $samerelease and $sameexpirydate and $sameremarks)) {
-					$sql .= ',';
-				}
-			}
-			
-			if (!$samepono) {
-				$sql						.= ' purchaseorder_id=:pono ';
-				$assetarray[':pono'] 		= $pono;
-				
-				if ($samerelease and $sameexpirydate and $sameremarks) {
-					$sql .= ',';
-				}
-			}
-			
-			if (!$samerelease) {
-				$sql						.= ' release_version=:release_version ';
-				$assetarray[':release_version'] = $release;
-				
-				if (!($sameexpirydate and $sameremarks)) {
-					$sql .= ',';
-				}
-			}
-			
-			if (!$sameexpirydate) {
-				$sql						.= ' expirydate=:expirydate ';
-				$assetarray[':expirydate'] 	= $expirydate;
-				
-				if (!$sameremarks) {
-					$sql .= ',';
-				}
-			}
-			
-			if (!$sameremarks) {
-				$sql						.= ' remarks=:remarks ';
-				$assetarray[':remarks'] 	= $remarks;
-			}
-			
-			$sql 						.= "WHERE asset_tag =:asset_tag";
-			$assetarray[':asset_tag'] 	= $source['asset_tag'];
-			
-			$stmt 						= $this->db->prepare($sql);
-			$stmt->execute($assetarray);
+			$stmt					= $this->db->prepare($sql[0]);
+			$stmt->execute($sql[1]);
 		}
 	}
 	
-	public function editHardware ($source, $assetid, $description, $quantity, $price, $crtrno, $pono, $release, $expirydate, $remarks, $class, $brand, $auditdate, $component, $label, $serial, $location, $status, $replacing) {
+	public function editHardware ($source, $candidate) {
 		
 		//Updates the Asset Table
-		$this->editAsset($source, $assetid, $description, $quantity, $price, $crtrno, $pono, $release, $expirydate, $remarks);
+		$this->editAsset($source, $candidate);
 
-		
-		//Updates the hardware table		
-		$sameclass			= ($source['class'] == $class); 
-		$samebrand			= ($source['brand'] == $brand);
-		$sameauditdate		= ($source['audit_date'] == $auditdate);
-		$samecomponent		= ($source['component'] == $component);
-		$samelabel			= ($source['label'] == $label);
-		$sameserial			= ($source['serial'] == $serial);
-		$samelocation		= ($source['location'] == $location);
-		$samestatus			= ($source['status'] == $status);
-		$samereplacing		= ($source['replacing'] == $replacing);
-		
-		if (!($sameclass and $samebrand and $sameauditdate and $samecomponent and $samelabel and $sameserial and $samelocation and $samestatus and $samereplacing)) {
-			$sql = "UPDATE hardware SET ";
-			$hardwarearr = array();
+		//Updates the Hardware table
 			
-			if (!$sameclass) {
-				$sql						.='class=:class';
-				$hardwarearr[':class']		= $class;
-				
-				if (!($samebrand and $sameauditdate and $samecomponent and $samelabel and $sameserial and $samelocation and $samestatus and $samereplacing)) {
-					$sql					.=',';
-				}
-			}
+		$sql = $this->prepareEditSQL($this->hardwareFields, $source, $candidate);
+		if ($sql[0] != "") {
+			$sql[0] 				= "UPDATE hardware SET".$sql[0]." WHERE asset_tag =:asset_tag";
+			$sql[1][':asset_tag'] 	= $source['asset_tag'];
 			
-			if (!$samebrand) {
-				$sql						.='brand=:brand';
-				$hardwarearr[':brand']		= $brand;
-				
-				if (!($sameauditdate and $samecomponent and $samelabel and $sameserial and $samelocation and $samestatus and $samereplacing)) {
-					$sql					.=',';
-				}
-			}
-			
-			if (!$sameauditdate) {
-				$sql						.='audit_date=:audit_date';
-				$hardwarearr[':audit_date']	= $auditdate;
-				
-				if (!($samecomponent and $samelabel and $sameserial and $samelocation and $samestatus and $samereplacing)) {
-					$sql					.=',';
-				}
-			}
-			
-			if (!$samecomponent) {
-				$sql						.='component=:component';
-				$hardwarearr[':component']	= $component;
-				
-				if (!($samelabel and $sameserial and $samelocation and $samestatus and $samereplacing)) {
-					$sql					.=',';
-				}
-			}
-			
-			if (!$samelabel) {
-				$sql						.='label=:label';
-				$hardwarearr[':label']		= $label;
-				
-				if (!($sameserial and $samelocation and $samestatus and $samereplacing)) {
-					$sql					.=',';
-				}
-			}
-			
-			if (!$sameserial) {
-				$sql						.='serial=:serial';
-				$hardwarearr[':serial']		= $serial;
-				
-				if (!($samelocation and $samestatus and $samereplacing)) {
-					$sql					.=',';
-				}
-			}
-			
-			if (!$samelocation) {
-				$sql						.='location=:location';
-				$hardwarearr[':location']	= $location;
-				
-				if (!($samestatus and $samereplacing)) {
-					$sql					.=',';
-				}
-			}
-			
-			if (!$samestatus) {
-				$sql						.='status=:status';
-				$hardwarearr[':status']		= $status;
-				
-				if (!($samereplacing)) {
-					$sql					.=',';
-				}
-			}
-			
-			if (!$samereplacing) {
-				$sql						.='replacing=:replacing';
-				$hardwarearr[':replacing']	= $replacing;
-			}
-			
-			$sql						.= ' WHERE asset_tag=:asset_tag';
-			$hardwarearr[':asset_tag']	= $source['asset_tag'];
-			
-			$stmt						= $this->db->prepare($sql);
-			$stmt->execute($hardwarearr);
+			$stmt					= $this->db->prepare($sql[0]);
+			$stmt->execute($sql[1]);
 		}
-		if ($source['asset_ID'] == $assetid) {
-			$this->savelog($_SESSION['username'], "edited hardware asset {$source['asset_ID']}");
+	
+		if ($source['asset_ID'] == $candidate['asset_ID']) {
+		$this->savelog($_SESSION['username'], "edited hardware asset {$source['asset_ID']}");
 		}
 		else {
-			$this->savelog($_SESSION['username'], "edited hardware asset {$source['asset_ID']} to {$assetid}");
+			$this->savelog($_SESSION['username'], "edited hardware asset {$source['asset_ID']} to {$candidate['asset_ID']}");
 		}
 	}
 	
-	public function editSoftware ($source, $assetid, $description, $quantity, $price, $crtrno, $pono, $release, $expirydate, $remarks, $vendor, $procure, $shortname, $purpose, $contracttype, $license, $verification) {
+	public function editSoftware ($source, $candidate) {
 		
 		//Updates the Asset Table
-		$this->editAsset($source, $assetid, $description, $quantity, $price, $crtrno, $pono, $release, $expirydate, $remarks);
+		$this->editAsset($source, $candidate);
 
-		
-		//Updates the Software table		
-		$samevendor			= ($source['vendor'] == $vendor); 
-		$sameprocure		= ($source['procured_from'] == $procure);
-		$sameshortname		= ($source['shortname'] == $shortname);
-		$samepurpose		= ($source['purpose'] == $purpose);
-		$samecontracttype	= ($source['contract_type'] == $contracttype);
-		$samelicense		= ($source['license_explanation'] == $license);
-		$sameverification	= ($source['verification'] == $verification);
-		
-		if (!($samevendor and $sameprocure and $sameshortname and $samepurpose and $samecontracttype and $samelicense and $sameverification)) {
-			$sql = "UPDATE software SET ";
-			$hardwarearr = array();
+		//Updates the Software table
 			
-			if (!$samevendor) {
-				$sql						.='vendor=:vendor';
-				$hardwarearr[':vendor']		= $vendor;
-				
-				if (!($sameprocure and $sameshortname and $samepurpose and $samecontracttype and $samelicense and $sameverification)) {
-					$sql					.=',';
-				}
-			}
+		$sql = $this->prepareEditSQL($this->softwareFields, $source, $candidate);
+		if ($sql[0] != "") {
+			$sql[0] 				= "UPDATE software SET".$sql[0]." WHERE asset_tag =:asset_tag";
+			$sql[1][':asset_tag'] 	= $source['asset_tag'];
 			
-			if (!$sameprocure) {
-				$sql						.='procured_from=:procured_from';
-				$hardwarearr[':procured_from']		= $procure;
-				
-				if (!($sameshortname and $samepurpose and $samecontracttype and $samelicense and $sameverification)) {
-					$sql					.=',';
-				}
-			}
-			
-			if (!$sameshortname) {
-				$sql							.='shortname=:shortname';
-				$hardwarearr[':shortname']		= $shortname;
-				
-				if (!($samepurpose and $samecontracttype and $samelicense and $sameverification)) {
-					$sql					.=',';
-				}
-			}
-			
-			if (!$samepurpose) {
-				$sql							.='purpose=:purpose';
-				$hardwarearr[':purpose']		= $purpose;
-				
-				if (!($samecontracttype and $samelicense and $sameverification)) {
-					$sql					.=',';
-				}
-			}
-			
-			if (!$samecontracttype) {
-				$sql							.='contract_type=:contract_type';
-				$hardwarearr[':contract_type']	= $contracttype;
-				
-				if (!($samelicense and $sameverification)) {
-					$sql					.=',';
-				}
-			}
-			
-			if (!$samelicense) {
-				$sql						.='license_explanation=:license_explanation';
-				$hardwarearr[':license_explanation']		= $license;
-				
-				if (!$sameverification) {
-					$sql					.=',';
-				}
-			}
-			
-			if (!$sameverification) {
-				$sql						.='verification=:verification';
-				$hardwarearr[':verification']	= $verification;
-				
-			}
-			
-	
-			
-			$sql						.= ' WHERE asset_tag=:asset_tag';
-			$hardwarearr[':asset_tag']	= $source['asset_tag'];
-
-			$stmt						= $this->db->prepare($sql);
-			$stmt->execute($hardwarearr);
+			$stmt					= $this->db->prepare($sql[0]);
+			$stmt->execute($sql[1]);
 		}
-		
-		if ($source['asset_ID'] == $assetid) {
-			$this->savelog($_SESSION['username'], "edited software asset {$source['asset_ID']}");
+	
+		if ($source['asset_ID'] == $candidate['asset_ID']) {
+		$this->savelog($_SESSION['username'], "edited software asset {$source['asset_ID']}");
 		}
 		else {
 			$this->savelog($_SESSION['username'], "edited software asset {$source['asset_ID']} to {$assetid}");
+		}
+	}
+	
+	
+	public function prepareEditSql($fields, $source, $candidate) {
+		//Prepares the center of the sql statement 
+		foreach($fields as $value) {
+			//Compares if the source and candidate entries are the same
+			$same[$value] = ($source[$value] == $candidate[$value]);
+		}
+		
+		//Ensure that there is at least one different field before iterating
+		if (!$this->allTrue($same)) {
+			$sql 			= "";
+			$fieldArray 	= array();
+			
+			foreach ($fields as $value) {
+				if (!$same[$value]) {
+					//Example: asset_ID=:asset_ID
+					$sql									.= " {$value}=:{$value}";
+					
+					//Example: $fieldArray[":asset_ID", $candidate[":asset_ID"];
+					$fieldArray[":{$value}"]	= 			$candidate[$value];
+					
+					//Remove the field
+					unset($same[$value]);
+					
+					//If there are other fields that are different, add a comma to separate them.
+					if (!$this->allTrue($same)) {
+						$sql 	.= ",";
+					}
+				}
+			}
+			return array($sql, $fieldArray); 
 		}
 	}
 }
