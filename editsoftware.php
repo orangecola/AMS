@@ -106,7 +106,9 @@
 		
 		
 		if ($NoChanges == 0 and $DateError == 0 and $NumberError == 0) {
-			$user->editSoftware($result[1], $candidate);
+			$candidate['version'] = $result[1]['version'] + 1;
+			$candidate['asset_tag'] = $result[1]['asset_tag'];
+			$user->editSoftware($candidate);
 			$result = $user->getSoftware($_GET['id']);
 			$Success = 1;
 		}

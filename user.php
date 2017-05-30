@@ -23,20 +23,7 @@ class USER
           }
 		return true;
 	}
-	
-	public function checkasset($assetID) {
-		//Checks if the asset ID has been taken. True if not taken, false if taken.
-		$stmt = $this->db->prepare("SELECT * FROM asset WHERE asset_ID=:asset_ID");
-		$stmt->bindValue(':asset_ID', $assetID);
-		$stmt->execute();
-		$userRow = $stmt->fetch(PDO::FETCH_ASSOC);
-		if($stmt->rowCount() > 0)
-          {
-             return false;
-          }
-		return true;
-	}
-	
+		
 	public function check_date($date) {
 		$dt = DateTime::createFromFormat("m/d/Y", $date);
 		return $dt !== false && !array_sum($dt->getLastErrors());
@@ -52,48 +39,120 @@ class USER
 		return ($number !== FALSE);
 	}
 	
-	public function addasset($asset_id, $description, $quantity, $price, $crtrno, $pono, $release, $expiry, $remarks) {
-		$stmt = $this->db->prepare("INSERT INTO asset(asset_ID, description, quantity, price, purchaseorder_id, release_version, expirydate, remarks, crtrno) VALUES (:asset_ID, :description, :quantity, :price, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno)");
-		$stmt->bindValue(':asset_ID', $asset_id);
-		$stmt->bindValue(':description', $description);
-		$stmt->bindValue(':quantity', $quantity);
-		$stmt->bindValue(':price', $price);
-		$stmt->bindValue(':purchaseorder_id', $pono);
-		$stmt->bindValue(':release_version', $release);
-		$stmt->bindValue(':expirydate', $expiry);
-		$stmt->bindValue(':remarks', $remarks);
-		$stmt->bindValue(':crtrno', $crtrno);
+	public function addasset($asset) {
+		$stmt = $this->db->prepare("INSERT INTO asset_version(current_version) VALUES (:version)");
+		$stmt->bindValue(':version', $asset['version']);
+		$stmt->execute();
+		
+		$stmt = $this->db->prepare("INSERT INTO asset(asset_tag, asset_ID, description, quantity, price, purchaseorder_id, release_version, expirydate, remarks, crtrno, version) VALUES (LAST_INSERT_ID(), :asset_ID, :description, :quantity, :price, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :version)");
+		$stmt->bindValue(':asset_ID', 			$asset['asset_ID']);
+		$stmt->bindValue(':description', 		$asset['description']);
+		$stmt->bindValue(':quantity', 			$asset['quantity']);
+		$stmt->bindValue(':price', 				$asset['price']);
+		$stmt->bindValue(':purchaseorder_id', 	$asset['purchaseorder_id']);
+		$stmt->bindValue(':release_version', 	$asset['release_version']);
+		$stmt->bindValue(':expirydate', 		$asset['expirydate']);
+		$stmt->bindValue(':remarks', 			$asset['remarks']);
+		$stmt->bindValue(':crtrno', 			$asset['crtrno']);
+		$stmt->bindValue(':version',			$asset['version']);
+		
 		$stmt->execute();
 	}
 	
-	public function addSoftware($asset_id, $vendor, $procure, $shortname, $purpose, $contracttype, $startdate, $license, $verification) {
-		$stmt = $this->db->prepare("INSERT INTO software(asset_tag, vendor, procured_from, shortname, purpose, contract_type, start_date, license_explanation, verification) VALUES (LAST_INSERT_ID(), :vendor, :procured_from, :shortname, :purpose, :contract_type, :start_date, :license_explanation, :verification)");
-		$stmt->bindValue(':vendor', $vendor);
-		$stmt->bindValue(':procured_from', $procure);
-		$stmt->bindValue(':shortname', $shortname);
-		$stmt->bindValue(':purpose', $purpose);
-		$stmt->bindValue(':contract_type', $contracttype);
-		$stmt->bindValue(':start_date', $startdate);
-		$stmt->bindValue(':license_explanation', $license);
-		$stmt->bindValue(':verification', $verification);
+	public function addSoftware($asset) {
+		$this->addAsset($asset);
+		
+		$stmt = $this->db->prepare("INSERT INTO software(asset_tag, vendor, procured_from, shortname, purpose, contract_type, start_date, license_explanation, verification, version) VALUES (LAST_INSERT_ID(), :vendor, :procured_from, :shortname, :purpose, :contract_type, :start_date, :license_explanation, :verification, :version)");
+		$stmt->bindValue(':vendor', 				$asset['vendor']);
+		$stmt->bindValue(':procured_from', 			$asset['procured_from']);
+		$stmt->bindValue(':shortname', 				$asset['shortname']);
+		$stmt->bindValue(':purpose', 				$asset['purpose']);
+		$stmt->bindValue(':contract_type', 			$asset['contract_type']);
+		$stmt->bindValue(':start_date', 			$asset['start_date']);
+		$stmt->bindValue(':license_explanation', 	$asset['license_explanation']);
+		$stmt->bindValue(':verification', 			$asset['verification']);
+		$stmt->bindValue(':version',				$asset['version']);
 		$stmt->execute();
-		$this->savelog($_SESSION['username'], "created software asset ".$asset_id);
+		$this->savelog($_SESSION['username'], "created software asset ".$asset['asset_ID']." version ".$asset['version']);
 	}
 	
-	public function addHardware($asset_id, $class, $brand, $auditdate, $component, $label, $serial, $location, $status, $replacing) {
-		$stmt = $this->db->prepare("INSERT INTO hardware(asset_tag, class, brand, audit_date, component, label, serial, location, status, replacing) VALUES (LAST_INSERT_ID(), :class, :brand, :audit_date, :component, :label, :serial, :location, :status, :replacing)");
-		$stmt->bindValue(':class', $class);
-		$stmt->bindValue(':brand', $brand);
-		$stmt->bindValue(':audit_date', $auditdate);
-		$stmt->bindValue(':component', $component);
-		$stmt->bindValue(':label', $label);
-		$stmt->bindValue(':serial', $serial);
-		$stmt->bindValue(':location', $location);
-		$stmt->bindValue(':status', $status);
-		$stmt->bindValue(':replacing', $replacing);
+	public function addHardware($asset) {
+		$this->addAsset($asset);
+		
+		$stmt = $this->db->prepare("INSERT INTO hardware(asset_tag, class, brand, audit_date, component, label, serial, location, status, replacing, version) VALUES (LAST_INSERT_ID(), :class, :brand, :audit_date, :component, :label, :serial, :location, :status, :replacing, :version)");
+		$stmt->bindValue(':class', 		$asset['class']);
+		$stmt->bindValue(':brand', 		$asset['brand']);
+		$stmt->bindValue(':audit_date', $asset['audit_date']);
+		$stmt->bindValue(':component', 	$asset['component']);
+		$stmt->bindValue(':label', 		$asset['label']);
+		$stmt->bindValue(':serial', 	$asset['serial']);
+		$stmt->bindValue(':location', 	$asset['location']);
+		$stmt->bindValue(':status', 	$asset['status']);
+		$stmt->bindValue(':replacing', 	$asset['replacing']);
+		$stmt->bindValue(':version',	$asset['version']);
 		$stmt->execute();
-		$this->savelog($_SESSION['username'], "created hardware asset ".$asset_id);
+		$this->savelog($_SESSION['username'], "created hardware asset ".$asset['asset_ID']." version ".$asset['version']);
 	}
+	
+	public function editasset($asset) {
+		$stmt = $this->db->prepare("INSERT INTO asset(asset_tag, asset_ID, description, quantity, price, purchaseorder_id, release_version, expirydate, remarks, crtrno, version) VALUES (:asset_tag, :asset_ID, :description, :quantity, :price, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :version)");
+		$stmt->bindValue(':asset_tag',			$asset['asset_tag']);
+		$stmt->bindValue(':asset_ID', 			$asset['asset_ID']);
+		$stmt->bindValue(':description', 		$asset['description']);
+		$stmt->bindValue(':quantity', 			$asset['quantity']);
+		$stmt->bindValue(':price', 				$asset['price']);
+		$stmt->bindValue(':purchaseorder_id', 	$asset['purchaseorder_id']);
+		$stmt->bindValue(':release_version', 	$asset['release_version']);
+		$stmt->bindValue(':expirydate', 		$asset['expirydate']);
+		$stmt->bindValue(':remarks', 			$asset['remarks']);
+		$stmt->bindValue(':crtrno', 			$asset['crtrno']);
+		$stmt->bindValue(':version',			$asset['version']);
+		
+		$stmt->execute();
+		
+		$stmt = $this->db->prepare("UPDATE asset_version SET current_version=:version where asset_tag=:asset_tag");
+		$stmt->bindValue(':asset_tag', $asset['asset_tag']);
+		$stmt->bindValue(':version', $asset['version']);
+		$stmt->execute();
+	}
+	
+	public function editSoftware($asset) {
+		$this->editAsset($asset);
+		
+		$stmt = $this->db->prepare("INSERT INTO software(asset_tag, vendor, procured_from, shortname, purpose, contract_type, start_date, license_explanation, verification, version) VALUES (:asset_tag, :vendor, :procured_from, :shortname, :purpose, :contract_type, :start_date, :license_explanation, :verification, :version)");
+		$stmt->bindValue(':asset_tag',	$asset['asset_tag']);
+		$stmt->bindValue(':vendor', 				$asset['vendor']);
+		$stmt->bindValue(':procured_from', 			$asset['procured_from']);
+		$stmt->bindValue(':shortname', 				$asset['shortname']);
+		$stmt->bindValue(':purpose', 				$asset['purpose']);
+		$stmt->bindValue(':contract_type', 			$asset['contract_type']);
+		$stmt->bindValue(':start_date', 			$asset['start_date']);
+		$stmt->bindValue(':license_explanation', 	$asset['license_explanation']);
+		$stmt->bindValue(':verification', 			$asset['verification']);
+		$stmt->bindValue(':version',				$asset['version']);
+		$stmt->execute();
+		$this->savelog($_SESSION['username'], "edited software asset ".$asset['asset_ID']." (version ".$asset['version'].")");
+	}
+	
+	public function editHardware($asset) {
+		$this->editAsset($asset);
+		
+		$stmt = $this->db->prepare("INSERT INTO hardware(asset_tag, class, brand, audit_date, component, label, serial, location, status, replacing, version) VALUES (:asset_tag, :class, :brand, :audit_date, :component, :label, :serial, :location, :status, :replacing, :version)");
+		$stmt->bindValue(':asset_tag',	$asset['asset_tag']);
+		$stmt->bindValue(':class', 		$asset['class']);
+		$stmt->bindValue(':brand', 		$asset['brand']);
+		$stmt->bindValue(':audit_date', $asset['audit_date']);
+		$stmt->bindValue(':component', 	$asset['component']);
+		$stmt->bindValue(':label', 		$asset['label']);
+		$stmt->bindValue(':serial', 	$asset['serial']);
+		$stmt->bindValue(':location', 	$asset['location']);
+		$stmt->bindValue(':status', 	$asset['status']);
+		$stmt->bindValue(':replacing', 	$asset['replacing']);
+		$stmt->bindValue(':version',	$asset['version']);
+		$stmt->execute();
+		$this->savelog($_SESSION['username'], "edited hardware asset ".$asset['asset_ID']." (version ".$asset['version'].")");
+	}
+	
 	public function savelog($user, $log) {
 		//Logs an action
 		
@@ -105,24 +164,29 @@ class USER
 		$stmt->bindValue(':log', $log);
 		$stmt->execute();
 	}
-	
-	public function getAssets() {
-		//Gets all of the asset details
-		$stmt = $this->db->prepare("SELECT * FROM asset");
-		$stmt->execute();
-		return $stmt->fetchAll();
-	}
-	
+		
 	public function getSoftwareList() {
 		//Gets all of the software details
-		$stmt = $this->db->prepare("SELECT * FROM asset INNER JOIN software WHERE asset.asset_tag=software.asset_tag");
+		$stmt = $this->db->prepare("SELECT 	asset.*, software.*
+			FROM asset_version INNER JOIN software, asset 
+			WHERE 
+            asset_version.asset_tag = software.asset_tag AND
+            asset_version.asset_tag = asset.asset_tag AND
+            asset_version.current_version = asset.version AND
+            asset_version.current_version = software.version");
 		$stmt->execute();
 		return $stmt->fetchAll();
 	}
 	
 	public function getHardwareList() {
-		//Gets all of the software details
-		$stmt = $this->db->prepare("SELECT * FROM asset INNER JOIN hardware where asset.asset_tag=hardware.asset_tag");
+		//Gets all of the hardware details
+		$stmt = $this->db->prepare("SELECT 	asset.*, hardware.*
+			FROM asset_version INNER JOIN hardware, asset 
+			WHERE 
+            asset_version.asset_tag = hardware.asset_tag AND
+            asset_version.asset_tag = asset.asset_tag AND
+            asset_version.current_version = asset.version AND
+            asset_version.current_version = hardware.version");
 		$stmt->execute();
 		return $stmt->fetchAll();
 	}
@@ -260,7 +324,14 @@ class USER
 		//[0]: Result of retrieving. True if successful, False if failed
 		//[1]: Array of user information
 		$result = array(false, false);
-		$stmt = $this->db->prepare("SELECT * from asset INNER JOIN software where software.asset_tag=asset.asset_tag AND software.asset_tag=:asset_tag");
+		$stmt = $this->db->prepare("SELECT 	asset.*, software.*
+			FROM asset_version INNER JOIN software, asset 
+			WHERE 
+            asset_version.asset_tag = :asset_tag AND
+            asset_version.asset_tag = software.asset_tag AND
+            asset_version.asset_tag = asset.asset_tag AND
+            asset_version.current_version = asset.version AND
+            asset_version.current_version = software.version");
 		$stmt->bindValue(':asset_tag', $asset_tag);
 		$stmt->execute();
 		if ($stmt->rowCount() == 1) {
@@ -277,7 +348,14 @@ class USER
 		//[0]: Result of retrieving. True if successful, False if failed
 		//[1]: Array of user information
 		$result = array(false, false);
-		$stmt = $this->db->prepare("SELECT * from asset INNER JOIN hardware where hardware.asset_tag=asset.asset_tag AND hardware.asset_tag=:asset_tag");
+		$stmt = $this->db->prepare("SELECT 	asset.*, hardware.*
+			FROM asset_version INNER JOIN hardware, asset 
+			WHERE 
+            asset_version.asset_tag = :asset_tag AND
+            asset_version.asset_tag = hardware.asset_tag AND
+            asset_version.asset_tag = asset.asset_tag AND
+            asset_version.current_version = asset.version AND
+            asset_version.current_version = hardware.version");
 		$stmt->bindValue(':asset_tag', $asset_tag);
 		$stmt->execute();
 		if ($stmt->rowCount() == 1) {
@@ -322,67 +400,6 @@ class USER
 		}
 		
 		return $result;
-	}
-	
-	public function editAsset($source, $candidate){
-		
-		$sql = $this->prepareEditSQL($this->assetFields, $source, $candidate);
-		
-		if ($sql[0] != "") {
-			$sql[0] 				= "UPDATE asset SET".$sql[0]." WHERE asset_tag =:asset_tag";
-			$sql[1][':asset_tag'] 	= $source['asset_tag'];
-			
-			$stmt					= $this->db->prepare($sql[0]);
-			$stmt->execute($sql[1]);
-		}
-	}
-	
-	public function editHardware ($source, $candidate) {
-		
-		//Updates the Asset Table
-		$this->editAsset($source, $candidate);
-
-		//Updates the Hardware table
-			
-		$sql = $this->prepareEditSQL($this->hardwareFields, $source, $candidate);
-		if ($sql[0] != "") {
-			$sql[0] 				= "UPDATE hardware SET".$sql[0]." WHERE asset_tag =:asset_tag";
-			$sql[1][':asset_tag'] 	= $source['asset_tag'];
-			
-			$stmt					= $this->db->prepare($sql[0]);
-			$stmt->execute($sql[1]);
-		}
-	
-		if ($source['asset_ID'] == $candidate['asset_ID']) {
-		$this->savelog($_SESSION['username'], "edited hardware asset {$source['asset_ID']}");
-		}
-		else {
-			$this->savelog($_SESSION['username'], "edited hardware asset {$source['asset_ID']} to {$candidate['asset_ID']}");
-		}
-	}
-	
-	public function editSoftware ($source, $candidate) {
-		
-		//Updates the Asset Table
-		$this->editAsset($source, $candidate);
-
-		//Updates the Software table
-			
-		$sql = $this->prepareEditSQL($this->softwareFields, $source, $candidate);
-		if ($sql[0] != "") {
-			$sql[0] 				= "UPDATE software SET".$sql[0]." WHERE asset_tag =:asset_tag";
-			$sql[1][':asset_tag'] 	= $source['asset_tag'];
-			
-			$stmt					= $this->db->prepare($sql[0]);
-			$stmt->execute($sql[1]);
-		}
-	
-		if ($source['asset_ID'] == $candidate['asset_ID']) {
-		$this->savelog($_SESSION['username'], "edited software asset {$source['asset_ID']}");
-		}
-		else {
-			$this->savelog($_SESSION['username'], "edited software asset {$source['asset_ID']} to {$assetid}");
-		}
 	}
 	
 	

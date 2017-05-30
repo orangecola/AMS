@@ -40,57 +40,60 @@
 	
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		
-		$asset_id 		= trim($_POST['assetid']);
-		$description 	= trim($_POST['description']);
-		$quantity 		= trim($_POST['quantity']);
-		$price 			= trim($_POST['price']);
-		$crtrno 		= trim($_POST['crtrno']);
-		$pono 			= trim($_POST['pono']);
-		$release 		= trim($_POST['release']);
-		$expiry 		= trim($_POST['expirydate']);
-		$remarks 		= trim($_POST['remarks']);
+		$asset['asset_ID'] 			= trim($_POST['assetid']);
+		$asset['description'] 		= trim($_POST['description']);
+		$asset['quantity'] 			= trim($_POST['quantity']);
+		$asset['price']				= trim($_POST['price']);
+		$asset['purchaseorder_id'] 	= trim($_POST['pono']);
+		$asset['release_version']	= trim($_POST['release']);
+		$asset['expirydate']		= trim($_POST['expirydate']);
+		$asset['remarks']			= trim($_POST['remarks']);
+		$asset['crtrno']	 		= trim($_POST['crtrno']);
+		$asset['version']			= 1;
 		
-		if (isset($_POST['software'])) {
-			$vendor 		= trim($_POST['vendor']);
-			$procure 		= trim($_POST['procure']);
-			$shortname 		= trim($_POST['shortname']);
-			$purpose 		= trim($_POST['purpose']);
-			$contracttype 	= trim($_POST['contracttype']);
-			$startdate 		= trim($_POST['startdate']);
-			$license 		= trim($_POST['license']);
-			$verification 	= trim($_POST['verification']);
+		if (isset($_POST['software']) and isset($_POST['hardware'])) {
+			$AssetError = 1;
+		}
+		
+		else if (isset($_POST['software'])) {
+			$asset['vendor'] 				= trim($_POST['vendor']);
+			$asset['procured_from']			= trim($_POST['procure']);
+			$asset['shortname']				= trim($_POST['shortname']);
+			$asset['purpose'] 				= trim($_POST['purpose']);
+			$asset['contract_type']			= trim($_POST['contracttype']);
+			$asset['start_date']			= trim($_POST['startdate']);
+			$asset['license_explanation']	= trim($_POST['license']);
+			$asset['verification'] 			= trim($_POST['verification']);
 			
-			if (!($user->check_date($startdate))) {
+			if (!($user->check_date($asset['start_date']))) {
 				$DateError = 1;
 			}
 		}
 		
 		
-		if (isset($_POST['hardware'])) {
-			$class 			= trim($_POST['class']);
-			$brand 			= trim($_POST['brand']);
-			$auditdate 		= trim($_POST['auditdate']);
-			$component 		= trim($_POST['component']);
-			$label 			= trim($_POST['label']);
-			$serial 		= trim($_POST['serial']);
-			$location 		= trim($_POST['location']);
-			$status 		= trim($_POST['status']);
-			$replacing 		= trim($_POST['replacing']);
+		else if (isset($_POST['hardware'])) {
+			$asset['class'] 		= trim($_POST['class']);
+			$asset['brand']			= trim($_POST['brand']);
+			$asset['audit_date'] 	= trim($_POST['auditdate']);
+			$asset['component']		= trim($_POST['component']);
+			$asset['label']			= trim($_POST['label']);
+			$asset['serial'] 		= trim($_POST['serial']);
+			$asset['location'] 		= trim($_POST['location']);
+			$asset['status'] 		= trim($_POST['status']);
+			$asset['replacing']		= trim($_POST['replacing']);
 		}
 		
 		
-		if (!($user->check_date($expiry))) {
+		if (!($user->check_date($asset['expirydate']))) {
 				$DateError = 1;
 		}
 		
 		if ($DateError == 0 and $AssetError == 0) {
-			$user->addasset($asset_id, $description, $quantity, $price, $crtrno, $pono, $release, $expiry, $remarks);
-			
 			if (isset($_POST['software'])) {
-				$user->addSoftware($asset_id, $vendor, $procure, $shortname, $purpose, $contracttype, $startdate, $license, $verification);
+				$user->addSoftware($asset);
 			}
 			else if (isset($_POST['hardware'])) {
-				$user->addHardware($asset_id, $class, $brand, $auditdate, $component, $label, $serial, $location, $status, $replacing);
+				$user->addHardware($asset);
 			}
 			$Success = 1;
 		}

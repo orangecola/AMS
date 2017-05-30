@@ -83,10 +83,10 @@
 						<?php 
 							foreach($result as $row) {
 								echo '<tr>';
-								echo "<td>{$row['username']}</td>";
-								echo "<td>{$row['role']}</td>";
-								echo "<td>{$row['status']}</td>";
-								echo "<td><a href=\"edituser.php?id={$row['user_ID']}\" class=\"btn btn-info btn-xs\"><i class='fa fa-edit'></i>Edit</a></td>";
+								echo "<td>".htmlentities($row['username'])	."</td>";
+								echo "<td>".htmlentities($row['role'])		."</td>";
+								echo "<td>".htmlentities($row['status'])	."</td>";
+								echo "<td><a href=\"edituser.php?id=".htmlentities($row['user_ID'])."\" class=\"btn btn-info btn-xs\"><i class='fa fa-edit'></i>Edit</a></td>";
 								echo '</tr>';
 							}
 						?>

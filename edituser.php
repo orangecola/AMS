@@ -117,7 +117,7 @@
               <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel">
                   <div class="x_title">
-                    <h2>Editing User <?php echo $result[1]['username'];?></h2>
+                    <h2>Editing User <?php echo htmlentities($result[1]['username']);?></h2>
                     
                     <div class="clearfix"></div>
                   </div>
@@ -194,9 +194,9 @@
             </div>
 
 		<script>
-			document.getElementById("username").setAttribute("value", "<?php echo $result[1]['username'];?>");
-			document.getElementById("<?php echo $result[1]['role'];?>").setAttribute("selected", "selected");
-			document.getElementById("<?php echo $result[1]['status'];?>").setAttribute("selected", "selected");
+			document.getElementById("username").setAttribute("value", <?php echo json_encode($result[1]['username']);?>);
+			document.getElementById(<?php echo json_encode($result[1]['role']);?>).setAttribute("selected", "selected");
+			document.getElementById(<?php echo json_encode($result[1]['status']);?>).setAttribute("selected", "selected");
 		</script>
         <!-- /page content -->
 

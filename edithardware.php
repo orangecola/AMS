@@ -105,7 +105,9 @@
 		}
 		
 		if (!$same and $DateError == 0 and $NumberError == 0) {
-			$user->editHardware($result[1], $candidate);
+			$candidate['version'] = $result[1]['version'] + 1;
+			$candidate['asset_tag'] = $result[1]['asset_tag'];
+			$user->editHardware($candidate);
 			$result = $user->getHardware($_GET['id']);
 			$Success = 1;
 		}
