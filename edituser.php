@@ -59,7 +59,7 @@
 	
 		
 		$candidate['username'] 	= trim($_POST['username']);
-		$candidate['password'] 	= trim($_POST['password']);
+		$candidate['password'] 	= password_hash(trim($_POST['password']), PASSWORD_DEFAULT);
 		$candidate['role'] 		= trim($_POST['role']);
 		$candidate['status']	= trim($_POST['status']);
 		
@@ -157,13 +157,13 @@
                         </div>
                       </div>
                       <div class="item form-group">
-                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">Confirm Password <span class="required">*</span></label>
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Confirm Password <span class="required">*</span></label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <input id="password2" class="form-control col-md-7 col-xs-12 optional" type="password" data-validate-linked="password">
                         </div>
                       </div>
 					  <div class="item form-group">
-                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">User Role<span class="required">*</span></label>
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">User Role<span class="required">*</span></label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <select class="form-control" name="role">
                             <option id="user" value="user">User</option>
@@ -172,7 +172,7 @@
                         </div>
                       </div>
 					  <div class="item form-group">
-                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">Status<span class="required">*</span></label>
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Status<span class="required">*</span></label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <select class="form-control" name="status">
                             <option id="active" value="active">Active</option>

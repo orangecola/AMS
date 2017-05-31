@@ -21,6 +21,7 @@
 			  <li><a><i class="fa fa-home"></i> Asset Management <span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu">
 				  <li id="addassets.php"><a href="addasset.php">Add Assets</a></li>
+                  <li id="bulkaddasset.php"><a href="bulkaddasset.php">Bulk Asset Import</a></li>
 				  <li id="assetlist.php"><a href="assetlist.php">Edit/Delete Assets</a></li>
 				</ul>
 			  </li>
@@ -40,7 +41,9 @@
 			  <li><a><i class="fa fa-users"></i>User Management <span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu">
 				  <?php if ($_SESSION['role'] == 'admin') {echo '<li id="adduser.php"><a href="adduser.php">Add User</a></li>' ;} ?>
+                  <?php if ($_SESSION['role'] == 'admin') {echo '<li id="bulkadduser.php"><a href="bulkadduser.php">Bulk Add Users</a></li>' ;} ?>
 				  <?php if ($_SESSION['role'] == 'admin') {echo '<li id="userlist.php"><a href="userlist.php">Edit User</a></li>' ;} ?>
+
 				  <li id="changepassword.php"><a href="changepassword.php">Change Password</a></li>
 				</ul>
 			  </li>

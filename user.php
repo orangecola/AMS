@@ -214,6 +214,29 @@ class USER
            echo $e->getMessage();
        }    
     }
+    
+    public function addBulkUsers($array) {
+        $username = "";
+        $password = "";
+        $role = "";
+        $status = "";
+        
+        $stmt = $this->db->prepare("INSERT INTO user(username,password,role,status) VALUES(:username, :password, :role, :status)");
+        $stmt->bindparam(":username", $username);
+        $stmt->bindparam(":password", $password);
+        $stmt->bindparam(":role", $role);
+        $stmt->bindparam(":status", $status);
+        
+        foreach($array as $row) {
+            if ($this->check($row[0])) {
+                $username = $row[0];
+                $password = password_hash($row[1], PASSWORD_DEFAULT);
+                $role = $row[2];
+                $status = $row[3];
+                $stmt->execute();
+            }
+        }
+    }
  
     public function login($username,$password)
 	//Checks the username / password combination for logging in. 
