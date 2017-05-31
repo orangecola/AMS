@@ -23,6 +23,7 @@
 				  <li id="addassets.php"><a href="addasset.php">Add Assets</a></li>
                   <li id="bulkaddasset.php"><a href="bulkaddasset.php">Bulk Asset Import</a></li>
 				  <li id="assetlist.php"><a href="assetlist.php">Edit/Delete Assets</a></li>
+                  <?php if ($_SESSION['role'] == 'admin') {echo '<li id="adminassetlist.php"><a href="adminassetlist.php">Admin version list</a></li>' ;} ?>
 				</ul>
 			  </li>
 			  <li><a><i class="fa fa-paper-plane-o"></i> Notifications<span class="fa fa-chevron-down"></span></a>

@@ -364,6 +364,28 @@ class USER
 		return $result;
 	}
 	
+    public function getSoftwareVersions($asset_tag) {
+        //Get the details of an asset with asset_ID=$asset_ID
+		//Return format
+		//Array: {true/false, array of user information}
+		//[0]: Result of retrieving. True if successful, False if failed
+		//[1]: Array of user information
+		$result = array(false, false);
+		$stmt = $this->db->prepare("SELECT 	asset.*, software.*
+			FROM asset_version INNER JOIN software, asset 
+			WHERE 
+            asset_version.asset_tag = :asset_tag AND
+            asset_version.asset_tag = software.asset_tag AND
+            asset_version.asset_tag = asset.asset_tag AND
+            software.version = asset.version");
+		$stmt->bindValue(':asset_tag', $asset_tag);
+		$stmt->execute();
+		if ($stmt->rowCount() > 1) {
+			$result[0] = true;
+			$result[1] = $stmt->fetchAll();
+		}
+		return $result;
+    }
 	public function getHardware($asset_tag) {
 		//Get the details of an asset with asset_ID=$asset_ID
 		//Return format
@@ -377,17 +399,39 @@ class USER
             asset_version.asset_tag = :asset_tag AND
             asset_version.asset_tag = hardware.asset_tag AND
             asset_version.asset_tag = asset.asset_tag AND
-            asset_version.current_version = asset.version AND
             asset_version.current_version = hardware.version");
 		$stmt->bindValue(':asset_tag', $asset_tag);
 		$stmt->execute();
-		if ($stmt->rowCount() == 1) {
+		if ($stmt->rowCount() >= 1) {
 			$result[0] = true;
 			$result[1] = $stmt->fetch();
 		}
 		return $result;
 	}
 	
+    public function getHardwareVersions($asset_tag) {
+		//Get the details of an asset with asset_ID=$asset_ID
+		//Return format
+		//Array: {true/false, array of user information}
+		//[0]: Result of retrieving. True if successful, False if failed
+		//[1]: Array of user information
+		$result = array(false, false);
+		$stmt = $this->db->prepare("SELECT 	asset.*, hardware.*
+			FROM asset_version INNER JOIN hardware, asset 
+			WHERE 
+            asset_version.asset_tag = :asset_tag AND
+            asset_version.asset_tag = hardware.asset_tag AND
+            asset_version.asset_tag = asset.asset_tag AND
+            asset.version = hardware.version");
+		$stmt->bindValue(':asset_tag', $asset_tag);
+		$stmt->execute();
+		if ($stmt->rowCount() >= 1) {
+			$result[0] = true;
+			$result[1] = $stmt->fetchAll();
+		}
+		return $result;
+	}
+    
 	public function editUser($source, $candidate) {
 		//Updates the user based on the infomration provided
 		//There must be at least one item changed 
