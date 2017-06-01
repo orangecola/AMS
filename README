@@ -1,8 +1,7 @@
 IMPLEMENTING
-Versioning
-	addAsset
-	editAsset
-	viewAsset
+Report generation
+	Asset Expiry
+	Cost of a CR / TR / PO
 	
 FEATURE REQUESTS
 
@@ -10,12 +9,7 @@ Phrase 1
 Locking system
 Locking down of inputs
 	Admin panel to Way to modify
-Importing data into the system
-Renewal
 Notifications
-Report generation
-	Asset Expiry
-	Cost of a CR / TR / PO
 Renewal/ Decomissioning
 	
 	

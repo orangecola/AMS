@@ -2,10 +2,10 @@
 class USER
 {
     private $db;
-	public $softwareFields = array('vendor', 'procured_from', 'shortname', 'purpose', 'contract_type', 'start_date', 'license_explanation', 'verification');
-	public $assetFields = array('asset_ID', 'description', 'quantity', 'price', 'crtrno', 'purchaseorder_id', 'release_version', 'expirydate', 'remarks');
-	public $hardwareFields = array('class', 'brand', 'audit_date', 'component', 'label', 'serial', 'location', 'status', 'replacing'); 
-	public $userFields = array('username', 'password', 'role', 'status');
+	public $softwareFields 		= array('vendor', 'procured_from', 'shortname', 'purpose', 'contract_type', 'start_date', 'license_explanation', 'verification');
+	public $assetFields 		= array('asset_ID', 'description', 'quantity', 'price', 'crtrno', 'purchaseorder_id', 'release_version', 'expirydate', 'remarks');
+	public $hardwareFields 		= array('class', 'brand', 'audit_date', 'component', 'label', 'serial', 'location', 'status', 'replacing'); 
+	public $userFields 			= array('username', 'password', 'role', 'status');
     function __construct($DB_con)
     {
       $this->db = $DB_con;
@@ -14,7 +14,7 @@ class USER
 	public function check($username) {
 		//Checks if the username that has been taken. True if not taken, false if taken.
 		$stmt = $this->db->prepare("SELECT * FROM user WHERE username=:username");
-		$stmt->bindValue(':username', $username);
+		$stmt->bindParam(':username', $username);
 		$stmt->execute();
 		$userRow = $stmt->fetch(PDO::FETCH_ASSOC);
 		if($stmt->rowCount() > 0)
@@ -41,20 +41,20 @@ class USER
 	
 	public function addasset($asset) {
 		$stmt = $this->db->prepare("INSERT INTO asset_version(current_version) VALUES (:version)");
-		$stmt->bindValue(':version', $asset['version']);
+		$stmt->bindParam(':version', $asset['version']);
 		$stmt->execute();
 		
 		$stmt = $this->db->prepare("INSERT INTO asset(asset_tag, asset_ID, description, quantity, price, purchaseorder_id, release_version, expirydate, remarks, crtrno, version) VALUES (LAST_INSERT_ID(), :asset_ID, :description, :quantity, :price, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :version)");
-		$stmt->bindValue(':asset_ID', 			$asset['asset_ID']);
-		$stmt->bindValue(':description', 		$asset['description']);
-		$stmt->bindValue(':quantity', 			$asset['quantity']);
-		$stmt->bindValue(':price', 				$asset['price']);
-		$stmt->bindValue(':purchaseorder_id', 	$asset['purchaseorder_id']);
-		$stmt->bindValue(':release_version', 	$asset['release_version']);
-		$stmt->bindValue(':expirydate', 		$asset['expirydate']);
-		$stmt->bindValue(':remarks', 			$asset['remarks']);
-		$stmt->bindValue(':crtrno', 			$asset['crtrno']);
-		$stmt->bindValue(':version',			$asset['version']);
+		$stmt->bindParam(':asset_ID', 			$asset['asset_ID']);
+		$stmt->bindParam(':description', 		$asset['description']);
+		$stmt->bindParam(':quantity', 			$asset['quantity']);
+		$stmt->bindParam(':price', 				$asset['price']);
+		$stmt->bindParam(':purchaseorder_id', 	$asset['purchaseorder_id']);
+		$stmt->bindParam(':release_version', 	$asset['release_version']);
+		$stmt->bindParam(':expirydate', 		$asset['expirydate']);
+		$stmt->bindParam(':remarks', 			$asset['remarks']);
+		$stmt->bindParam(':crtrno', 			$asset['crtrno']);
+		$stmt->bindParam(':version',			$asset['version']);
 		
 		$stmt->execute();
 	}
@@ -63,15 +63,15 @@ class USER
 		$this->addAsset($asset);
 		
 		$stmt = $this->db->prepare("INSERT INTO software(asset_tag, vendor, procured_from, shortname, purpose, contract_type, start_date, license_explanation, verification, version) VALUES (LAST_INSERT_ID(), :vendor, :procured_from, :shortname, :purpose, :contract_type, :start_date, :license_explanation, :verification, :version)");
-		$stmt->bindValue(':vendor', 				$asset['vendor']);
-		$stmt->bindValue(':procured_from', 			$asset['procured_from']);
-		$stmt->bindValue(':shortname', 				$asset['shortname']);
-		$stmt->bindValue(':purpose', 				$asset['purpose']);
-		$stmt->bindValue(':contract_type', 			$asset['contract_type']);
-		$stmt->bindValue(':start_date', 			$asset['start_date']);
-		$stmt->bindValue(':license_explanation', 	$asset['license_explanation']);
-		$stmt->bindValue(':verification', 			$asset['verification']);
-		$stmt->bindValue(':version',				$asset['version']);
+		$stmt->bindParam(':vendor', 				$asset['vendor']);
+		$stmt->bindParam(':procured_from', 			$asset['procured_from']);
+		$stmt->bindParam(':shortname', 				$asset['shortname']);
+		$stmt->bindParam(':purpose', 				$asset['purpose']);
+		$stmt->bindParam(':contract_type', 			$asset['contract_type']);
+		$stmt->bindParam(':start_date', 			$asset['start_date']);
+		$stmt->bindParam(':license_explanation', 	$asset['license_explanation']);
+		$stmt->bindParam(':verification', 			$asset['verification']);
+		$stmt->bindParam(':version',				$asset['version']);
 		$stmt->execute();
 		$this->savelog($_SESSION['username'], "created software asset ".$asset['asset_ID']." version ".$asset['version']);
 	}
@@ -80,39 +80,241 @@ class USER
 		$this->addAsset($asset);
 		
 		$stmt = $this->db->prepare("INSERT INTO hardware(asset_tag, class, brand, audit_date, component, label, serial, location, status, replacing, version) VALUES (LAST_INSERT_ID(), :class, :brand, :audit_date, :component, :label, :serial, :location, :status, :replacing, :version)");
-		$stmt->bindValue(':class', 		$asset['class']);
-		$stmt->bindValue(':brand', 		$asset['brand']);
-		$stmt->bindValue(':audit_date', $asset['audit_date']);
-		$stmt->bindValue(':component', 	$asset['component']);
-		$stmt->bindValue(':label', 		$asset['label']);
-		$stmt->bindValue(':serial', 	$asset['serial']);
-		$stmt->bindValue(':location', 	$asset['location']);
-		$stmt->bindValue(':status', 	$asset['status']);
-		$stmt->bindValue(':replacing', 	$asset['replacing']);
-		$stmt->bindValue(':version',	$asset['version']);
+		$stmt->bindParam(':class', 		$asset['class']);
+		$stmt->bindParam(':brand', 		$asset['brand']);
+		$stmt->bindParam(':audit_date', $asset['audit_date']);
+		$stmt->bindParam(':component', 	$asset['component']);
+		$stmt->bindParam(':label', 		$asset['label']);
+		$stmt->bindParam(':serial', 	$asset['serial']);
+		$stmt->bindParam(':location', 	$asset['location']);
+		$stmt->bindParam(':status', 	$asset['status']);
+		$stmt->bindParam(':replacing', 	$asset['replacing']);
+		$stmt->bindParam(':version',	$asset['version']);
 		$stmt->execute();
 		$this->savelog($_SESSION['username'], "created hardware asset ".$asset['asset_ID']." version ".$asset['version']);
 	}
 	
+	public function bulkaddhardware($data) {
+		$assetv 	= $this->db->prepare("INSERT INTO asset_version(current_version) VALUES (:version)");
+		$assets		= $this->db->prepare("INSERT INTO asset(asset_tag, asset_ID, description, quantity, price, purchaseorder_id, release_version, expirydate, remarks, crtrno, version) VALUES (LAST_INSERT_ID(), :asset_ID, :description, :quantity, :price, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :version)");
+		$hardware	= $this->db->prepare("INSERT INTO hardware(asset_tag, class, brand, audit_date, component, label, serial, location, status, replacing, version) VALUES (LAST_INSERT_ID(), :class, :brand, :audit_date, :component, :label, :serial, :location, :status, :replacing, :version)");
+		
+			
+		
+		$asset_ID = $description = $quantity = $price = $purchaseorder_id = $release_version = $expirydate = $remarks = $crtrno = "";
+		
+		$class = $brand = $audit_date = $component = $label = $serial = $location = $status = $replacing = "";
+		
+		$assetv->bindValue(':version', 1);
+		
+		$assets->bindParam(':asset_ID', 			$asset_ID);
+		$assets->bindParam(':description', 			$description);
+		$assets->bindParam(':quantity', 			$quantity);
+		$assets->bindParam(':price', 				$price);
+		$assets->bindParam(':purchaseorder_id', 	$purchaseorder_id);
+		$assets->bindParam(':release_version', 		$release_version);
+		$assets->bindParam(':expirydate', 			$expirydate);
+		$assets->bindParam(':remarks', 				$remarks);
+		$assets->bindParam(':crtrno', 				$crtrno);
+		$assets->bindValue(':version',				1);
+		
+		$hardware->bindParam(':class', 				$class);
+		$hardware->bindParam(':brand', 				$brand);
+		$hardware->bindParam(':audit_date', 		$audit_date);
+		$hardware->bindParam(':component', 			$component);
+		$hardware->bindParam(':label', 				$label);
+		$hardware->bindParam(':serial', 			$serial);
+		$hardware->bindParam(':location', 			$location);
+		$hardware->bindParam(':status', 			$status);
+		$hardware->bindParam(':replacing', 			$replacing);
+		$hardware->bindValue(':version',			1);
+		
+		foreach($data as $row) {
+			
+			if(isset($row['Unique Asset ID'])) {
+				$asset_ID = $row['Unique Asset ID'];
+			}
+			if(isset($row['Details'])) {
+				$description = $row['Details'];
+			}
+			if(isset($row['Qty'])) {
+				$quantity = $row['Qty'];
+			}
+			if(isset($row['RRP (SGD)'])) {
+				$price = $row['RRP (SGD)'];
+			}
+			if(isset($row['PO Number'])) {
+				$purchaseorder_id = $row['PO Number'];
+			}
+			if(isset($row['Release'])) {
+				$release_version = $row['Release'];
+			}
+			if(isset($row['Warranty End Date'])) {
+				$expirydate = $row['Warranty End Date'];
+			}
+			if(isset($row['Comments'])) {
+				$remarks = $row['Comments'];
+			}
+			if(isset($row['CR/TR Grouping'])) {
+				$crtrno = $row['CR/TR Grouping'];
+			}
+
+
+
+			if(isset($row['Class'])) {
+				$class = $row['Class'];
+			}
+			if(isset($row['Brand'])) {
+				$brand = $row['Brand'];
+			}
+			if(isset($row['Audit Date'])) {
+				$audit_date = $row['Audit Date'];
+			}
+			if(isset($row['Component'])) {
+				$component = $row['Component'];
+			}
+			if(isset($row['Label'])) {
+				$label = $row['Label'];
+			}
+			if(isset($row['Serial'])) {
+				$serial = $row['Serial'];
+			}
+			if(isset($row['Excel Sheet'])) {
+				$location = $row['Excel Sheet'];
+			}
+			if(isset($row['Status'])) {
+				$status= $row['Status'];
+			}
+			if(isset($row['Refresh/Replacement'])){
+				$replacing = $row['Refresh/Replacement'];
+			}
+			
+			$assetv->execute();
+			$assets->execute();
+			$hardware->execute();
+			
+			$asset_ID = $description = $quantity = $price = $purchaseorder_id = $release_version = $expirydate = $remarks = $crtrno = "";
+		
+			$class = $brand = $audit_date = $component = $label = $serial = $location = $status = $replacing = "";
+		}
+	}
+	
+	public function bulkaddsoftware($data) {
+		$assetv 	= $this->db->prepare("INSERT INTO asset_version(current_version) VALUES (:version)");
+		$assets		= $this->db->prepare("INSERT INTO asset(asset_tag, asset_ID, description, quantity, price, purchaseorder_id, release_version, expirydate, remarks, crtrno, version) VALUES (LAST_INSERT_ID(), :asset_ID, :description, :quantity, :price, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :version)");
+		$software 	= $this->db->prepare("INSERT INTO software(asset_tag, vendor, procured_from, shortname, purpose, contract_type, start_date, license_explanation, verification, version) VALUES (LAST_INSERT_ID(), :vendor, :procured_from, :shortname, :purpose, :contract_type, :start_date, :license_explanation, :verification, :version)");
+				
+		$asset_ID = $description = $quantity = $price = $purchaseorder_id = $release_version = $expirydate = $remarks = $crtrno = "";
+		
+		$vendor = $procured_from = $shortname = $purpose = $contract_type = $start_date = $license_explanation = $verification = "";
+		
+		$assetv->bindValue(':version', 1);
+		
+		$assets->bindParam(':asset_ID', 				$asset_ID);
+		$assets->bindParam(':description', 				$description);
+		$assets->bindParam(':quantity', 				$quantity);
+		$assets->bindParam(':price', 					$price);
+		$assets->bindParam(':purchaseorder_id', 		$purchaseorder_id);
+		$assets->bindParam(':release_version', 			$release_version);
+		$assets->bindParam(':expirydate', 				$expirydate);
+		$assets->bindParam(':remarks', 					$remarks);
+		$assets->bindParam(':crtrno', 					$crtrno);
+		$assets->bindValue(':version',					1);
+		
+		$software->bindParam(':vendor', 				$vendor);
+		$software->bindParam(':procured_from', 			$procured_from);
+		$software->bindParam(':shortname', 				$shortname);
+		$software->bindParam(':purpose', 				$purpose);
+		$software->bindParam(':contract_type', 			$contract_type);
+		$software->bindParam(':start_date', 			$start_date);
+		$software->bindParam(':license_explanation',	$license_explanation);
+		$software->bindParam(':verification', 			$verification);
+		$software->bindValue(':version', 1);
+		
+		foreach($data as $row) {
+			
+			if(isset($row['Reference ID'])) {
+				$asset_ID = $row['Reference ID'];
+			}
+			if(isset($row['Description'])) {
+				$description = $row['Description'];
+			}
+			if(isset($row['Quantity'])) {
+				$quantity = $row['Quantity'];
+			}
+			if(isset($row['Price'])) {
+				$price = $row['Price'];
+			}
+			if(isset($row['CR/TR'])) {
+				$crtrno = $row['CR/TR'];
+			}
+			if(isset($row['PO'])) {
+				$purchaseorder_id = $row['PO'];
+			}
+			if(isset($row['Release'])) {
+				$release_version = $row['Release'];
+			}
+			if(isset($row['End Date'])) {
+				$expirydate = $row['End Date'];
+			}
+			if(isset($row['Purpose'])) {
+				$purpose = $row['Purpose'];
+			}
+			if(isset($row['Remarks'])) {
+				$remarks = $row['Remarks'];
+			}
+			if(isset($row['Vendor'])) {
+				$vendor = $row['Vendor'];
+			}
+			if(isset($row['Procured from'])) {
+				$procured_from = $row['Procured from'];
+			}
+			if(isset($row['Shortname'])) {
+				$shortname = $row['Shortname'];
+			}
+			if(isset($row['Contract Type'])) {
+				$contract_type = $row['Contract Type'];
+			}
+			if(isset($row['Start Date'])) {
+				$start_date = $row['Start Date'];
+			}
+			if(isset($row['license explanation'])) {
+				$license_explanation = $row['license explanation'];
+			}
+			if(isset($row['Verification Status'])) {
+				$verification = $row['Verification Status'];
+			}
+			
+			$assetv->execute();
+			$assets->execute();
+			$software->execute();
+			
+			$asset_ID = $description = $quantity = $price = $purchaseorder_id = $release_version = $expirydate = $remarks = $crtrno = "";
+		
+			$vendor = $procured_from = $shortname = $purpose = $contract_type = $start_date = $license_explanation = $verification = "";
+		
+		}
+	}
+	
 	public function editasset($asset) {
 		$stmt = $this->db->prepare("INSERT INTO asset(asset_tag, asset_ID, description, quantity, price, purchaseorder_id, release_version, expirydate, remarks, crtrno, version) VALUES (:asset_tag, :asset_ID, :description, :quantity, :price, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :version)");
-		$stmt->bindValue(':asset_tag',			$asset['asset_tag']);
-		$stmt->bindValue(':asset_ID', 			$asset['asset_ID']);
-		$stmt->bindValue(':description', 		$asset['description']);
-		$stmt->bindValue(':quantity', 			$asset['quantity']);
-		$stmt->bindValue(':price', 				$asset['price']);
-		$stmt->bindValue(':purchaseorder_id', 	$asset['purchaseorder_id']);
-		$stmt->bindValue(':release_version', 	$asset['release_version']);
-		$stmt->bindValue(':expirydate', 		$asset['expirydate']);
-		$stmt->bindValue(':remarks', 			$asset['remarks']);
-		$stmt->bindValue(':crtrno', 			$asset['crtrno']);
-		$stmt->bindValue(':version',			$asset['version']);
+		$stmt->bindParam(':asset_tag',			$asset['asset_tag']);
+		$stmt->bindParam(':asset_ID', 			$asset['asset_ID']);
+		$stmt->bindParam(':description', 		$asset['description']);
+		$stmt->bindParam(':quantity', 			$asset['quantity']);
+		$stmt->bindParam(':price', 				$asset['price']);
+		$stmt->bindParam(':purchaseorder_id', 	$asset['purchaseorder_id']);
+		$stmt->bindParam(':release_version', 	$asset['release_version']);
+		$stmt->bindParam(':expirydate', 		$asset['expirydate']);
+		$stmt->bindParam(':remarks', 			$asset['remarks']);
+		$stmt->bindParam(':crtrno', 			$asset['crtrno']);
+		$stmt->bindParam(':version',			$asset['version']);
 		
 		$stmt->execute();
 		
 		$stmt = $this->db->prepare("UPDATE asset_version SET current_version=:version where asset_tag=:asset_tag");
-		$stmt->bindValue(':asset_tag', $asset['asset_tag']);
-		$stmt->bindValue(':version', $asset['version']);
+		$stmt->bindParam(':asset_tag', $asset['asset_tag']);
+		$stmt->bindParam(':version', $asset['version']);
 		$stmt->execute();
 	}
 	
@@ -120,16 +322,16 @@ class USER
 		$this->editAsset($asset);
 		
 		$stmt = $this->db->prepare("INSERT INTO software(asset_tag, vendor, procured_from, shortname, purpose, contract_type, start_date, license_explanation, verification, version) VALUES (:asset_tag, :vendor, :procured_from, :shortname, :purpose, :contract_type, :start_date, :license_explanation, :verification, :version)");
-		$stmt->bindValue(':asset_tag',	$asset['asset_tag']);
-		$stmt->bindValue(':vendor', 				$asset['vendor']);
-		$stmt->bindValue(':procured_from', 			$asset['procured_from']);
-		$stmt->bindValue(':shortname', 				$asset['shortname']);
-		$stmt->bindValue(':purpose', 				$asset['purpose']);
-		$stmt->bindValue(':contract_type', 			$asset['contract_type']);
-		$stmt->bindValue(':start_date', 			$asset['start_date']);
-		$stmt->bindValue(':license_explanation', 	$asset['license_explanation']);
-		$stmt->bindValue(':verification', 			$asset['verification']);
-		$stmt->bindValue(':version',				$asset['version']);
+		$stmt->bindParam(':asset_tag',	$asset['asset_tag']);
+		$stmt->bindParam(':vendor', 				$asset['vendor']);
+		$stmt->bindParam(':procured_from', 			$asset['procured_from']);
+		$stmt->bindParam(':shortname', 				$asset['shortname']);
+		$stmt->bindParam(':purpose', 				$asset['purpose']);
+		$stmt->bindParam(':contract_type', 			$asset['contract_type']);
+		$stmt->bindParam(':start_date', 			$asset['start_date']);
+		$stmt->bindParam(':license_explanation', 	$asset['license_explanation']);
+		$stmt->bindParam(':verification', 			$asset['verification']);
+		$stmt->bindParam(':version',				$asset['version']);
 		$stmt->execute();
 		$this->savelog($_SESSION['username'], "edited software asset ".$asset['asset_ID']." (version ".$asset['version'].")");
 	}
@@ -138,17 +340,17 @@ class USER
 		$this->editAsset($asset);
 		
 		$stmt = $this->db->prepare("INSERT INTO hardware(asset_tag, class, brand, audit_date, component, label, serial, location, status, replacing, version) VALUES (:asset_tag, :class, :brand, :audit_date, :component, :label, :serial, :location, :status, :replacing, :version)");
-		$stmt->bindValue(':asset_tag',	$asset['asset_tag']);
-		$stmt->bindValue(':class', 		$asset['class']);
-		$stmt->bindValue(':brand', 		$asset['brand']);
-		$stmt->bindValue(':audit_date', $asset['audit_date']);
-		$stmt->bindValue(':component', 	$asset['component']);
-		$stmt->bindValue(':label', 		$asset['label']);
-		$stmt->bindValue(':serial', 	$asset['serial']);
-		$stmt->bindValue(':location', 	$asset['location']);
-		$stmt->bindValue(':status', 	$asset['status']);
-		$stmt->bindValue(':replacing', 	$asset['replacing']);
-		$stmt->bindValue(':version',	$asset['version']);
+		$stmt->bindParam(':asset_tag',	$asset['asset_tag']);
+		$stmt->bindParam(':class', 		$asset['class']);
+		$stmt->bindParam(':brand', 		$asset['brand']);
+		$stmt->bindParam(':audit_date', $asset['audit_date']);
+		$stmt->bindParam(':component', 	$asset['component']);
+		$stmt->bindParam(':label', 		$asset['label']);
+		$stmt->bindParam(':serial', 	$asset['serial']);
+		$stmt->bindParam(':location', 	$asset['location']);
+		$stmt->bindParam(':status', 	$asset['status']);
+		$stmt->bindParam(':replacing', 	$asset['replacing']);
+		$stmt->bindParam(':version',	$asset['version']);
 		$stmt->execute();
 		$this->savelog($_SESSION['username'], "edited hardware asset ".$asset['asset_ID']." (version ".$asset['version'].")");
 	}
@@ -159,9 +361,9 @@ class USER
 		date_default_timezone_set('Asia/Singapore');
 		$time = date("Y-m-d H:i:s");
 		$stmt = $this->db->prepare("INSERT INTO log(user, time, log) VALUES (:user, :time, :log)");
-		$stmt->bindValue(':user', $user);
-		$stmt->bindValue(':time', $time);
-		$stmt->bindValue(':log', $log);
+		$stmt->bindParam(':user', $user);
+		$stmt->bindParam(':time', $time);
+		$stmt->bindParam(':log', $log);
 		$stmt->execute();
 	}
 		
@@ -301,8 +503,8 @@ class USER
 		//Check for the same password must be finished prior to this (This has no checks!)
 		$new_password = password_hash($newpassword, PASSWORD_DEFAULT);
 		$stmt = $this->db->prepare("UPDATE user SET password=:password where username=:username AND status='active'");
-		$stmt->bindValue(':username', $_SESSION['username']);
-		$stmt->bindValue(':password', $new_password);
+		$stmt->bindParam(':username', $_SESSION['username']);
+		$stmt->bindParam(':password', $new_password);
 		$stmt->execute();
 		$this->savelog($_SESSION['username'], 'changed password');
 	}
@@ -331,7 +533,7 @@ class USER
 		//[1]: Array of user information
 		$result = array(false, false);
 		$stmt = $this->db->prepare("SELECT * from user where user_ID=:user_ID");
-		$stmt->bindValue(':user_ID', $user_ID);
+		$stmt->bindParam(':user_ID', $user_ID);
 		$stmt->execute();
 		if ($stmt->rowCount() == 1) {
 			$result[0] = true;
@@ -355,7 +557,7 @@ class USER
             asset_version.asset_tag = asset.asset_tag AND
             asset_version.current_version = asset.version AND
             asset_version.current_version = software.version");
-		$stmt->bindValue(':asset_tag', $asset_tag);
+		$stmt->bindParam(':asset_tag', $asset_tag);
 		$stmt->execute();
 		if ($stmt->rowCount() == 1) {
 			$result[0] = true;
@@ -378,9 +580,9 @@ class USER
             asset_version.asset_tag = software.asset_tag AND
             asset_version.asset_tag = asset.asset_tag AND
             software.version = asset.version");
-		$stmt->bindValue(':asset_tag', $asset_tag);
+		$stmt->bindParam(':asset_tag', $asset_tag);
 		$stmt->execute();
-		if ($stmt->rowCount() > 1) {
+		if ($stmt->rowCount() >= 1) {
 			$result[0] = true;
 			$result[1] = $stmt->fetchAll();
 		}
@@ -400,9 +602,9 @@ class USER
             asset_version.asset_tag = hardware.asset_tag AND
             asset_version.asset_tag = asset.asset_tag AND
             asset_version.current_version = hardware.version");
-		$stmt->bindValue(':asset_tag', $asset_tag);
+		$stmt->bindParam(':asset_tag', $asset_tag);
 		$stmt->execute();
-		if ($stmt->rowCount() >= 1) {
+		if ($stmt->rowCount() == 1) {
 			$result[0] = true;
 			$result[1] = $stmt->fetch();
 		}
@@ -423,7 +625,7 @@ class USER
             asset_version.asset_tag = hardware.asset_tag AND
             asset_version.asset_tag = asset.asset_tag AND
             asset.version = hardware.version");
-		$stmt->bindValue(':asset_tag', $asset_tag);
+		$stmt->bindParam(':asset_tag', $asset_tag);
 		$stmt->execute();
 		if ($stmt->rowCount() >= 1) {
 			$result[0] = true;

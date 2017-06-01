@@ -34,21 +34,44 @@
 
 <?php 
 	include('config.php');
-	$wrongPassword = 0;
 	$Success = 0;
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $type = $_POST['type'];
-        $tmpName = $_FILES['csv']['tmp_name'];
-        
-        $csv = array_map('str_getcsv', file($tmpName));
-
-        //Array Manipulation here.
-        foreach($csv as &$Row) {
-            $Row = str_getcsv($Row[0], ";");
-            print_r($Row);
-            echo "<br />";
+        $inputFileName= $_FILES['csv']['tmp_name'];
+		$data = array();
+		include 'vendors/PHPExcel/Classes/PHPExcel/IOFactory.php';
+		try {
+            $inputFileType = PHPExcel_IOFactory::identify($inputFileName); //Identify the file
+            $objReader = PHPExcel_IOFactory::createReader($inputFileType); //Creating the reader
+            $objPHPExcel = $objReader->load($inputFileName); //Loading the file
+			
+			$sheet = $objPHPExcel->getSheet(1);     		//Selecting sheet 0
+			$highestRow = $sheet->getHighestRow();     		//Getting number of rows
+			$highestColumn = $sheet->getHighestColumn();    //Getting number of columns
+			
+			$headers = $sheet->rangeToArray('A3:' . $highestColumn . '3', NULL, TRUE, FALSE);
+			
+			for ($row = 4; $row <= $highestRow; $row++) {
+				$rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
+				$newrow = array();
+				foreach($headers[0] as $key=>$value) {
+					if (isset($rowData[0][$key])) {
+						$newrow[$value] = $rowData[0][$key];
+					}
+					$data[$row-4] = $newrow;
+				}
+			}
+        } catch (Exception $e) {
+            die('Error loading file "' . pathinfo($inputFileName, PATHINFO_BASENAME) 
+            . '": ' . $e->getMessage());
         }
-        echo $type;
+		if ($type == 'software') {
+			$user->bulkaddsoftware($data);
+		}
+		if ($type == 'hardware') {
+			$user->bulkaddhardware($data);
+		}
+		$Success = 1;
 	}
 ?>  
   
@@ -72,28 +95,24 @@
               <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel">
                   <div class="x_title">
-                    <h2>Change Password</h2>
+                    <h2>Bulk Asset Import</h2>
                     
                     <div class="clearfix"></div>
                   </div>
                   <div class="x_content">
-				  <?php if ($wrongPassword == 1) {echo '<div class="alert alert-danger alert-dismissible fade in" role="alert">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
-                    </button>
-                    <strong>Error</strong> Old password is incorrect
-                  </div>';} 
+				  <?php 
 				  
 				  if ($Success == 1) {echo '<div class="alert alert-success alert-dismissible fade in" role="alert">
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
                     </button>
-                    <strong>Success</strong> Password changed successfully
+                    <strong>Success</strong> Data Added Successfully
                   </div>';}
 				  ?>
                     <br />
                     <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post" enctype="multipart/form-data">
 
                       <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">CSV File to import
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Excel File to import
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <input type="file" class="form-control col-md-7 col-xs-12"  name="csv">
