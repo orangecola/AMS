@@ -1,3 +1,11 @@
+<?php 
+	if(!isset($_SESSION['user_ID']))
+	  {
+		 header('Location: logout.php');
+	  }
+
+?>
+
 <div class="col-md-3 left_col">
 	  <div class="left_col scroll-view">
 		<div class="navbar nav_title" style="border: 0;">
@@ -7,13 +15,7 @@
 		<div class="clearfix"></div>
 
 		<br />
-		<?php 
-			if(!isset($_SESSION['user_ID']))
-			  {
-				 header('Location: logout.php');
-			  }
 
-		?>
 		<!-- sidebar menu -->
 		<div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
 		  <div class="menu_section">
@@ -35,8 +37,6 @@
 			  <li><a><i class="fa fa-bar-chart-o"></i> Reports <span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu">
 				  <li id="generatereport.php"><a href="generatereport.php">Generate Report</a></li>
-				  <li id="addreportstructure.php"><a href="addreportstructure.php">Add Reporting Structure</a></li>
-				  <li id="editreportstructure.php"><a href="editreportstructure.php">Edit/Delete Reporting Structure</a></li>
 				</ul>
 			  </li>
 			  <li><a><i class="fa fa-users"></i>User Management <span class="fa fa-chevron-down"></span></a>

@@ -704,5 +704,30 @@ class USER
 			return array($sql, $fieldArray); 
 		}
 	}
+	
+	public function getDistinct() {
+		$result = array();
+		$stmt = $this->db->prepare("SELECT DISTINCT purchaseorder_id FROM asset ORDER BY purchaseorder_id");
+		$stmt->execute();
+		$result[0] = $stmt->fetchAll();
+		
+		$stmt = $this->db->prepare("SELECT DISTINCT release_version FROM asset ORDER BY release_version");
+		$stmt->execute();
+		$result[1] = $stmt->fetchAll();
+		
+		$stmt = $this->db->prepare("SELECT DISTINCT crtrno FROM asset ORDER BY crtrno");
+		$stmt->execute();
+		$result[2] = $stmt->fetchAll();
+		
+		return $result;
+	}
+	
+	public function generateReport($type, $filter) {
+			
+		  $stmt = $this->db->prepare("SELECT * FROM asset WHERE ".$type."= :filter");
+		  $stmt->bindparam(":filter", $filter);
+		  $stmt->execute();
+		  return $stmt->fetchAll();
+	}
 }
 ?>
