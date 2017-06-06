@@ -37,7 +37,7 @@
 	$DateError=0;
 	$AssetError=0;
 	$Success=0;
-	
+	$result = $user->getOptions();
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		
 		$asset['asset_ID'] 			= trim($_POST['assetid']);
@@ -291,28 +291,56 @@
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Vendor
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" class="form-control col-md-7 col-xs-12"  name="vendor">
+                          <select class="form-control required" name="vendor">
+                            <option value="">Select Option</option>
+                            <?php 
+                                foreach($result['vendor'] as $row) {
+                                    echo '<option value="'.$row['vendor_name'].'">'.$row['vendor_name'].'</option>';
+                                }
+                            ?>
+                          </select>
                         </div>
                       </div>
 					  <div class="item form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Procured From
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" class="form-control col-md-7 col-xs-12"  name="procure">
+                          <select class="form-control required" name="procure">
+                            <option value="">Select Option</option>
+                            <?php 
+                                foreach($result['procured_from'] as $row) {
+                                    echo '<option value="'.$row['procured_from_name'].'">'.$row['procured_from_name'].'</option>';
+                                }
+                            ?>
+                          </select>
                         </div>
                       </div>
 					  <div class="item form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Short name
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" class="form-control col-md-7 col-xs-12"  name="shortname">
+                          <select class="form-control required" name="shortname">
+                            <option value="">Select Option</option>
+                            <?php 
+                                foreach($result['shortname'] as $row) {
+                                    echo '<option value="'.$row['shortname_name'].'">'.$row['shortname_name'].'</option>';
+                                }
+                            ?>
+                          </select>
                         </div>
                       </div>
 					  <div class="item form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Purpose
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" class="form-control col-md-7 col-xs-12"  name="purpose">
+                          <select class="form-control required" name="purpose">
+                            <option value="">Select Option</option>
+                            <?php 
+                                foreach($result['purpose'] as $row) {
+                                    echo '<option value="'.$row['purpose_name'].'">'.$row['purpose_name'].'</option>';
+                                }
+                            ?>
+                          </select>
                         </div>
                       </div>
 					  <div class="item form-group">
@@ -320,9 +348,12 @@
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <select class="form-control required" name="contracttype">
-                            <option value="Software & Support">Software & Support</option>
-                            <option value="Software">Software</option>
-                            <option value="Support">Support</option>
+                            <option value="">Select Option</option>
+                            <?php 
+                                foreach($result['contracttype'] as $row) {
+                                    echo '<option value="'.$row['contracttype_name'].'">'.$row['contracttype_name'].'</option>';
+                                }
+                            ?>
                           </select>
                         </div>
                       </div>
@@ -368,13 +399,27 @@
                           <div class="item form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Class</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" class="form-control col-md-7 col-xs-12"  name="class" disabled="disabled">
+                          <select class="form-control required" name="class" disabled="disabled">
+                            <option value="">Select Option</option>
+                            <?php 
+                                foreach($result['class'] as $row) {
+                                    echo '<option value="'.$row['class_name'].'">'.$row['class_name'].'</option>';
+                                }
+                            ?>
+                          </select>
                         </div>
                       </div>
 					  <div class="item form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Brand</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" class="form-control col-md-7 col-xs-12"  name="brand" disabled="disabled">
+                          <select class="form-control required" name="brand" disabled="disabled">
+                            <option value="">Select Option</option>
+                            <?php 
+                                foreach($result['brand'] as $row) {
+                                    echo '<option value="'.$row['brand_name'].'">'.$row['brand_name'].'</option>';
+                                }
+                            ?>
+                          </select>
                         </div>
                       </div>
 					  <div class="item form-group">

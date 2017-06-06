@@ -707,18 +707,54 @@ class USER
 	
 	public function getDistinct() {
 		$result = array();
-		$stmt = $this->db->prepare("SELECT DISTINCT purchaseorder_id FROM asset ORDER BY purchaseorder_id");
+		$stmt = $this->db->prepare("SELECT DISTINCT asset.purchaseorder_id FROM asset, asset_version WHERE asset.version = asset_version.current_version AND asset.asset_tag = asset_version.asset_tag ORDER BY purchaseorder_id");
 		$stmt->execute();
 		$result[0] = $stmt->fetchAll();
 		
-		$stmt = $this->db->prepare("SELECT DISTINCT release_version FROM asset ORDER BY release_version");
+		$stmt = $this->db->prepare("SELECT DISTINCT asset.release_version FROM asset, asset_version WHERE asset.version = asset_version.current_version AND asset.asset_tag = asset_version.asset_tag ORDER BY release_version");
 		$stmt->execute();
 		$result[1] = $stmt->fetchAll();
 		
-		$stmt = $this->db->prepare("SELECT DISTINCT crtrno FROM asset ORDER BY crtrno");
+		$stmt = $this->db->prepare("SELECT DISTINCT asset.crtrno FROM asset, asset_version WHERE asset.version = asset_version.current_version AND asset.asset_tag = asset_version.asset_tag ORDER BY crtrno");
 		$stmt->execute();
 		$result[2] = $stmt->fetchAll();
 		
+		return $result;
+	}
+    
+    public function getOptions() {
+		$result = array();
+		$stmt = $this->db->prepare("SELECT * from vendor");
+		$stmt->execute();
+		$result['vendor'] = $stmt->fetchAll();
+		
+		$stmt = $this->db->prepare("SELECT * from procured_from");
+		$stmt->execute();
+		$result['procured_from'] = $stmt->fetchAll();
+		
+		$stmt = $this->db->prepare("SELECT * from shortname");
+		$stmt->execute();
+		$result['shortname'] = $stmt->fetchAll();
+		
+        $stmt = $this->db->prepare("SELECT * from purpose");
+		$stmt->execute();
+		$result['purpose'] = $stmt->fetchAll();
+        
+        $stmt = $this->db->prepare("SELECT * from contracttype");
+		$stmt->execute();
+		$result['contracttype'] = $stmt->fetchAll();
+        
+        $stmt = $this->db->prepare("SELECT * from class");
+		$stmt->execute();
+		$result['class'] = $stmt->fetchAll();
+        
+        $stmt = $this->db->prepare("SELECT * from brand");
+		$stmt->execute();
+		$result['brand'] = $stmt->fetchAll();
+        
+        $stmt = $this->db->prepare("SELECT * from server");
+		$stmt->execute();
+		$result['server'] = $stmt->fetchAll();
 		return $result;
 	}
 	
@@ -728,6 +764,20 @@ class USER
 		  $stmt->bindparam(":filter", $filter);
 		  $stmt->execute();
 		  return $stmt->fetchAll();
+	}
+    
+    public function addOption($type, $value) {
+			
+		  $stmt = $this->db->prepare("INSERT INTO ".$type." (".$type."_name) VALUES(:filter)");
+		  $stmt->bindparam(":filter", $value);
+		  $stmt->execute();
+	}
+    
+    public function deleteOption($type, $value) {
+			
+		  $stmt = $this->db->prepare("DELETE FROM ".$type." WHERE ".$type."_id= :filter");
+		  $stmt->bindparam(":filter", $value);
+		  $stmt->execute();
 	}
 }
 ?>

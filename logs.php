@@ -31,7 +31,13 @@
     <!-- Custom Theme Style -->
     <link href="build/css/custom.min.css" rel="stylesheet">
   </head>
-	<?php include_once('config.php');?>
+	<?php include_once('config.php');
+        if(!($_SESSION['role'] == 'admin'))
+		  {
+			 header('Location: logout.php');
+		  }
+          $result = $user->getOptions();
+        ?>
   <body class="nav-md footer_fixed">
     <div class="container body">
       <div class="main_container">

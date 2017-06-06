@@ -25,7 +25,6 @@
 				  <li id="addassets.php"><a href="addasset.php">Add Assets</a></li>
                   <li id="bulkaddasset.php"><a href="bulkaddasset.php">Bulk Asset Import</a></li>
 				  <li id="assetlist.php"><a href="assetlist.php">Edit/Delete Assets</a></li>
-                  <?php if ($_SESSION['role'] == 'admin') {echo '<li id="adminassetlist.php"><a href="adminassetlist.php">Admin version list</a></li>' ;} ?>
 				</ul>
 			  </li>
 			  <li><a><i class="fa fa-paper-plane-o"></i> Notifications<span class="fa fa-chevron-down"></span></a>
@@ -39,16 +38,21 @@
 				  <li id="generatereport.php"><a href="generatereport.php">Generate Report</a></li>
 				</ul>
 			  </li>
-			  <li><a><i class="fa fa-users"></i>User Management <span class="fa fa-chevron-down"></span></a>
-				<ul class="nav child_menu">
-				  <?php if ($_SESSION['role'] == 'admin') {echo '<li id="adduser.php"><a href="adduser.php">Add User</a></li>' ;} ?>
-                  <?php if ($_SESSION['role'] == 'admin') {echo '<li id="bulkadduser.php"><a href="bulkadduser.php">Bulk Add Users</a></li>' ;} ?>
-				  <?php if ($_SESSION['role'] == 'admin') {echo '<li id="userlist.php"><a href="userlist.php">Edit User</a></li>' ;} ?>
+			  <li id="changepassword.php"><a href="changepassword.php"><i class="fa fa-user"></i>Change Password</a></li>
+              <?php if ($_SESSION['role'] == 'admin') { 
 
-				  <li id="changepassword.php"><a href="changepassword.php">Change Password</a></li>
-				</ul>
-			  </li>
-			  <li id="logs.php"><a href="logs.php"><i class="fa fa-cogs"></i> Logs</a>
+                        echo '<li><a><i class="fa fa-gears"></i> Admin Panel <span class="fa fa-chevron-down"></span></a>';
+                        echo '<ul class="nav child_menu">';
+                        echo '<li id="adduser.php"><a href="adduser.php">Add User</a></li>' ; 
+                        echo '<li id="bulkadduser.php"><a href="bulkadduser.php">Bulk Add Users</a></li>' ;
+                        echo '<li id="userlist.php"><a href="userlist.php">Edit User</a></li>' ;
+                        echo '<li id="adminassetlist.php"><a href="adminassetlist.php">Admin version list</a></li>' ;
+                        echo '<li id="optionsedit.php"><a href="optionsedit.php">Asset options list</a></li>' ;
+                        echo '<li id="logs.php"><a href="logs.php">Logs</a></li>';
+                        echo '</ul>';
+                        echo '</li>';
+                      } ?>
+              
 			  </li>
 			</ul>
 		  </div>
