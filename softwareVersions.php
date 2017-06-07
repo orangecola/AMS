@@ -34,7 +34,9 @@
 
 <?php 
 	include_once('config.php');
-
+	$noversion = 0;
+	$current = 0;
+	$success = 0;
 	
 	if(!(isset($_GET['id']))) {
 			header('Location: adminassetlist.php');
@@ -46,6 +48,38 @@
 		header('Location: adminassetlist.php');
 	}
 	
+	$currentversion = $user->getCurrentVersion($_GET['id'])['current_version'];
+
+	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+		$versioncheck = false;
+		foreach($result[1] as $row) {
+			if($row['version'] == $_POST['version']) {
+				$versioncheck = true;
+				break;
+			}
+		}
+		
+		if (!$versioncheck) {
+			$noversion = 1;
+		}
+
+		
+		else if ($_POST['version'] == $currentversion) {
+			$current = 1;
+		}
+		
+		else {
+			foreach($result[1] as $row) {
+				if ($row['version'] == $_POST['version']) {
+					$row['version'] = $currentversion + 1;
+					$user->editSoftware($row);
+					break;
+				}
+			}
+			$result = $user->getSoftwareVersions($_GET['id']);
+			$success = 1;
+		}
+	}
 ?>  
   
   <body class="nav-md">
@@ -84,7 +118,26 @@
                     <div class="clearfix"></div>
                   </div>
                   <div class="x_content">
+				  <?php
+				  if ($noversion == 1) {echo '<div class="alert alert-danger alert-dismissible fade in" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                    </button>
+                    <strong>Error</strong> Version not found
+                  </div>';} 
 				  
+				  if ($current == 1) {echo '<div class="alert alert-danger alert-dismissible fade in" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                    </button>
+                    <strong>Error</strong> Version is already the current version
+                  </div>';}
+				  
+				  if ($success == 1) {echo '<div class="alert alert-success alert-dismissible fade in" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                    </button>
+                    <strong>Success</strong> Asset reverted successfully
+                  </div>';}
+				  
+				  ?>
                     <br />
                     <form id="demo-form2" enctype="multipart/form-data" class="form-horizontal form-label-left" method="post">
                       <div class="item form-group">
@@ -101,10 +154,10 @@
                         </div>
                       </div>
                       <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Asset ID <span class="required">*</span>
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Asset ID
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text"  class="form-control col-md-7 col-xs-12 required"  name="assetid" disabled>
+                          <input type="text"  class="form-control col-md-7 col-xs-12"  name="assetid" disabled>
                         </div>
                       </div>
 					<div class="item form-group">
@@ -244,6 +297,7 @@
 						<div class="item form-group">
                         <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
 						  <a class="btn btn-primary" href="adminassetlist.php">Cancel</a>
+						  <button type="submit" class="btn btn-danger">Revert</button>
                         </div>
                         
                     </div>

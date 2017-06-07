@@ -49,6 +49,7 @@
 		header('Location: assetlist.php');
 	}
 	
+	$options = $user->getOptions();
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		$candidate['asset_ID'] 			= trim($_POST['assetid']);
 		$candidate['description']		= trim($_POST['description']);
@@ -250,13 +251,31 @@
                           <div class="item form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Class</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" class="form-control col-md-7 col-xs-12"  name="class" >
+                          <select class="form-control required" name="class">
+                            <?php 
+							echo '<option class="nochange" value="'.htmlentities($result[1]['class']).'">'.htmlentities($result[1]['class']).' (No Change)</option>';
+							?>
+                            <?php 
+                                foreach($options['class'] as $row) {
+                                    echo '<option value="'.$row['class_name'].'">'.$row['class_name'].'</option>';
+                                }
+                            ?>
+                          </select>
                         </div>
                       </div>
 					  <div class="item form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Brand</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" class="form-control col-md-7 col-xs-12"  name="brand" >
+                          <select class="form-control required" name="brand">
+                            <?php 
+							echo '<option class="nochange" value="'.htmlentities($result[1]['brand']).'">'.htmlentities($result[1]['brand']).' (No Change)</option>';
+							?>
+                            <?php 
+                                foreach($options['brand'] as $row) {
+                                    echo '<option value="'.$row['brand_name'].'">'.$row['brand_name'].'</option>';
+                                }
+                            ?>
+                          </select>
                         </div>
                       </div>
 					  <div class="item form-group">
@@ -322,30 +341,7 @@
               </div>
             </div>
 
-        <script>
-			function reset() {
-				document.getElementsByName("assetid")[0].setAttribute("value", <?php echo json_encode($result[1]['asset_ID']);?>);
-				document.getElementsByName("description")[0].innerHTML = <?php echo json_encode($result[1]['description']);?>;
-				document.getElementsByName("quantity")[0].setAttribute("value", <?php echo json_encode($result[1]['quantity']);?>);
-				document.getElementsByName("price")[0].setAttribute("value", <?php echo json_encode($result[1]['price']);?>);
-				document.getElementsByName("crtrno")[0].setAttribute("value", <?php echo json_encode($result[1]['crtrno']);?>);
-				document.getElementsByName("pono")[0].setAttribute("value", <?php echo json_encode($result[1]['purchaseorder_id']);?>);
-				document.getElementsByName("release")[0].setAttribute("value", <?php echo json_encode($result[1]['release_version']);?>);
-				document.getElementsByName("expirydate")[0].setAttribute("value", <?php echo json_encode($result[1]['expirydate']);?>);
-				document.getElementsByName("remarks")[0].innerHTML = <?php echo json_encode($result[1]['remarks']);?>;
-				
-				document.getElementsByName("class")[0].setAttribute("value", <?php echo json_encode($result[1]['class']);?>);
-				document.getElementsByName("brand")[0].setAttribute("value", <?php echo json_encode($result[1]['brand']);?>);
-				document.getElementsByName("auditdate")[0].setAttribute("value", <?php echo json_encode($result[1]['audit_date']);?>);
-				document.getElementsByName("component")[0].setAttribute("value", <?php echo json_encode($result[1]['component']);?>);
-				document.getElementsByName("label")[0].setAttribute("value", <?php echo json_encode($result[1]['label']);?>);
-				document.getElementsByName("serial")[0].setAttribute("value", <?php echo json_encode($result[1]['serial']);?>);
-				document.getElementsByName("location")[0].setAttribute("value", <?php echo json_encode($result[1]['location']);?>);
-				document.getElementsByName("status")[0].setAttribute("value", <?php echo json_encode($result[1]['status']);?>);
-				document.getElementsByName("replacing")[0].setAttribute("value", <?php echo json_encode($result[1]['replacing']);?>);
-			}
-			reset();
-		</script>    
+        
         <!-- /page content -->
 
         <!-- footer content -->
@@ -361,6 +357,31 @@
 
     <!-- jQuery -->
     <script src="vendors/jquery/dist/jquery.min.js"></script>
+	<script>
+			function reset() {
+				document.getElementsByName("assetid")[0].setAttribute("value", <?php echo json_encode($result[1]['asset_ID']);?>);
+				document.getElementsByName("description")[0].innerHTML = <?php echo json_encode($result[1]['description']);?>;
+				document.getElementsByName("quantity")[0].setAttribute("value", <?php echo json_encode($result[1]['quantity']);?>);
+				document.getElementsByName("price")[0].setAttribute("value", <?php echo json_encode($result[1]['price']);?>);
+				document.getElementsByName("crtrno")[0].setAttribute("value", <?php echo json_encode($result[1]['crtrno']);?>);
+				document.getElementsByName("pono")[0].setAttribute("value", <?php echo json_encode($result[1]['purchaseorder_id']);?>);
+				document.getElementsByName("release")[0].setAttribute("value", <?php echo json_encode($result[1]['release_version']);?>);
+				document.getElementsByName("expirydate")[0].setAttribute("value", <?php echo json_encode($result[1]['expirydate']);?>);
+				document.getElementsByName("remarks")[0].innerHTML = <?php echo json_encode($result[1]['remarks']);?>;
+				
+				$('.nochange').each(function() {
+					$(this).attr('selected', 'selected');
+				});
+				document.getElementsByName("auditdate")[0].setAttribute("value", <?php echo json_encode($result[1]['audit_date']);?>);
+				document.getElementsByName("component")[0].setAttribute("value", <?php echo json_encode($result[1]['component']);?>);
+				document.getElementsByName("label")[0].setAttribute("value", <?php echo json_encode($result[1]['label']);?>);
+				document.getElementsByName("serial")[0].setAttribute("value", <?php echo json_encode($result[1]['serial']);?>);
+				document.getElementsByName("location")[0].setAttribute("value", <?php echo json_encode($result[1]['location']);?>);
+				document.getElementsByName("status")[0].setAttribute("value", <?php echo json_encode($result[1]['status']);?>);
+				document.getElementsByName("replacing")[0].setAttribute("value", <?php echo json_encode($result[1]['replacing']);?>);
+			}
+			reset();
+		</script>    
     <!-- Bootstrap -->
     <script src="vendors/bootstrap/dist/js/bootstrap.min.js"></script>
     <!-- FastClick -->

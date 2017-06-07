@@ -105,7 +105,7 @@
 								echo "<td>".htmlentities($row['remarks'])			."</td>";
 								echo "<td>";
 								echo "<a class='btn btn-primary btn-xs' data-toggle='modal' data-target="."#".htmlentities($row['asset_tag'])."view href="."#".htmlentities($row['asset_tag'])."view><i class='fa fa-folder'></i> View </a>";
-								echo "<a href=\"hardwareversions.php?id=".htmlentities($row['asset_tag'])."\" class=\"btn btn-info btn-xs\"><i class='fa fa-edit'></i>Edit</a>";
+								echo "<a href=\"hardwareversions.php?id=".htmlentities($row['asset_tag'])."\" class=\"btn btn-info btn-xs\"><i class='fa fa-edit'></i> Versions</a>";
 								echo "</td>";
 								echo '</tr>';
 								#Modal for more information
@@ -138,8 +138,8 @@
 								echo				"<p>Replacing			: ".htmlentities($row['replacing']) 		."</p>";
 								echo 			"</div>";
 								echo 		"<div class='modal-footer'>";
-								echo			"<a href=\"hardwareversions.php?id=".htmlentities($row['asset_tag'])."\" class=\"btn btn-info\"><i class='fa fa-edit'></i>Edit</a>";
-								echo 			"<button type='button' class='btn btn-default' data-dismiss='modal'>Close</button>";
+								echo			"<a href=\"hardwareversions.php?id=".htmlentities($row['asset_tag'])."\" class=\"btn btn-info\"><i class='fa fa-edit'></i> Versions</a>";
+								echo 			"<button type='button' class='btn btn-default' data-dismiss='modal'> Close</button>";
 								echo		"</div>";
 								echo	"</div>";
 								echo "</div>";
@@ -159,7 +159,7 @@
 								echo "<td>".htmlentities($row['remarks'])			."</td>";
 								echo "<td>";
 								echo "<a class='btn btn-primary btn-xs' data-toggle='modal' data-target="."#".htmlentities($row['asset_tag'])."view href="."#".htmlentities($row['asset_tag'])."view><i class='fa fa-folder'></i> View </a>";
-								echo "<a href=\"softwareversions.php?id=".htmlentities($row['asset_tag'])."\" class=\"btn btn-info btn-xs\"><i class='fa fa-edit'></i>Edit</a>";
+								echo "<a href=\"softwareversions.php?id=".htmlentities($row['asset_tag'])."\" class=\"btn btn-info btn-xs\"><i class='fa fa-edit'></i> Versions</a>";
 								echo "</td>";
 								echo '</tr>';
 								#Modal for more information
@@ -191,8 +191,8 @@
 								echo				"<p>Verification		: ".htmlentities($row['verification']) 			."</p>";
 								echo 			"</div>";
 								echo 		"<div class='modal-footer'>";
-								echo			"<a href=\"softwareversions.php?id=".htmlentities($row['asset_tag'])."\" class=\"btn btn-info\"><i class='fa fa-edit'></i>Edit</a>";
-								echo 			"<button type='button' class='btn btn-default' data-dismiss='modal'>Close</button>";
+								echo			"<a href=\"softwareversions.php?id=".htmlentities($row['asset_tag'])."\" class=\"btn btn-info\"><i class='fa fa-edit'></i> Versions</a>";
+								echo 			"<button type='button' class='btn btn-default' data-dismiss='modal'> Close</button>";
 								echo		"</div>";
 								echo	"</div>";
 								echo "</div>";

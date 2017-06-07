@@ -197,6 +197,7 @@ class USER
 		
 			$class = $brand = $audit_date = $component = $label = $serial = $location = $status = $replacing = "";
 		}
+		$this->savelog($_SESSION['username'], "batch imported hardware assets");
 	}
 	
 	public function bulkaddsoftware($data) {
@@ -294,6 +295,7 @@ class USER
 			$vendor = $procured_from = $shortname = $purpose = $contract_type = $start_date = $license_explanation = $verification = "";
 		
 		}
+		$this->savelog($_SESSION['username'], "batch imported software assets");
 	}
 	
 	public function editasset($asset) {
@@ -438,6 +440,8 @@ class USER
                 $stmt->execute();
             }
         }
+		
+		$this->savelog($_SESSION['username'], "batch imported users");
     }
  
     public function login($username,$password)
@@ -724,45 +728,47 @@ class USER
     
     public function getOptions() {
 		$result = array();
-		$stmt = $this->db->prepare("SELECT * from vendor");
+		$stmt = $this->db->prepare("SELECT * from vendor ORDER BY vendor_name");
 		$stmt->execute();
 		$result['vendor'] = $stmt->fetchAll();
 		
-		$stmt = $this->db->prepare("SELECT * from procured_from");
+		$stmt = $this->db->prepare("SELECT * from procured_from ORDER BY procured_from_name");
 		$stmt->execute();
 		$result['procured_from'] = $stmt->fetchAll();
 		
-		$stmt = $this->db->prepare("SELECT * from shortname");
+		$stmt = $this->db->prepare("SELECT * from shortname ORDER BY shortname_name");
 		$stmt->execute();
 		$result['shortname'] = $stmt->fetchAll();
 		
-        $stmt = $this->db->prepare("SELECT * from purpose");
+        $stmt = $this->db->prepare("SELECT * from purpose ORDER BY purpose_name");
 		$stmt->execute();
 		$result['purpose'] = $stmt->fetchAll();
         
-        $stmt = $this->db->prepare("SELECT * from contracttype");
+        $stmt = $this->db->prepare("SELECT * from contracttype ORDER BY contracttype_name");
 		$stmt->execute();
 		$result['contracttype'] = $stmt->fetchAll();
         
-        $stmt = $this->db->prepare("SELECT * from class");
+        $stmt = $this->db->prepare("SELECT * from class ORDER BY class_name");
 		$stmt->execute();
 		$result['class'] = $stmt->fetchAll();
         
-        $stmt = $this->db->prepare("SELECT * from brand");
+        $stmt = $this->db->prepare("SELECT * from brand ORDER BY brand_name");
 		$stmt->execute();
 		$result['brand'] = $stmt->fetchAll();
         
-        $stmt = $this->db->prepare("SELECT * from server");
+        $stmt = $this->db->prepare("SELECT * from server ORDER BY server_name");
 		$stmt->execute();
 		$result['server'] = $stmt->fetchAll();
 		return $result;
 	}
 	
 	public function generateReport($type, $filter) {
-			
-		  $stmt = $this->db->prepare("SELECT * FROM asset WHERE ".$type."= :filter");
-		  $stmt->bindparam(":filter", $filter);
+		  $entry = '%'.$filter.'%';
+		  $stmt = $this->db->prepare("SELECT * FROM asset WHERE ".$type." LIKE :filter");
+		  $stmt->bindparam(":filter", $entry);
 		  $stmt->execute();
+		  
+		  $this->savelog($_SESSION['username'], "generated report for $type $filter");
 		  return $stmt->fetchAll();
 	}
     
@@ -771,6 +777,7 @@ class USER
 		  $stmt = $this->db->prepare("INSERT INTO ".$type." (".$type."_name) VALUES(:filter)");
 		  $stmt->bindparam(":filter", $value);
 		  $stmt->execute();
+		  $this->savelog($_SESSION['username'], "added option $filter for $type");
 	}
     
     public function deleteOption($type, $value) {
@@ -778,6 +785,14 @@ class USER
 		  $stmt = $this->db->prepare("DELETE FROM ".$type." WHERE ".$type."_id= :filter");
 		  $stmt->bindparam(":filter", $value);
 		  $stmt->execute();
+		  $this->savelog($_SESSION['username'], "removed option $filter for $type");
+	}
+	
+	public function getCurrentVersion($asset_tag) {
+		$stmt = $this->db->prepare("SELECT current_version FROM asset_version where asset_tag=:asset_tag");
+		$stmt->bindparam(":asset_tag", $asset_tag);
+		$stmt->execute();
+		return $stmt->fetch();
 	}
 }
 ?>

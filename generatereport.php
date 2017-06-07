@@ -42,6 +42,19 @@
 			$value = $value[0];
 		}
 	}
+	
+	unset($value);
+	$parsed = array();
+	foreach($result[2] as &$value) {		
+		$value = array_map('trim', explode(",", $value));
+		foreach($value as $row) {
+			array_push($parsed, $row);
+		}
+	}
+	unset($value);
+	
+	$result[2] = array_keys(array_flip($parsed)); 
+	
 ?>  
   
   <body class="nav-md footer_fixed">

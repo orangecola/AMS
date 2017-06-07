@@ -46,7 +46,7 @@
                         echo '<li id="adduser.php"><a href="adduser.php">Add User</a></li>' ; 
                         echo '<li id="bulkadduser.php"><a href="bulkadduser.php">Bulk Add Users</a></li>' ;
                         echo '<li id="userlist.php"><a href="userlist.php">Edit User</a></li>' ;
-                        echo '<li id="adminassetlist.php"><a href="adminassetlist.php">Admin version list</a></li>' ;
+                        echo '<li id="adminassetlist.php"><a href="adminassetlist.php">Previous Versions</a></li>' ;
                         echo '<li id="optionsedit.php"><a href="optionsedit.php">Asset options list</a></li>' ;
                         echo '<li id="logs.php"><a href="logs.php">Logs</a></li>';
                         echo '</ul>';

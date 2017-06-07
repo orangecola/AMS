@@ -44,7 +44,7 @@
 	}
 	
 	$result = $user->getSoftware($_GET['id']);
-	
+	$options = $user->getOptions();
 	if (!$result[0]) {
 		header('Location: assetlist.php');
 	}
@@ -252,28 +252,64 @@
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Vendor
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" class="form-control col-md-7 col-xs-12"  name="vendor">
+                          <select class="form-control required" name="vendor">
+                            <?php 
+							echo '<option class="nochange" value="'.htmlentities($result[1]['vendor']).'">'.htmlentities($result[1]['vendor']).' (No Change)</option>';
+							?>
+                            <?php 
+                                foreach($options['vendor'] as $row) {
+                                    echo '<option value="'.$row['vendor_name'].'">'.$row['vendor_name'].'</option>';
+                                }
+                            ?>
+							</select>
                         </div>
                       </div>
 					  <div class="item form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Procured From
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" class="form-control col-md-7 col-xs-12"  name="procure">
+                          <select class="form-control required" name="procure">
+                            <?php 
+							echo '<option class="nochange" value="'.htmlentities($result[1]['procured_from']).'">'.htmlentities($result[1]['procured_from']).' (No Change)</option>';
+							?>
+                            <?php 
+                                foreach($options['procured_from'] as $row) {
+                                    echo '<option value="'.$row['procured_from_name'].'">'.$row['procured_from_name'].'</option>';
+                                }
+                            ?>
+						  </select>
                         </div>
                       </div>
 					  <div class="item form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Short name
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" class="form-control col-md-7 col-xs-12"  name="shortname">
+                          <select class="form-control required" name="shortname">
+                            <?php 
+							echo '<option class="nochange" value="'.htmlentities($result[1]['shortname']).'">'.htmlentities($result[1]['shortname']).' (No Change)</option>';
+							?>
+                            <?php 
+                                foreach($options['shortname'] as $row) {
+                                    echo '<option value="'.$row['shortname_name'].'">'.$row['shortname_name'].'</option>';
+                                }
+                            ?>
+                          </select>
                         </div>
                       </div>
 					  <div class="item form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Purpose
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" class="form-control col-md-7 col-xs-12"  name="purpose">
+                          <select class="form-control required" name="purpose">
+                            <?php 
+							echo '<option class="nochange" value="'.htmlentities($result[1]['purpose']).'">'.htmlentities($result[1]['purpose']).' (No Change)</option>';
+							?>
+                            <?php 
+                                foreach($options['purpose'] as $row) {
+                                    echo '<option value="'.$row['purpose_name'].'">'.$row['purpose_name'].'</option>';
+                                }
+                            ?>
+                          </select>
                         </div>
                       </div>
 					  <div class="item form-group">
@@ -281,9 +317,14 @@
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <select class="form-control required" name="contracttype">
-                            <option id="Software & Support" value="Software & Support">Software & Support</option>
-                            <option id="Software" value="Software">Software</option>
-                            <option id="Support" value="Support">Support</option>
+                            <?php 
+							echo '<option class="nochange" value="'.htmlentities($result[1]['contract_type']).'">'.htmlentities($result[1]['contract_type']).' (No Change)</option>';
+							?>
+                            <?php 
+                                foreach($options['contracttype'] as $row) {
+                                    echo '<option value="'.$row['contracttype_name'].'">'.$row['contracttype_name'].'</option>';
+                                }
+                            ?>
                           </select>
                         </div>
                       </div>
@@ -295,7 +336,7 @@
                             <div class="controls">
                               <div class="xdisplay_inputx form-group">
 							  
-                                <input type="text" class="form-control" name="startdate" id="single_cal4" placeholder="First Name" aria-describedby="inputSuccess2Status4">
+                                <input type="text" class="form-control" name="startdate" id="single_cal4" aria-describedby="inputSuccess2Status4">
                                 
                                 <span id="inputSuccess2Status4" class="sr-only">(success)</span>
                               </div>
@@ -332,29 +373,7 @@
               </div>
             </div>
 
-        <script>
-			function reset() {
-				document.getElementsByName("assetid")[0].setAttribute("value", <?php echo json_encode($result[1]['asset_ID']);?>);
-				document.getElementsByName("description")[0].innerHTML = <?php echo json_encode($result[1]['description']);?>;
-				document.getElementsByName("quantity")[0].setAttribute("value", <?php echo json_encode($result[1]['quantity']);?>);
-				document.getElementsByName("price")[0].setAttribute("value", <?php echo json_encode($result[1]['price']);?>);
-				document.getElementsByName("crtrno")[0].setAttribute("value", <?php echo json_encode($result[1]['crtrno']);?>);
-				document.getElementsByName("pono")[0].setAttribute("value", <?php echo json_encode($result[1]['purchaseorder_id']);?>);
-				document.getElementsByName("release")[0].setAttribute("value", <?php echo json_encode($result[1]['release_version']);?>);
-				document.getElementsByName("expirydate")[0].setAttribute("value", <?php echo json_encode($result[1]['expirydate']);?>);
-				document.getElementsByName("remarks")[0].innerHTML = <?php echo json_encode($result[1]['remarks']);?>;
-				
-				document.getElementsByName("vendor")[0].setAttribute("value", <?php echo json_encode($result[1]['vendor']);?>);
-				document.getElementsByName("procure")[0].setAttribute("value", <?php echo json_encode($result[1]['procured_from']);?>);
-				document.getElementsByName("shortname")[0].setAttribute("value", <?php echo json_encode($result[1]['shortname']);?>);
-				document.getElementsByName("purpose")[0].setAttribute("value", <?php echo json_encode($result[1]['purpose']);?>);
-				document.getElementById(<?php echo json_encode($result[1]['contract_type']);?>).setAttribute("selected", "selected");
-				document.getElementsByName("startdate")[0].setAttribute("value", <?php echo json_encode($result[1]['start_date']);?>);
-				document.getElementsByName("license")[0].setAttribute("value", <?php echo json_encode($result[1]['license_explanation']);?>);
-				document.getElementsByName("verification")[0].setAttribute("value", <?php echo json_encode($result[1]['verification']);?>);
-			}
-			reset();
-		</script>    
+          
         <!-- /page content -->
 
         <!-- footer content -->
@@ -370,6 +389,28 @@
 
     <!-- jQuery -->
     <script src="vendors/jquery/dist/jquery.min.js"></script>
+	
+	<script>
+			function reset() {
+				document.getElementsByName("assetid")[0].setAttribute("value", <?php echo json_encode($result[1]['asset_ID']);?>);
+				document.getElementsByName("description")[0].innerHTML = <?php echo json_encode($result[1]['description']);?>;
+				document.getElementsByName("quantity")[0].setAttribute("value", <?php echo json_encode($result[1]['quantity']);?>);
+				document.getElementsByName("price")[0].setAttribute("value", <?php echo json_encode($result[1]['price']);?>);
+				document.getElementsByName("crtrno")[0].setAttribute("value", <?php echo json_encode($result[1]['crtrno']);?>);
+				document.getElementsByName("pono")[0].setAttribute("value", <?php echo json_encode($result[1]['purchaseorder_id']);?>);
+				document.getElementsByName("release")[0].setAttribute("value", <?php echo json_encode($result[1]['release_version']);?>);
+				document.getElementsByName("expirydate")[0].setAttribute("value", <?php echo json_encode($result[1]['expirydate']);?>);
+				document.getElementsByName("remarks")[0].innerHTML = <?php echo json_encode($result[1]['remarks']);?>;
+				
+				$('.nochange').each(function() {
+					$(this).attr('selected', 'selected');
+				});
+				document.getElementsByName("startdate")[0].setAttribute("value", <?php echo json_encode($result[1]['start_date']);?>);
+				document.getElementsByName("license")[0].setAttribute("value", <?php echo json_encode($result[1]['license_explanation']);?>);
+				document.getElementsByName("verification")[0].setAttribute("value", <?php echo json_encode($result[1]['verification']);?>);
+			}
+			reset();
+		</script>  
     <!-- Bootstrap -->
     <script src="vendors/bootstrap/dist/js/bootstrap.min.js"></script>
     <!-- FastClick -->

@@ -103,9 +103,6 @@
               </div>
             </div>
             <div class="clearfix"></div>
-            <div class="row">
-				
-
               <div class="col-md-4 col-sm-6 col-xs-12">
                 <div class="x_panel">
                   <div class="x_title">
@@ -133,14 +130,14 @@
                         echo '<form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post">';
                         echo '<td>'.$row['vendor_name'].'</td>';
                         echo '<input type="hidden" name="vendordelete" value="'.$row['vendor_id'].'">';
-                        echo '<td><button type="submit" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i>Delete</button></td>';
+                        echo '<td><button type="submit" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i> Delete</button></td>';
                         echo '</form>';
                         echo '</tr>';
                         }
                         ?>
                     <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post">
                         <td><input type="text" placeholder="Field to add" required="required" class="form-control"  name="vendor"></td>
-                        <td><button type="submit" class="btn btn-success btn-xs">Add</button></td>
+                        <td><button type="submit" class="btn btn-success btn-xs"><i class="fa fa-save"></i> Add</button></td>
                     </form>
                     </tr>
                     </tbody>
@@ -175,14 +172,14 @@
                         echo '<form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post">';
                         echo '<td>'.$row['procured_from_name'].'</td>';
                         echo '<input type="hidden" name="procured_fromdelete" value="'.$row['procured_from_id'].'">';
-                        echo '<td><button type="submit" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i>Delete</button></td>';
+                        echo '<td><button type="submit" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i> Delete</button></td>';
                         echo '</form>';
                         echo '</tr>';
                         }
                         ?>
                     <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post">
                         <td><input type="text" placeholder="Field to add" required="required" class="form-control"  name="procured_from"></td>
-                        <td><button type="submit" class="btn btn-success btn-xs">Add</button></td>
+                        <td><button type="submit" class="btn btn-success btn-xs"><i class="fa fa-save"></i> Add</button></td>
                     </form>
                     </tr>
                     </tbody>
@@ -217,14 +214,14 @@
                         echo '<form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post">';
                         echo '<td>'.$row['shortname_name'].'</td>';
                         echo '<input type="hidden" name="shortnamedelete" value="'.$row['shortname_id'].'">';
-                        echo '<td><button type="submit" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i>Delete</button></td>';
+                        echo '<td><button type="submit" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i> Delete</button></td>';
                         echo '</form>';
                         echo '</tr>';
                         }
                         ?>
                     <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post">
                         <td><input type="text" placeholder="Field to add" required="required" class="form-control"  name="shortname"></td>
-                        <td><button type="submit" class="btn btn-success btn-xs">Add</button></td>
+                        <td><button type="submit" class="btn btn-success btn-xs"><i class="fa fa-save"></i> Add</button></td>
                     </form>
                     </tr>
                     </tbody>
@@ -232,9 +229,7 @@
                   </div>
                 </div>
               </div>
-              
-              </div>
-              <div class="row">
+    
               <div class="col-md-4 col-sm-6 col-xs-12">
                 <div class="x_panel">
                   <div class="x_title">
@@ -262,14 +257,14 @@
                         echo '<form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post">';
                         echo '<td>'.$row['purpose_name'].'</td>';
                         echo '<input type="hidden" name="purposedelete" value="'.$row['purpose_id'].'">';
-                        echo '<td><button type="submit" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i>Delete</button></td>';
+                        echo '<td><button type="submit" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i> Delete</button></td>';
                         echo '</form>';
                         echo '</tr>';
                         }
                         ?>
                     <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post">
                         <td><input type="text" placeholder="Field to add" required="required" class="form-control"  name="purpose"></td>
-                        <td><button type="submit" class="btn btn-success btn-xs">Add</button></td>
+                        <td><button type="submit" class="btn btn-success btn-xs"><i class="fa fa-save"></i> Add</button></td>
                     </form>
                     </tr>
                     </tbody>
@@ -304,14 +299,14 @@
                         echo '<form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post">';
                         echo '<td>'.$row['contracttype_name'].'</td>';
                         echo '<input type="hidden" name="contracttypedelete" value="'.$row['contracttype_id'].'">';
-                        echo '<td><button type="submit" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i>Delete</button></td>';
+                        echo '<td><button type="submit" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i> Delete</button></td>';
                         echo '</form>';
                         echo '</tr>';
                         }
                         ?>
                     <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post">
                         <td><input type="text" placeholder="Field to add" required="required" class="form-control"  name="contracttype"></td>
-                        <td><button type="submit" class="btn btn-success btn-xs">Add</button></td>
+                        <td><button type="submit" class="btn btn-success btn-xs"><i class="fa fa-save"></i> Add</button></td>
                     </form>
                     </tr>
                     </tbody>
@@ -346,14 +341,14 @@
                         echo '<form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post">';
                         echo '<td>'.$row['class_name'].'</td>';
                         echo '<input type="hidden" name="classdelete" value="'.$row['class_id'].'">';
-                        echo '<td><button type="submit" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i>Delete</button></td>';
+                        echo '<td><button type="submit" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i> Delete</button></td>';
                         echo '</form>';
                         echo '</tr>';
                         }
                         ?>
                     <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post">
                         <td><input type="text" placeholder="Field to add" required="required" class="form-control"  name="class"></td>
-                        <td><button type="submit" class="btn btn-success btn-xs">Add</button></td>
+                        <td><button type="submit" class="btn btn-success btn-xs"><i class="fa fa-save"></i> Add</button></td>
                     </form>
                     </tr>
                     </tbody>
@@ -361,8 +356,6 @@
                   </div>
                 </div>
             </div>
-        </div>
-        <div class="row">
               <div class="col-md-4 col-sm-6 col-xs-12">
                 <div class="x_panel">
                   <div class="x_title">
@@ -390,14 +383,14 @@
                         echo '<form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post">';
                         echo '<td>'.$row['brand_name'].'</td>';
                         echo '<input type="hidden" name="branddelete" value="'.$row['brand_id'].'">';
-                        echo '<td><button type="submit" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i>Delete</button></td>';
+                        echo '<td><button type="submit" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i> Delete</button></td>';
                         echo '</form>';
                         echo '</tr>';
                         }
                         ?>
                     <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post">
                         <td><input type="text" placeholder="Field to add" required="required" class="form-control"  name="brand"></td>
-                        <td><button type="submit" class="btn btn-success btn-xs">Add</button></td>
+                        <td><button type="submit" class="btn btn-success btn-xs"><i class="fa fa-save"></i> Add</button></td>
                     </form>
                     </tr>
                     </tbody>
@@ -432,14 +425,14 @@
                         echo '<form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post">';
                         echo '<td>'.$row['server_name'].'</td>';
                         echo '<input type="hidden" name="serverdelete" value="'.$row['server_id'].'">';
-                        echo '<td><button type="submit" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i>Delete</button></td>';
+                        echo '<td><button type="submit" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i> Delete</button></td>';
                         echo '</form>';
                         echo '</tr>';
                         }
                         ?>
                     <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post">
                         <td><input type="text" placeholder="Field to add" required="required" class="form-control"  name="server"></td>
-                        <td><button type="submit" class="btn btn-success btn-xs">Add</button></td>
+                        <td><button type="submit" class="btn btn-success btn-xs"><i class="fa fa-save"></i> Add</button></td>
                     </form>
                     </tr>
                     </tbody>
@@ -447,9 +440,7 @@
                   </div>
                 </div>
             </div>
-            
-            </div>
-</div>    
+		</div>    
         <!-- /page content -->
 
         <!-- footer content -->
