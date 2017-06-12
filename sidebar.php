@@ -25,6 +25,7 @@
 				  <li id="addassets.php"><a href="addasset.php">Add Assets</a></li>
                   <li id="bulkaddasset.php"><a href="bulkaddasset.php">Bulk Asset Import</a></li>
 				  <li id="assetlist.php"><a href="assetlist.php">Edit/Delete Assets</a></li>
+				  <li id="purchaseorder.php"><a href="purchaseorder.php">View/Edit Purchase Orders</a></li>
 				</ul>
 			  </li>
 			  <li><a><i class="fa fa-paper-plane-o"></i> Notifications<span class="fa fa-chevron-down"></span></a>

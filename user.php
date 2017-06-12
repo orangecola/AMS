@@ -395,6 +395,68 @@ class USER
 		return $stmt->fetchAll();
 	}
 	
+	public function getPurchaseOrder($purchaseorder_id) {
+		$result['validation'] = false;
+		//Gets all of the software details
+		$stmt = $this->db->prepare("SELECT 	asset.*, software.*
+			FROM asset_version INNER JOIN software, asset 
+			WHERE 
+            asset_version.asset_tag = software.asset_tag AND
+            asset_version.asset_tag = asset.asset_tag AND
+            asset_version.current_version = asset.version AND
+            asset_version.current_version = software.version AND
+			asset.purchaseorder_id = :purchaseorder_id");
+		
+		$stmt->bindParam(":purchaseorder_id", $purchaseorder_id);
+		$stmt->execute();
+		if($stmt->rowCount() > 0) {
+			$result['validation'] = true;
+		}
+		$result['software'] = $stmt->fetchAll();
+	
+		//Gets all of the hardware details
+		$stmt = $this->db->prepare("SELECT 	asset.*, hardware.*
+			FROM asset_version INNER JOIN hardware, asset 
+			WHERE 
+            asset_version.asset_tag = hardware.asset_tag AND
+            asset_version.asset_tag = asset.asset_tag AND
+            asset_version.current_version = asset.version AND
+            asset_version.current_version = hardware.version AND
+			asset.purchaseorder_id = :purchaseorder_id");
+		
+		$stmt->bindParam(":purchaseorder_id", $purchaseorder_id);
+		$stmt->execute();
+		if($stmt->rowCount() > 0) {
+			$result['validation'] = true;
+		}
+		$result['hardware'] = $stmt->fetchAll();
+		
+		$stmt = $this->db->prepare("SELECT * FROM purchaseorder where purchaseorder_id = :purchaseorder_id");
+		$stmt->bindParam(":purchaseorder_id", $purchaseorder_id);
+		$stmt->execute();
+		if($stmt->rowCount() == 1) {
+			$result['exists'] = true;
+			$result['purchaseorder'] = $stmt->fetch();
+		}
+		else {
+			$result['exists'] = false;
+		}
+		return $result;
+	}
+	
+	public function updatePurchaseOrder($purchaseorder_id, $field, $value) {
+		$stmt = $this->db->prepare("UPDATE purchaseorder SET ".$field."=:value where purchaseorder_id=:purchaseorder_id");
+		$stmt->bindParam(':value', $value);
+		$stmt->bindParam(':purchaseorder_id', $purchaseorder_id);
+		$stmt->execute();
+	}
+	
+	public function newPurchaseOrder($purchaseorder_id, $field, $value) {
+		$stmt = $this->db->prepare("INSERT INTO purchaseorder (purchaseorder_id, ".$field.")VALUES (:purchaseorder_id, :value)");
+		$stmt->bindParam(':value', $value);
+		$stmt->bindParam(':purchaseorder_id', $purchaseorder_id);
+		$stmt->execute();
+	}
     public function register($username, $password, $role)
 	//Adds the provided user into the database and activates it.
 	

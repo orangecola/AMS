@@ -38,6 +38,7 @@
 	if(isset($_POST['purchaseorderid'])) {
 		$header = "Purchase Order ". $_POST['purchaseorderid'];
 		$result = $user->generateReport('purchaseorder_id', $_POST['purchaseorderid']);
+		$purchaseorder = $user->getPurchaseOrder($_POST['purchaseorderid']);
 	}
 	else if(isset($_POST['release'])) {
 		$header = 'Release ' . $_POST['release'];
@@ -133,7 +134,12 @@
                         </div>
                         <!-- /.col -->
                         <div class="col-xs-6">
-                          <p class="lead pull-right">Amount Total $<?php echo $total; ?></p>
+                          <p class="lead pull-right">Calculated Total $<?php echo $total;?>
+						  <?php if(isset($_POST['purchaseorderid'])) {
+							echo "<br />Discount \${$purchaseorder['purchaseorder']['discount']}";
+							echo "<br />Saved Total \${$purchaseorder['purchaseorder']['total']}";
+						}?>
+						</p>
                         </div>
                         <!-- /.col -->
                       </div>
