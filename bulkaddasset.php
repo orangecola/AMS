@@ -40,6 +40,7 @@
         $inputFileName= $_FILES['csv']['tmp_name'];
 		$data = array();
 		include 'vendors/PHPExcel/Classes/PHPExcel/IOFactory.php';
+		ini_set('memory_limit', '500M');
 		try {
             $inputFileType = PHPExcel_IOFactory::identify($inputFileName); //Identify the file
             $objReader = PHPExcel_IOFactory::createReader($inputFileType); //Creating the reader

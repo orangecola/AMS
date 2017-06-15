@@ -37,8 +37,14 @@
 	$NoChanges=0;
 	$DateError=0;
 	$NumberError = 0;
+	$ParentError = 0;
 	$Success=0;
 	
+	$distinct = $user->getDistinct();
+	
+	foreach($distinct[3] as &$value) {
+		$value = $value[0];
+	}
 	if(!(isset($_GET['id']))) {
 			header('Location: assetlist.php');
 	}
@@ -60,7 +66,8 @@
 		$candidate['release_version']		= trim($_POST['release']);
 		$candidate['expirydate']			= trim($_POST['expirydate']);
 		$candidate['remarks']				= trim($_POST['remarks']);
-			
+		$candidate['parent']				= trim($_POST['parent']);
+		
 		$candidate['vendor']				= trim($_POST['vendor']);
 		$candidate['procured_from']			= trim($_POST['procure']);
 		$candidate['shortname']				= trim($_POST['shortname']);
@@ -104,8 +111,11 @@
 				$DateError = 1;
 		}
 		
+		if (!(in_array($candidate['parent'], $distinct[3])) and $candidate['parent'] != "") {
+				$ParentError = 1;
+		}
 		
-		if ($NoChanges == 0 and $DateError == 0 and $NumberError == 0) {
+		if ($NoChanges == 0 and $DateError == 0 and $NumberError == 0 and $ParentError == 0) {
 			$candidate['version'] = $result[1]['version'] + 1;
 			$candidate['asset_tag'] = $result[1]['asset_tag'];
 			$user->editSoftware($candidate);
@@ -127,6 +137,7 @@
 		?>
 		<script>
 			document.getElementById('assetlist.php').setAttribute("class", "current-page");
+			var asset_ID = <?php echo json_encode($distinct[3]); ?>;
 		</script>
         <!-- page content -->
         <div class="right_col" role="main">
@@ -171,6 +182,12 @@
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
                     </button>
                     <strong>Success</strong> Software edits successful
+                  </div>';}
+				  
+				  if ($ParentError == 1) {echo '<div class="alert alert-danger alert-dismissible fade in" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                    </button>
+                    <strong>Error</strong> Parent Asset ID Does not exist
                   </div>';}
 				  
 				  ?>
@@ -241,6 +258,13 @@
                           </div>
                         </fieldset>
 						</div>
+					<div class="item form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Parent Asset
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input type="text" name="parent" id="parent" class="form-control col-md-7 col-xs-12">
+                        </div>
+                    </div>
 					<div class="item form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="vendor">Remarks
                         </label>
@@ -396,6 +420,7 @@
 				document.getElementsByName("description")[0].innerHTML = <?php echo json_encode($result[1]['description']);?>;
 				document.getElementsByName("quantity")[0].setAttribute("value", <?php echo json_encode($result[1]['quantity']);?>);
 				document.getElementsByName("price")[0].setAttribute("value", <?php echo json_encode($result[1]['price']);?>);
+				document.getElementsByName("parent")[0].setAttribute("value", <?php echo json_encode($result[1]['parent']);?>);
 				document.getElementsByName("crtrno")[0].setAttribute("value", <?php echo json_encode($result[1]['crtrno']);?>);
 				document.getElementsByName("pono")[0].setAttribute("value", <?php echo json_encode($result[1]['purchaseorder_id']);?>);
 				document.getElementsByName("release")[0].setAttribute("value", <?php echo json_encode($result[1]['release_version']);?>);
@@ -422,8 +447,18 @@
 	<!--Bootstrap-daterangepicker-->
 	<script src="vendors/moment/min/moment.min.js"></script>
 	<script src="vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
-	
+	<!-- jQuery autocomplete -->
+    <script src="vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js"></script>
     <!-- Custom Theme Scripts -->
     <script src="build/js/custom.min.js"></script>
+	<script>
+	console.log(asset_ID);
+	$('#parent').autocomplete({
+		lookup: asset_ID,
+		onSelect: function () {
+
+    }
+	});
+	</script>
 	</body>
 </html>

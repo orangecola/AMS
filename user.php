@@ -3,7 +3,7 @@ class USER
 {
     private $db;
 	public $softwareFields 		= array('vendor', 'procured_from', 'shortname', 'purpose', 'contract_type', 'start_date', 'license_explanation', 'verification');
-	public $assetFields 		= array('asset_ID', 'description', 'quantity', 'price', 'crtrno', 'purchaseorder_id', 'release_version', 'expirydate', 'remarks');
+	public $assetFields 		= array('asset_ID', 'description', 'quantity', 'price', 'crtrno', 'purchaseorder_id', 'release_version', 'expirydate', 'remarks', 'parent');
 	public $hardwareFields 		= array('class', 'brand', 'audit_date', 'component', 'label', 'serial', 'location', 'status', 'replacing'); 
 	public $userFields 			= array('username', 'password', 'role', 'status');
     function __construct($DB_con)
@@ -44,7 +44,7 @@ class USER
 		$stmt->bindParam(':version', $asset['version']);
 		$stmt->execute();
 		
-		$stmt = $this->db->prepare("INSERT INTO asset(asset_tag, asset_ID, description, quantity, price, purchaseorder_id, release_version, expirydate, remarks, crtrno, version) VALUES (LAST_INSERT_ID(), :asset_ID, :description, :quantity, :price, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :version)");
+		$stmt = $this->db->prepare("INSERT INTO asset(asset_tag, asset_ID, description, quantity, price, purchaseorder_id, release_version, expirydate, remarks, crtrno, parent, version) VALUES (LAST_INSERT_ID(), :asset_ID, :description, :quantity, :price, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :parent, :version)");
 		$stmt->bindParam(':asset_ID', 			$asset['asset_ID']);
 		$stmt->bindParam(':description', 		$asset['description']);
 		$stmt->bindParam(':quantity', 			$asset['quantity']);
@@ -55,7 +55,7 @@ class USER
 		$stmt->bindParam(':remarks', 			$asset['remarks']);
 		$stmt->bindParam(':crtrno', 			$asset['crtrno']);
 		$stmt->bindParam(':version',			$asset['version']);
-		
+		$stmt->bindParam(':parent',				$asset['parent']);
 		$stmt->execute();
 	}
 	
@@ -299,7 +299,7 @@ class USER
 	}
 	
 	public function editasset($asset) {
-		$stmt = $this->db->prepare("INSERT INTO asset(asset_tag, asset_ID, description, quantity, price, purchaseorder_id, release_version, expirydate, remarks, crtrno, version) VALUES (:asset_tag, :asset_ID, :description, :quantity, :price, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :version)");
+		$stmt = $this->db->prepare("INSERT INTO asset(asset_tag, asset_ID, description, quantity, price, purchaseorder_id, release_version, expirydate, remarks, crtrno, version, parent) VALUES (:asset_tag, :asset_ID, :description, :quantity, :price, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :version, :parent)");
 		$stmt->bindParam(':asset_tag',			$asset['asset_tag']);
 		$stmt->bindParam(':asset_ID', 			$asset['asset_ID']);
 		$stmt->bindParam(':description', 		$asset['description']);
@@ -311,6 +311,7 @@ class USER
 		$stmt->bindParam(':remarks', 			$asset['remarks']);
 		$stmt->bindParam(':crtrno', 			$asset['crtrno']);
 		$stmt->bindParam(':version',			$asset['version']);
+		$stmt->bindParam(':parent', 			$asset['parent']);
 		
 		$stmt->execute();
 		
@@ -667,6 +668,7 @@ class USER
             asset_version.asset_tag = :asset_tag AND
             asset_version.asset_tag = hardware.asset_tag AND
             asset_version.asset_tag = asset.asset_tag AND
+			asset_version.current_version 	= asset.version AND
             asset_version.current_version = hardware.version");
 		$stmt->bindParam(':asset_tag', $asset_tag);
 		$stmt->execute();
@@ -785,6 +787,10 @@ class USER
 		$stmt->execute();
 		$result[2] = $stmt->fetchAll();
 		
+		$stmt = $this->db->prepare("SELECT DISTINCT asset.asset_ID FROM asset, asset_version WHERE asset.version = asset_version.current_version AND asset.asset_tag = asset_version.asset_tag ORDER BY asset_ID");
+		$stmt->execute();
+		$result[3] = $stmt->fetchAll();
+		
 		return $result;
 	}
     
@@ -856,5 +862,49 @@ class USER
 		$stmt->execute();
 		return $stmt->fetch();
 	}
+	
+	public function getParents($asset, $savedIDs = array()) {
+		
+		$stmt = $this->db->prepare("SELECT 	asset.asset_ID, asset.purchaseorder_id, asset.parent 
+									FROM 	asset, asset_version 
+									WHERE 	asset.asset_ID=:asset_ID
+									AND 	asset.version=asset_version.current_version
+									AND		asset.asset_tag=asset_version.asset_tag");
+									
+		if ($asset['parent'] != "") {
+			$stmt->bindparam(":asset_ID", $asset['parent']);
+			$stmt->execute();
+			foreach($stmt->fetchAll() as $parent) {
+				if (!in_array($parent, $savedIDs)) {
+					array_push($savedIDs, $parent);
+					
+					echo "<div class='col-xs-6'>".htmlentities($parent['purchaseorder_id'])."</div>"; 
+					
+					echo "<div class='col-xs-6'>".htmlentities($parent['asset_ID'])."</div>";
+					$this->getParents($parent, $savedIDs);
+				}
+			}
+		}
+	}
+	
+	public function getChildren($asset, $savedIDs = array()) {
+		$stmt = $this->db->prepare("SELECT 	asset.asset_ID, asset.purchaseorder_id, asset.parent 
+									FROM 	asset, asset_version 
+									WHERE 	asset.parent=:asset_ID
+									AND 	asset.version=asset_version.current_version
+									AND		asset.asset_tag=asset_version.asset_tag");
+		$stmt->bindparam(":asset_ID", $asset['asset_ID']);
+		$stmt->execute();
+		foreach($stmt->fetchAll() as $child) {
+			if (!in_array($child, $savedIDs)) {
+				array_push($savedIDs, $child);
+				echo "<div class='col-xs-6'>".htmlentities($child['purchaseorder_id'])."</div>"; 
+					
+				echo "<div class='col-xs-6'>".htmlentities($child['asset_ID'])."</div>";
+				$this->getChildren($child, $savedIDs);
+			}
+		}
+	}
+	
 }
 ?>

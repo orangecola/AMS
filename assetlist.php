@@ -87,6 +87,7 @@
                       <tbody>
 						<?php 
 							foreach($hardware as $row) {
+								$parents = $user->getparents($row);
 								echo '<tr>';
 								echo "<td>".htmlentities($row['asset_ID'])."</td>";
 								echo "<td>Hardware</td>";
@@ -131,6 +132,16 @@
 								echo				"<p>Location 			: ".htmlentities($row['location']) 			."</p>";
 								echo				"<p>Status				: ".htmlentities($row['status'])			."</p>";
 								echo				"<p>Replacing			: ".htmlentities($row['replacing']) 		."</p>";
+								echo				"<h4>Parent Information</h4>";
+								echo				"<div class='row'>";
+								echo				"<div class='col-xs-6'>Asset ID</div><div class='col-xs-6'>Purchase Order No</div>";
+								echo				$user->getParents($row);
+								echo				"</div>";
+								echo				"<h4>Children Information</h4>";
+								echo				"<div class='row'>";
+								echo				"<div class='col-xs-6'>Asset ID</div><div class='col-xs-6'>Purchase Order No</div>";
+								echo				$user->getChildren($row);
+								echo				"</div>";
 								echo 			"</div>";
 								echo 		"<div class='modal-footer'>";
 								echo			"<a href=\"edithardware.php?id=".htmlentities($row['asset_tag'])."\" class=\"btn btn-info\"><i class='fa fa-edit'></i>Edit</a>";
@@ -184,6 +195,16 @@
 								echo				"<p>Start Date			: ".htmlentities($row['start_date']) 			."</p>";
 								echo				"<p>License Explanation	: ".htmlentities($row['license_explanation']) 	."</p>";
 								echo				"<p>Verification		: ".htmlentities($row['verification']) 			."</p>";
+								echo				"<h4>Parent Information</h4>";
+								echo				"<div class='row'>";
+								echo				"<div class='col-xs-6'>Asset ID</div><div class='col-xs-6'>Purchase Order No</div>";
+								echo				$user->getParents($row);
+								echo				"</div>";
+								echo				"<h4>Children Information</h4>";
+								echo				"<div class='row'>";
+								echo				"<div class='col-xs-6'>Asset ID</div><div class='col-xs-6'>Purchase Order No</div>";
+								echo				$user->getChildren($row);
+								echo				"</div>";
 								echo 			"</div>";
 								echo 		"<div class='modal-footer'>";
 								echo			"<a href=\"editsoftware.php?id=".htmlentities($row['asset_tag'])."\" class=\"btn btn-info\"><i class='fa fa-edit'></i>Edit</a>";

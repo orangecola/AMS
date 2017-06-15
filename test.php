@@ -1,5 +1,8 @@
 <?php 
-date_default_timezone_set('Asia/Singapore');
-		$time = date("Y-m-d H:i:s");
-echo $time;
+include_once('config.php');
+echo 'parent';
+$user->getParents($user->getSoftware(1668)[1]);
+
+echo 'child';
+$user->getChildren($user->getSoftware(1666)[1]);
 ?>

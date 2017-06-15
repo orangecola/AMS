@@ -37,7 +37,14 @@
 	$DateError=0;
 	$AssetError=0;
 	$Success=0;
+	$ParentError=0;
 	$result = $user->getOptions();
+	$distinct = $user->getDistinct();
+	
+	foreach($distinct[3] as &$value) {
+		$value = $value[0];
+	}
+	
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		
 		$asset['asset_ID'] 			= trim($_POST['assetid']);
@@ -49,6 +56,7 @@
 		$asset['expirydate']		= trim($_POST['expirydate']);
 		$asset['remarks']			= trim($_POST['remarks']);
 		$asset['crtrno']	 		= trim($_POST['crtrno']);
+		$asset['parent']			= trim($_POST['parent']);
 		$asset['version']			= 1;
 		
 		if (isset($_POST['software']) and isset($_POST['hardware'])) {
@@ -88,7 +96,15 @@
 				$DateError = 1;
 		}
 		
-		if ($DateError == 0 and $AssetError == 0) {
+		if (!(in_array($asset['parent'], $distinct[3])) and $asset['parent'] != "") {
+				$ParentError = 1;
+		}
+		
+		if (in_array($asset['asset_ID'], $distinct[3])) {
+				$AssetError = 1;
+		}
+		
+		if ($DateError == 0 and $AssetError == 0 and $ParentError == 0) {
 			if (isset($_POST['software'])) {
 				$user->addSoftware($asset);
 			}
@@ -111,7 +127,8 @@
 			include('sidebar.php');
 		?>
 		<script>
-			//document.getElementById('addpurchaseorder.php').setAttribute("class", "current-page");
+			document.getElementById('addasset.php').setAttribute("class", "current-page");
+			var asset_ID = <?php echo json_encode($distinct[3]); ?>;
 		</script>
         <!-- page content -->
         <div class="right_col" role="main">
@@ -146,6 +163,12 @@
                     <strong>Error</strong> Date Error
                   </div>';}
 				  
+				  if ($ParentError == 1) {echo '<div class="alert alert-danger alert-dismissible fade in" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                    </button>
+                    <strong>Error</strong> Parent Asset ID Does not exist
+                  </div>';}
+				  
 				  if ($Success == 1) {echo '<div class="alert alert-success alert-dismissible fade in" role="alert">
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
                     </button>
@@ -163,43 +186,37 @@
                         </div>
                       </div>
 					<div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="vendor">Description
-                        </label>
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="vendor">Description</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <textarea class="form-control col-md-7 col-xs-12"  name="description"></textarea>
                         </div>
                       </div>					  
                       <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="vendor">Quantity
-                        </label>
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="vendor">Quantity</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <input type="text" class="form-control col-md-7 col-xs-12"  name="quantity">
                         </div>
                       </div>
 					  <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="vendor">Price
-                        </label>
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="vendor">Price</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <input type="text" class="form-control col-md-7 col-xs-12"  name="price">
                         </div>
                       </div>
                       <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Change Request / Tech Refresh Number
-                        </label>
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Change Request / Tech Refresh Number</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <input type="text" name="crtrno" class="form-control col-md-7 col-xs-12">
                         </div>
                       </div>
 					  <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Purchase Order ID
-                        </label>
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Purchase Order ID</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <input type="text" name="pono" class="form-control col-md-7 col-xs-12">
                         </div>
                       </div>
 					  <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Release version
-                        </label>
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Release version</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <input type="text" name="release" class="form-control col-md-7 col-xs-12">
                         </div>
@@ -212,23 +229,28 @@
                             <div class="controls">
                               <div class="xdisplay_inputx form-group">
 							  
-                                <input type="text" class="form-control " id="single_cal3" placeholder="First Name" name="expirydate" aria-describedby="inputSuccess2Status4">
+                                <input type="text" class="form-control " id="single_cal3" name="expirydate" aria-describedby="inputSuccess2Status4">
                                 
                                 <span id="inputSuccess2Status4" class="sr-only">(success)</span>
                               </div>
                             </div>
                           </div>
                         </fieldset>
-						</div>
+					</div>
 					<div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="vendor">Remarks
-                        </label>
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Parent Asset</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input type="text" name="parent" id="parent" class="form-control col-md-7 col-xs-12">
+                        </div>
+				    </div>
+					<div class="item form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="vendor">Remarks</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <textarea class="form-control col-md-7 col-xs-12"  name="remarks"></textarea>
                         </div>
                       </div>
-					  <div class="x_content">
 
+					<!-- Tabs -->
 
                     <div class="" role="tabpanel" data-example-id="togglable-tabs">
                       <ul id="myTab" class="nav nav-tabs bar_tabs" role="tablist">
@@ -365,7 +387,7 @@
                             <div class="controls">
                               <div class="xdisplay_inputx form-group">
 							  
-                                <input type="text" class="form-control" name="startdate" id="single_cal4" placeholder="First Name" aria-describedby="inputSuccess2Status4">
+                                <input type="text" class="form-control" name="startdate" id="single_cal4" aria-describedby="inputSuccess2Status4">
                                 
                                 <span id="inputSuccess2Status4" class="sr-only">(success)</span>
                               </div>
@@ -479,6 +501,7 @@
                         </div>
                       </div>
                     </div>
+					<!-- /tabs -->
                   </div>
                     </form>
                   </div>
@@ -513,8 +536,18 @@
 	<!--Bootstrap-daterangepicker-->
 	<script src="vendors/moment/min/moment.min.js"></script>
 	<script src="vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
-	
+	<!-- jQuery autocomplete -->
+    <script src="vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js"></script>
     <!-- Custom Theme Scripts -->
     <script src="build/js/custom.min.js"></script>
+	<script>
+	console.log(asset_ID);
+	$('#parent').autocomplete({
+		lookup: asset_ID,
+		onSelect: function () {
+
+    }
+	});
+	</script>
 	</body>
 </html>
