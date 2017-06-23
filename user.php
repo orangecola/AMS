@@ -2,11 +2,12 @@
 class USER
 {
     private $db;
-	public $softwareFields 		= array('vendor', 'procured_from', 'shortname', 'purpose', 'contract_type', 'start_date', 'license_explanation', 'verification');
-	public $assetFields 		= array('asset_ID', 'description', 'quantity', 'price', 'crtrno', 'purchaseorder_id', 'release_version', 'expirydate', 'remarks', 'parent');
-	public $hardwareFields 		= array('class', 'brand', 'audit_date', 'component', 'label', 'serial', 'location', 'status', 'replacing'); 
+	public $softwareFields 		= array('vendor', 'procured_from', 'shortname', 'purpose', 'contract_type', 'start_date', 'license_explanation');
+	public $assetFields 		= array('asset_ID', 'description', 'quantity', 'price', 'currency', 'crtrno', 'purchaseorder_id', 'release_version', 'expirydate', 'remarks', 'parent', 'status');
+	public $hardwareFields 		= array('class', 'brand', 'audit_date', 'component', 'label', 'serial', 'location', 'replacing'); 
 	public $userFields 			= array('username', 'password', 'role', 'status');
-    function __construct($DB_con)
+    public $options = ['status', 'vendor', 'procured_from', 'shortname', 'purpose', 'contracttype', 'releaseversion', 'class', 'brand', 'location', 'server', 'currency'];
+	function __construct($DB_con)
     {
       $this->db = $DB_con;
     }
@@ -44,25 +45,39 @@ class USER
 		$stmt->bindParam(':version', $asset['version']);
 		$stmt->execute();
 		
-		$stmt = $this->db->prepare("INSERT INTO asset(asset_tag, asset_ID, description, quantity, price, purchaseorder_id, release_version, expirydate, remarks, crtrno, parent, version) VALUES (LAST_INSERT_ID(), :asset_ID, :description, :quantity, :price, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :parent, :version)");
+		$stmt = $this->db->prepare("INSERT INTO 
+			asset(
+			asset_tag, asset_ID, description, quantity, price, currency, purchaseorder_id, release_version, expirydate, remarks, crtrno, status, parent, version, lastedited
+			) VALUES (
+			LAST_INSERT_ID(), :asset_ID, :description, :quantity, :price, :currency, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :status, :parent, :version, :lastedited)");
 		$stmt->bindParam(':asset_ID', 			$asset['asset_ID']);
 		$stmt->bindParam(':description', 		$asset['description']);
 		$stmt->bindParam(':quantity', 			$asset['quantity']);
 		$stmt->bindParam(':price', 				$asset['price']);
+		$stmt->bindParam(':currency',			$asset['currency']);
 		$stmt->bindParam(':purchaseorder_id', 	$asset['purchaseorder_id']);
 		$stmt->bindParam(':release_version', 	$asset['release_version']);
 		$stmt->bindParam(':expirydate', 		$asset['expirydate']);
 		$stmt->bindParam(':remarks', 			$asset['remarks']);
 		$stmt->bindParam(':crtrno', 			$asset['crtrno']);
 		$stmt->bindParam(':version',			$asset['version']);
+		$stmt->bindParam(':status',				$asset['status']);
 		$stmt->bindParam(':parent',				$asset['parent']);
+		date_default_timezone_set('Asia/Singapore');
+		$time = date("Y-m-d H:i:s");
+		$stmt->bindParam(':lastedited',			$time);
 		$stmt->execute();
 	}
 	
 	public function addSoftware($asset) {
 		$this->addAsset($asset);
 		
-		$stmt = $this->db->prepare("INSERT INTO software(asset_tag, vendor, procured_from, shortname, purpose, contract_type, start_date, license_explanation, verification, version) VALUES (LAST_INSERT_ID(), :vendor, :procured_from, :shortname, :purpose, :contract_type, :start_date, :license_explanation, :verification, :version)");
+		$stmt = $this->db->prepare("INSERT INTO software(
+		
+		asset_tag, vendor, procured_from, shortname, purpose, contract_type, start_date, license_explanation, version
+		) VALUES (
+		LAST_INSERT_ID(), :vendor, :procured_from, :shortname, :purpose, :contract_type, :start_date, :license_explanation, :version)");
+		
 		$stmt->bindParam(':vendor', 				$asset['vendor']);
 		$stmt->bindParam(':procured_from', 			$asset['procured_from']);
 		$stmt->bindParam(':shortname', 				$asset['shortname']);
@@ -70,7 +85,6 @@ class USER
 		$stmt->bindParam(':contract_type', 			$asset['contract_type']);
 		$stmt->bindParam(':start_date', 			$asset['start_date']);
 		$stmt->bindParam(':license_explanation', 	$asset['license_explanation']);
-		$stmt->bindParam(':verification', 			$asset['verification']);
 		$stmt->bindParam(':version',				$asset['version']);
 		$stmt->execute();
 		$this->savelog($_SESSION['username'], "created software asset ".$asset['asset_ID']." version ".$asset['version']);
@@ -79,7 +93,7 @@ class USER
 	public function addHardware($asset) {
 		$this->addAsset($asset);
 		
-		$stmt = $this->db->prepare("INSERT INTO hardware(asset_tag, class, brand, audit_date, component, label, serial, location, status, replacing, version) VALUES (LAST_INSERT_ID(), :class, :brand, :audit_date, :component, :label, :serial, :location, :status, :replacing, :version)");
+		$stmt = $this->db->prepare("INSERT INTO hardware(asset_tag, class, brand, audit_date, component, label, serial, location, replacing, version) VALUES (LAST_INSERT_ID(), :class, :brand, :audit_date, :component, :label, :serial, :location, :replacing, :version)");
 		$stmt->bindParam(':class', 		$asset['class']);
 		$stmt->bindParam(':brand', 		$asset['brand']);
 		$stmt->bindParam(':audit_date', $asset['audit_date']);
@@ -87,7 +101,6 @@ class USER
 		$stmt->bindParam(':label', 		$asset['label']);
 		$stmt->bindParam(':serial', 	$asset['serial']);
 		$stmt->bindParam(':location', 	$asset['location']);
-		$stmt->bindParam(':status', 	$asset['status']);
 		$stmt->bindParam(':replacing', 	$asset['replacing']);
 		$stmt->bindParam(':version',	$asset['version']);
 		$stmt->execute();
@@ -203,11 +216,11 @@ class USER
 	public function bulkaddsoftware($data) {
 		$assetv 	= $this->db->prepare("INSERT INTO asset_version(current_version) VALUES (:version)");
 		$assets		= $this->db->prepare("INSERT INTO asset(asset_tag, asset_ID, description, quantity, price, purchaseorder_id, release_version, expirydate, remarks, crtrno, version) VALUES (LAST_INSERT_ID(), :asset_ID, :description, :quantity, :price, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :version)");
-		$software 	= $this->db->prepare("INSERT INTO software(asset_tag, vendor, procured_from, shortname, purpose, contract_type, start_date, license_explanation, verification, version) VALUES (LAST_INSERT_ID(), :vendor, :procured_from, :shortname, :purpose, :contract_type, :start_date, :license_explanation, :verification, :version)");
+		$software 	= $this->db->prepare("INSERT INTO software(asset_tag, vendor, procured_from, shortname, purpose, contract_type, start_date, license_explanation, version) VALUES (LAST_INSERT_ID(), :vendor, :procured_from, :shortname, :purpose, :contract_type, :start_date, :license_explanation, :version)");
 				
 		$asset_ID = $description = $quantity = $price = $purchaseorder_id = $release_version = $expirydate = $remarks = $crtrno = "";
 		
-		$vendor = $procured_from = $shortname = $purpose = $contract_type = $start_date = $license_explanation = $verification = "";
+		$vendor = $procured_from = $shortname = $purpose = $contract_type = $start_date = $license_explanation = "";
 		
 		$assetv->bindValue(':version', 1);
 		
@@ -229,7 +242,6 @@ class USER
 		$software->bindParam(':contract_type', 			$contract_type);
 		$software->bindParam(':start_date', 			$start_date);
 		$software->bindParam(':license_explanation',	$license_explanation);
-		$software->bindParam(':verification', 			$verification);
 		$software->bindValue(':version', 1);
 		
 		foreach($data as $row) {
@@ -282,9 +294,6 @@ class USER
 			if(isset($row['license explanation'])) {
 				$license_explanation = $row['license explanation'];
 			}
-			if(isset($row['Verification Status'])) {
-				$verification = $row['Verification Status'];
-			}
 			
 			$assetv->execute();
 			$assets->execute();
@@ -292,19 +301,20 @@ class USER
 			
 			$asset_ID = $description = $quantity = $price = $purchaseorder_id = $release_version = $expirydate = $remarks = $crtrno = "";
 		
-			$vendor = $procured_from = $shortname = $purpose = $contract_type = $start_date = $license_explanation = $verification = "";
+			$vendor = $procured_from = $shortname = $purpose = $contract_type = $start_date = $license_explanation = "";
 		
 		}
 		$this->savelog($_SESSION['username'], "batch imported software assets");
 	}
 	
 	public function editasset($asset) {
-		$stmt = $this->db->prepare("INSERT INTO asset(asset_tag, asset_ID, description, quantity, price, purchaseorder_id, release_version, expirydate, remarks, crtrno, version, parent) VALUES (:asset_tag, :asset_ID, :description, :quantity, :price, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :version, :parent)");
+		$stmt = $this->db->prepare("INSERT INTO asset(asset_tag, asset_ID, description, quantity, price, currency, purchaseorder_id, release_version, expirydate, remarks, crtrno, version, parent, status, lastedited) VALUES (:asset_tag, :asset_ID, :description, :quantity, :price, :currency, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :version, :parent, :status, :lastedited)");
 		$stmt->bindParam(':asset_tag',			$asset['asset_tag']);
 		$stmt->bindParam(':asset_ID', 			$asset['asset_ID']);
 		$stmt->bindParam(':description', 		$asset['description']);
 		$stmt->bindParam(':quantity', 			$asset['quantity']);
 		$stmt->bindParam(':price', 				$asset['price']);
+		$stmt->bindParam(':currency',			$asset['currency']);
 		$stmt->bindParam(':purchaseorder_id', 	$asset['purchaseorder_id']);
 		$stmt->bindParam(':release_version', 	$asset['release_version']);
 		$stmt->bindParam(':expirydate', 		$asset['expirydate']);
@@ -312,7 +322,10 @@ class USER
 		$stmt->bindParam(':crtrno', 			$asset['crtrno']);
 		$stmt->bindParam(':version',			$asset['version']);
 		$stmt->bindParam(':parent', 			$asset['parent']);
-		
+		$stmt->bindParam(':status', 			$asset['status']);
+		date_default_timezone_set('Asia/Singapore');
+		$time = date("Y-m-d H:i:s");
+		$stmt->bindParam(':lastedited',			$time);
 		$stmt->execute();
 		
 		$stmt = $this->db->prepare("UPDATE asset_version SET current_version=:version where asset_tag=:asset_tag");
@@ -324,8 +337,8 @@ class USER
 	public function editSoftware($asset) {
 		$this->editAsset($asset);
 		
-		$stmt = $this->db->prepare("INSERT INTO software(asset_tag, vendor, procured_from, shortname, purpose, contract_type, start_date, license_explanation, verification, version) VALUES (:asset_tag, :vendor, :procured_from, :shortname, :purpose, :contract_type, :start_date, :license_explanation, :verification, :version)");
-		$stmt->bindParam(':asset_tag',	$asset['asset_tag']);
+		$stmt = $this->db->prepare("INSERT INTO software(asset_tag, vendor, procured_from, shortname, purpose, contract_type, start_date, license_explanation, version) VALUES (:asset_tag, :vendor, :procured_from, :shortname, :purpose, :contract_type, :start_date, :license_explanation, :version)");
+		$stmt->bindParam(':asset_tag',				$asset['asset_tag']);
 		$stmt->bindParam(':vendor', 				$asset['vendor']);
 		$stmt->bindParam(':procured_from', 			$asset['procured_from']);
 		$stmt->bindParam(':shortname', 				$asset['shortname']);
@@ -333,7 +346,6 @@ class USER
 		$stmt->bindParam(':contract_type', 			$asset['contract_type']);
 		$stmt->bindParam(':start_date', 			$asset['start_date']);
 		$stmt->bindParam(':license_explanation', 	$asset['license_explanation']);
-		$stmt->bindParam(':verification', 			$asset['verification']);
 		$stmt->bindParam(':version',				$asset['version']);
 		$stmt->execute();
 		$this->savelog($_SESSION['username'], "edited software asset ".$asset['asset_ID']." (version ".$asset['version'].")");
@@ -342,7 +354,7 @@ class USER
 	public function editHardware($asset) {
 		$this->editAsset($asset);
 		
-		$stmt = $this->db->prepare("INSERT INTO hardware(asset_tag, class, brand, audit_date, component, label, serial, location, status, replacing, version) VALUES (:asset_tag, :class, :brand, :audit_date, :component, :label, :serial, :location, :status, :replacing, :version)");
+		$stmt = $this->db->prepare("INSERT INTO hardware(asset_tag, class, brand, audit_date, component, label, serial, location, replacing, version) VALUES (:asset_tag, :class, :brand, :audit_date, :component, :label, :serial, :location, :replacing, :version)");
 		$stmt->bindParam(':asset_tag',	$asset['asset_tag']);
 		$stmt->bindParam(':class', 		$asset['class']);
 		$stmt->bindParam(':brand', 		$asset['brand']);
@@ -351,7 +363,6 @@ class USER
 		$stmt->bindParam(':label', 		$asset['label']);
 		$stmt->bindParam(':serial', 	$asset['serial']);
 		$stmt->bindParam(':location', 	$asset['location']);
-		$stmt->bindParam(':status', 	$asset['status']);
 		$stmt->bindParam(':replacing', 	$asset['replacing']);
 		$stmt->bindParam(':version',	$asset['version']);
 		$stmt->execute();
@@ -397,6 +408,7 @@ class USER
 	}
 	
 	public function getPurchaseOrder($purchaseorder_id) {
+		$result['purchaseorder_id'] = $purchaseorder_id;
 		$result['validation'] = false;
 		//Gets all of the software details
 		$stmt = $this->db->prepare("SELECT 	asset.*, software.*
@@ -412,8 +424,9 @@ class USER
 		$stmt->execute();
 		if($stmt->rowCount() > 0) {
 			$result['validation'] = true;
+			$result['software'] = $stmt->fetchAll();
 		}
-		$result['software'] = $stmt->fetchAll();
+
 	
 		//Gets all of the hardware details
 		$stmt = $this->db->prepare("SELECT 	asset.*, hardware.*
@@ -429,8 +442,9 @@ class USER
 		$stmt->execute();
 		if($stmt->rowCount() > 0) {
 			$result['validation'] = true;
+			$result['hardware'] = $stmt->fetchAll();
 		}
-		$result['hardware'] = $stmt->fetchAll();
+
 		
 		$stmt = $this->db->prepare("SELECT * FROM purchaseorder where purchaseorder_id = :purchaseorder_id");
 		$stmt->bindParam(":purchaseorder_id", $purchaseorder_id);
@@ -795,38 +809,14 @@ class USER
 	}
     
     public function getOptions() {
+		
 		$result = array();
-		$stmt = $this->db->prepare("SELECT * from vendor ORDER BY vendor_name");
-		$stmt->execute();
-		$result['vendor'] = $stmt->fetchAll();
 		
-		$stmt = $this->db->prepare("SELECT * from procured_from ORDER BY procured_from_name");
-		$stmt->execute();
-		$result['procured_from'] = $stmt->fetchAll();
-		
-		$stmt = $this->db->prepare("SELECT * from shortname ORDER BY shortname_name");
-		$stmt->execute();
-		$result['shortname'] = $stmt->fetchAll();
-		
-        $stmt = $this->db->prepare("SELECT * from purpose ORDER BY purpose_name");
-		$stmt->execute();
-		$result['purpose'] = $stmt->fetchAll();
-        
-        $stmt = $this->db->prepare("SELECT * from contracttype ORDER BY contracttype_name");
-		$stmt->execute();
-		$result['contracttype'] = $stmt->fetchAll();
-        
-        $stmt = $this->db->prepare("SELECT * from class ORDER BY class_name");
-		$stmt->execute();
-		$result['class'] = $stmt->fetchAll();
-        
-        $stmt = $this->db->prepare("SELECT * from brand ORDER BY brand_name");
-		$stmt->execute();
-		$result['brand'] = $stmt->fetchAll();
-        
-        $stmt = $this->db->prepare("SELECT * from server ORDER BY server_name");
-		$stmt->execute();
-		$result['server'] = $stmt->fetchAll();
+		foreach ($this->options as $option) {
+			$stmt = $this->db->prepare("SELECT * from {$option} ORDER BY {$option}_name");
+			$stmt->execute();
+			$result[$option] = $stmt->fetchAll();
+		}
 		return $result;
 	}
 	
@@ -845,7 +835,7 @@ class USER
 		  $stmt = $this->db->prepare("INSERT INTO ".$type." (".$type."_name) VALUES(:filter)");
 		  $stmt->bindparam(":filter", $value);
 		  $stmt->execute();
-		  $this->savelog($_SESSION['username'], "added option $filter for $type");
+		  $this->savelog($_SESSION['username'], "added option $value for $type");
 	}
     
     public function deleteOption($type, $value) {
@@ -853,7 +843,7 @@ class USER
 		  $stmt = $this->db->prepare("DELETE FROM ".$type." WHERE ".$type."_id= :filter");
 		  $stmt->bindparam(":filter", $value);
 		  $stmt->execute();
-		  $this->savelog($_SESSION['username'], "removed option $filter for $type");
+		  $this->savelog($_SESSION['username'], "removed option $value for $type");
 	}
 	
 	public function getCurrentVersion($asset_tag) {
@@ -863,7 +853,7 @@ class USER
 		return $stmt->fetch();
 	}
 	
-	public function getParents($asset, $savedIDs = array()) {
+	public function getParents($asset, &$savedIDs = array()) {
 		
 		$stmt = $this->db->prepare("SELECT 	asset.asset_ID, asset.purchaseorder_id, asset.parent 
 									FROM 	asset, asset_version 
@@ -878,9 +868,9 @@ class USER
 				if (!in_array($parent, $savedIDs)) {
 					array_push($savedIDs, $parent);
 					
-					echo "<div class='col-xs-6'>".htmlentities($parent['purchaseorder_id'])."</div>"; 
+					echo "<div class='col-xs-6'>".htmlentities($parent['asset_ID'])."</div>"; 
 					
-					echo "<div class='col-xs-6'>".htmlentities($parent['asset_ID'])."</div>";
+					echo "<div class='col-xs-6'>".htmlentities($parent['purchaseorder_id'])."</div>";
 					$this->getParents($parent, $savedIDs);
 				}
 			}
@@ -898,13 +888,138 @@ class USER
 		foreach($stmt->fetchAll() as $child) {
 			if (!in_array($child, $savedIDs)) {
 				array_push($savedIDs, $child);
-				echo "<div class='col-xs-6'>".htmlentities($child['purchaseorder_id'])."</div>"; 
+				echo "<div class='col-xs-6'>".htmlentities($child['asset_ID'])."</div>"; 
 					
-				echo "<div class='col-xs-6'>".htmlentities($child['asset_ID'])."</div>";
+				echo "<div class='col-xs-6'>".htmlentities($child['purchaseorder_id'])."</div>";
 				$this->getChildren($child, $savedIDs);
 			}
 		}
 	}
 	
+	public function savePurchaseOrderFile($purchaseorder, $file) {
+		
+		$fileName = $file['name'];
+		$tmpName  = $file['tmp_name'];
+		$fileSize = $file['size'];
+		$fileType = $file['type'];
+
+		$fp      = fopen($tmpName, 'r');
+		$content = fread($fp, filesize($tmpName));
+		$content = addslashes($content);
+		fclose($fp);
+		
+		$sql = "";
+		if ($purchaseorder['exists'] == 1) {
+		
+			$sql = "UPDATE purchaseorder SET filecontent=:filecontent, filename=:filename, filesize=:filesize, filetype=:filetype where purchaseorder_id=:purchaseorder_id";
+		}
+		else {
+			$sql = "INSERT INTO purchaseorder (purchaseorder_id, filecontent, filename, filesize, filetype)VALUES (:purchaseorder_id, :filecontent, :filename, :filesize, :filetype)";
+		}
+		
+		$stmt = $this->db->prepare($sql);
+		$stmt->bindParam(':purchaseorder_id', $purchaseorder['purchaseorder_id']);
+		$stmt->bindParam(':filename', $fileName);
+		$stmt->bindParam(':filesize', $fileSize);
+		$stmt->bindParam(':filetype', $fileType);
+		$stmt->bindParam(':filecontent', $content);
+		
+		$stmt->execute();
+	}
+	
+	public function getPurchaseOrderFile($purchaseorder_id) {
+		$stmt = $this->db->prepare("SELECT purchaseorder_id, filename, filecontent, filesize, filetype FROM purchaseorder WHERE purchaseorder_id=:purchaseorder_id");
+		$stmt->bindParam(':purchaseorder_id', $purchaseorder_id);
+		$stmt->execute();
+		return $stmt->fetch();
+	}
+	
+	public function deletePurchaseOrderFile($purchaseorder_id) {
+		$sql = "UPDATE purchaseorder SET filecontent=NULL, filename=NULL, filesize=NULL, filetype=NULL where purchaseorder_id=:purchaseorder_id";
+		$stmt = $this->db->prepare($sql);
+		$stmt->bindParam(':purchaseorder_id', $purchaseorder_id);
+		$stmt->execute();
+	}
+	
+	public function printAssetModal($asset) {
+		#Modal for more information
+		echo "<div id='".htmlentities($asset['asset_tag'])."view' class='modal fade' role='dialog'>";
+		echo 	"<div class='modal-dialog'>";
+		echo 		"<div class='modal-content'>";
+		echo 			"<div class='modal-header'>";
+		echo 				"<button type='button' class='close' data-dismiss='modal'>&times;</button>";
+		echo 					"<h3 class='modal-title'>Asset ".htmlentities($asset['asset_ID'])." Information</h3>";
+		echo 			"</div>";
+		echo	 		"<div class='modal-body'>";
+		echo				"<h4>Asset Information</h4>";
+		echo				"<p>Description			: ".htmlentities($asset['description'])			."</p>";
+		echo				"<p>Quantity			: ".htmlentities($asset['quantity'])			."</p>";
+		echo				"<p>Price				: ".htmlentities($asset['price']) . " " 		. htmlentities($asset['currency'])	."</p>";
+		echo				"<p>CR / TR No			: ".htmlentities($asset['crtrno'])				."</p>";
+		echo				"<p>Purchase Order ID	: ".htmlentities($asset['purchaseorder_id'])	."</p>";
+		echo				"<p>Release Version		: ".htmlentities($asset['release_version']) 	."</p>";
+		echo				"<p>Expiry Date			: ".htmlentities($asset['expirydate']) 			."</p>";
+		echo				"<p>Status				: ".htmlentities($asset['status'])				."</p>";
+		echo				"<p>Remarks				: ".htmlentities($asset['remarks']) 			."</p>";
+	}
+	
+	public function printSoftwareModal($software) {
+		$this->printAssetModal($software);
+		echo				"<h4>Software Information</h4>";
+		echo				"<p>Vendor				: ".htmlentities($software['vendor'])				."</p>";
+		echo				"<p>Procured From		: ".htmlentities($software['procured_from']) 		."</p>";
+		echo				"<p>Short Name			: ".htmlentities($software['shortname']) 			."</p>";
+		echo				"<p>Purpose				: ".htmlentities($software['purpose']) 				."</p>";
+		echo 				"<p>Contract type		: ".htmlentities($software['contract_type']) 		."</p>";
+		echo				"<p>Start Date			: ".htmlentities($software['start_date']) 			."</p>";
+		echo				"<p>License Explanation	: ".htmlentities($software['license_explanation']) 	."</p>";
+		echo				"<h4>Parent Information</h4>";
+		echo				"<div class='row'>";
+		echo				"<div class='col-xs-6'>Asset ID</div><div class='col-xs-6'>Purchase Order No</div>";
+		echo				$this->getParents($software);
+		echo				"</div>";
+		echo				"<h4>Children Information</h4>";
+		echo				"<div class='row'>";
+		echo				"<div class='col-xs-6'>Asset ID</div><div class='col-xs-6'>Purchase Order No</div>";
+		echo				$this->getChildren($software);
+		echo				"</div>";
+		echo 			"</div>";
+		echo 		"<div class='modal-footer'>";
+		echo			"<a href=\"editsoftware.php?id=".htmlentities($software['asset_tag'])."\" class=\"btn btn-info\"><i class='fa fa-edit'></i>Edit</a>";
+		echo 			"<button type='button' class='btn btn-default' data-dismiss='modal'>Close</button>";
+		echo		"</div>";
+		echo	"</div>";
+		echo "</div>";
+	}
+	
+	public function printHardwareModal($hardware) {
+		$this->printAssetModal($hardware);
+		echo				"<h4>Hardware Information</h4>";
+		echo				"<p>Class				: ".htmlentities($hardware['class']) 			."</p>";
+		echo				"<p>Brand				: ".htmlentities($hardware['brand']) 			."</p>";
+		echo				"<p>Audit Date			: ".htmlentities($hardware['audit_date']) 		."</p>";
+		echo				"<p>Component			: ".htmlentities($hardware['component']) 		."</p>";
+		echo 				"<p>Label				: ".htmlentities($hardware['label']) 			."</p>";
+		echo				"<p>Serial				: ".htmlentities($hardware['serial']) 			."</p>";
+		echo				"<p>Location 			: ".htmlentities($hardware['location']) 		."</p>";
+		echo				"<p>RMA					: ".htmlentities($hardware['replacing']) 		."</p>";
+		echo				"<h4>Parent Information</h4>";
+		echo				"<div class='row'>";
+		echo				"<div class='col-xs-6'>Asset ID</div><div class='col-xs-6'>Purchase Order No</div>";
+		echo				$this->getParents($hardware);
+		echo				"</div>";
+		echo				"<h4>Children Information</h4>";
+		echo				"<div class='row'>";
+		echo				"<div class='col-xs-6'>Asset ID</div><div class='col-xs-6'>Purchase Order No</div>";
+		echo				$this->getChildren($hardware);
+		echo				"</div>";
+		echo 			"</div>";
+		echo 		"<div class='modal-footer'>";
+		echo			"<a href=\"edithardware.php?id=".htmlentities($hardware['asset_tag'])."\" class=\"btn btn-info\"><i class='fa fa-edit'></i>Edit</a>";
+		echo 			"<button type='button' class='btn btn-default' data-dismiss='modal'>Close</button>";
+		echo		"</div>";
+		echo	"</div>";
+		echo "</div>";
+	}
 }
 ?>

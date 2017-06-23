@@ -9,6 +9,7 @@
 	if(isset($_POST['purchaseorderid'])) {
 		$result = $user->getPurchaseOrder($_POST['purchaseorderid']);
 		if(!$result['validation']) {
+			echo 'Purchase Order does not exist';
 			exit();
 		}
 		if($result['exists']) {
@@ -29,9 +30,9 @@
 				$discount = $result['purchaseorder']['discount'];
 			}
 		}
-	}	
+	}
 ?>  
-	<form id="demo-form2" class="form-horizontal form-label-left" method="post" action="report.php">
+	<form id="demo-form2" class="form-horizontal form-label-left" method="post" enctype="multipart/form-data">
 		<div class="item form-group">
 			<label class="control-label col-md-3 col-sm-3 col-xs-12">Discount
 			</label>
@@ -56,6 +57,36 @@
 				</div>
 			</div>
 		</div>
+		<div class="item form-group">
+			<label class="control-label col-md-3 col-sm-3 col-xs-12">Purchase Order Receipt
+			</label>
+			<div class="col-md-6 col-sm-6 col-xs-12">
+				<div class="input-group">
+					<input type="hidden" name="MAX_FILE_SIZE" value="2000000">
+					<input type="hidden" name="purchaseorderid" value="<?php echo htmlentities($_POST['purchaseorderid']);?>">
+					<input name="file" type="file">				
+					<span class="input-group-btn">
+						<button type="submit" class="btn btn-primary" name="action" value="upload">Upload</button>
+					</span>
+				</div>
+			</div>
+			
+		</div>
+		<?php if (isset($result['purchaseorder']['filename']) and $result['purchaseorder']['filename'] != "") {?>
+			<label class="control-label col-md-3 col-sm-3 col-xs-12">Saved File
+			</label>
+			<div class="col-md-6 col-sm-6 col-xs-12">
+				<div class="input-group">
+					<?php
+						echo "<a href='downloadpurchaseorder.php?id={$result['purchaseorder_id']}'>{$result['purchaseorder']['filename']}</a> ";
+					?>
+					<span class="input-group-btn">
+						<button type="submit" class="btn btn-danger" name="action" value="delete">Delete</button>
+					</span>
+				</div>
+			</div>	
+
+		<?php } ?>
 	</form>
 		<table id="datatable" class="table table-striped table-bordered">
                       <thead>
@@ -72,104 +103,105 @@
 
                       <tbody>
 						<?php 
-							foreach($result['hardware'] as $row) {
-								echo '<tr>';
-								echo "<td>".htmlentities($row['asset_ID'])."</td>";
-								echo "<td>Hardware</td>";
-								echo "<td>".htmlentities($row['description'])		."</td>";
-								echo "<td>".htmlentities($row['quantity'])			."</td>";
-								echo "<td>".htmlentities($row['price'])				."</td>";
-								echo "<td>";
-								echo "<a class='btn btn-primary btn-xs' data-toggle='modal' data-target="."#".htmlentities($row['asset_tag'])."view href="."#".htmlentities($row['asset_tag'])."view><i class='fa fa-folder'></i> View </a>";
-								echo "<a href=\"edithardware.php?id=".htmlentities($row['asset_tag'])."\" class=\"btn btn-info btn-xs\"><i class='fa fa-edit'></i>Edit</a>";
-								echo "</td>";
-								echo '</tr>';
-								#Modal for more information
-								echo "<div id='".htmlentities($row['asset_tag'])."view' class='modal fade' role='dialog'>";
-								echo 	"<div class='modal-dialog'>";
-								echo 		"<div class='modal-content'>";
-								echo 			"<div class='modal-header'>";
-								echo 				"<button type='button' class='close' data-dismiss='modal'>&times;</button>";
-								echo 					"<h3 class='modal-title'>Asset ".htmlentities($row['asset_ID'])." Information</h3>";
-								echo 			"</div>";
-								echo	 		"<div class='modal-body'>";
-								echo				"<h4>Asset Information</h4>";
-								echo				"<p>Description			: ".htmlentities($row['description'])		."</p>";
-								echo				"<p>Quantity			: ".htmlentities($row['quantity'])			."</p>";
-								echo				"<p>Price				: ".htmlentities($row['price'])				."</p>";
-								echo				"<p>CR / TR No			: ".htmlentities($row['crtrno'])			."</p>";
-								echo				"<p>Purchase Order ID	: ".htmlentities($row['purchaseorder_id'])	."</p>";
-								echo				"<p>Release Version		: ".htmlentities($row['release_version']) 	."</p>";
-								echo				"<p>Expiry Date			: ".htmlentities($row['expirydate']) 		."</p>";
-								echo				"<p>Remarks				: ".htmlentities($row['remarks']) 			."</p>";
-								echo				"<h4>Hardware Information</h4>";
-								echo				"<p>Class				: ".htmlentities($row['class']) 			."</p>";
-								echo				"<p>Brand				: ".htmlentities($row['brand']) 			."</p>";
-								echo				"<p>Audit Date			: ".htmlentities($row['audit_date']) 		."</p>";
-								echo				"<p>Component			: ".htmlentities($row['component']) 		."</p>";
-								echo 				"<p>Label				: ".htmlentities($row['label']) 			."</p>";
-								echo				"<p>Serial				: ".htmlentities($row['serial']) 			."</p>";
-								echo				"<p>Location 			: ".htmlentities($row['location']) 			."</p>";
-								echo				"<p>Status				: ".htmlentities($row['status'])			."</p>";
-								echo				"<p>Replacing			: ".htmlentities($row['replacing']) 		."</p>";
-								echo 			"</div>";
-								echo 		"<div class='modal-footer'>";
-								echo			"<a href=\"edithardware.php?id=".htmlentities($row['asset_tag'])."\" class=\"btn btn-info\"><i class='fa fa-edit'></i>Edit</a>";
-								echo 			"<button type='button' class='btn btn-default' data-dismiss='modal'>Close</button>";
-								echo		"</div>";
-								echo	"</div>";
-								echo "</div>";
+							if (isset($result['hardware'])) {
+								foreach($result['hardware'] as $row) {
+									echo '<tr>';
+									echo "<td>".htmlentities($row['asset_ID'])."</td>";
+									echo "<td>Hardware</td>";
+									echo "<td>".htmlentities($row['description'])		."</td>";
+									echo "<td>".htmlentities($row['quantity'])			."</td>";
+									echo "<td>".htmlentities($row['price'])				."</td>";
+									echo "<td>";
+									echo "<a class='btn btn-primary btn-xs' data-toggle='modal' data-target="."#".htmlentities($row['asset_tag'])."view href="."#".htmlentities($row['asset_tag'])."view><i class='fa fa-folder'></i> View </a>";
+									echo "<a href=\"edithardware.php?id=".htmlentities($row['asset_tag'])."\" class=\"btn btn-info btn-xs\"><i class='fa fa-edit'></i>Edit</a>";
+									echo "</td>";
+									echo '</tr>';
+									#Modal for more information
+									echo "<div id='".htmlentities($row['asset_tag'])."view' class='modal fade' role='dialog'>";
+									echo 	"<div class='modal-dialog'>";
+									echo 		"<div class='modal-content'>";
+									echo 			"<div class='modal-header'>";
+									echo 				"<button type='button' class='close' data-dismiss='modal'>&times;</button>";
+									echo 					"<h3 class='modal-title'>Asset ".htmlentities($row['asset_ID'])." Information</h3>";
+									echo 			"</div>";
+									echo	 		"<div class='modal-body'>";
+									echo				"<h4>Asset Information</h4>";
+									echo				"<p>Description			: ".htmlentities($row['description'])		."</p>";
+									echo				"<p>Quantity			: ".htmlentities($row['quantity'])			."</p>";
+									echo				"<p>Price				: ".htmlentities($row['price'])				."</p>";
+									echo				"<p>CR / TR No			: ".htmlentities($row['crtrno'])			."</p>";
+									echo				"<p>Purchase Order ID	: ".htmlentities($row['purchaseorder_id'])	."</p>";
+									echo				"<p>Release Version		: ".htmlentities($row['release_version']) 	."</p>";
+									echo				"<p>Expiry Date			: ".htmlentities($row['expirydate']) 		."</p>";
+									echo				"<p>Remarks				: ".htmlentities($row['remarks']) 			."</p>";
+									echo				"<h4>Hardware Information</h4>";
+									echo				"<p>Class				: ".htmlentities($row['class']) 			."</p>";
+									echo				"<p>Brand				: ".htmlentities($row['brand']) 			."</p>";
+									echo				"<p>Audit Date			: ".htmlentities($row['audit_date']) 		."</p>";
+									echo				"<p>Component			: ".htmlentities($row['component']) 		."</p>";
+									echo 				"<p>Label				: ".htmlentities($row['label']) 			."</p>";
+									echo				"<p>Serial				: ".htmlentities($row['serial']) 			."</p>";
+									echo				"<p>Location 			: ".htmlentities($row['location']) 			."</p>";
+									echo				"<p>Status				: ".htmlentities($row['status'])			."</p>";
+									echo				"<p>Replacing			: ".htmlentities($row['replacing']) 		."</p>";
+									echo 			"</div>";
+									echo 		"<div class='modal-footer'>";
+									echo			"<a href=\"edithardware.php?id=".htmlentities($row['asset_tag'])."\" class=\"btn btn-info\"><i class='fa fa-edit'></i>Edit</a>";
+									echo 			"<button type='button' class='btn btn-default' data-dismiss='modal'>Close</button>";
+									echo		"</div>";
+									echo	"</div>";
+									echo "</div>";
+								}
 							}
-							
-							foreach($result['software'] as $row) {
-								echo '<tr>';
-								echo "<td>".htmlentities($row['asset_ID'])			."</td>";
-								echo "<td>Software</td>";
-								echo "<td>".htmlentities($row['description'])		."</td>";
-								echo "<td>".htmlentities($row['quantity'])			."</td>";
-								echo "<td>".htmlentities($row['price'])				."</td>";
-								echo "<td>";
-								echo "<a class='btn btn-primary btn-xs' data-toggle='modal' data-target="."#".htmlentities($row['asset_tag'])."view href="."#".htmlentities($row['asset_tag'])."view><i class='fa fa-folder'></i> View </a>";
-								echo "<a href=\"editsoftware.php?id=".htmlentities($row['asset_tag'])."\" class=\"btn btn-info btn-xs\"><i class='fa fa-edit'></i>Edit</a>";
-								echo "</td>";
-								echo '</tr>';
-								#Modal for more information
-								echo "<div id='".htmlentities($row['asset_tag'])."view' class='modal fade' role='dialog'>";
-								echo 	"<div class='modal-dialog'>";
-								echo 		"<div class='modal-content'>";
-								echo 			"<div class='modal-header'>";
-								echo 				"<button type='button' class='close' data-dismiss='modal'>&times;</button>";
-								echo 					"<h3 class='modal-title'>Asset ".htmlentities($row['asset_ID'])." Information</h3>";
-								echo 			"</div>";
-								echo	 		"<div class='modal-body'>";
-								echo				"<h4>Asset Information</h4>";
-								echo				"<p>Description			: ".htmlentities($row['description'])			."</p>";
-								echo				"<p>Quantity			: ".htmlentities($row['quantity'])				."</p>";
-								echo				"<p>Price				: ".htmlentities($row['price'])					."</p>";
-								echo				"<p>CR / TR No			: ".htmlentities($row['crtrno']) 				."</p>";
-								echo				"<p>Purchase Order ID	: ".htmlentities($row['purchaseorder_id']) 		."</p>";
-								echo				"<p>Release Version		: ".htmlentities($row['release_version'])		."</p>";
-								echo				"<p>Expiry Date			: ".htmlentities($row['expirydate']) 			."</p>";
-								echo				"<p>Remarks				: ".htmlentities($row['remarks']) 				."</p>";
-								echo				"<h4>Software Information</h4>";
-								echo				"<p>Vendor				: ".htmlentities($row['vendor'])				."</p>";
-								echo				"<p>Procured From		: ".htmlentities($row['procured_from']) 		."</p>";
-								echo				"<p>Short Name			: ".htmlentities($row['shortname']) 			."</p>";
-								echo				"<p>Purpose				: ".htmlentities($row['purpose']) 				."</p>";
-								echo 				"<p>Contract type		: ".htmlentities($row['contract_type']) 		."</p>";
-								echo				"<p>Start Date			: ".htmlentities($row['start_date']) 			."</p>";
-								echo				"<p>License Explanation	: ".htmlentities($row['license_explanation']) 	."</p>";
-								echo				"<p>Verification		: ".htmlentities($row['verification']) 			."</p>";
-								echo 			"</div>";
-								echo 		"<div class='modal-footer'>";
-								echo			"<a href=\"editsoftware.php?id=".htmlentities($row['asset_tag'])."\" class=\"btn btn-info\"><i class='fa fa-edit'></i>Edit</a>";
-								echo 			"<button type='button' class='btn btn-default' data-dismiss='modal'>Close</button>";
-								echo		"</div>";
-								echo	"</div>";
-								echo "</div>";
-							}
-							
-							
+							if (isset($result['software'])) {
+								foreach($result['software'] as $row) {
+									echo '<tr>';
+									echo "<td>".htmlentities($row['asset_ID'])			."</td>";
+									echo "<td>Software</td>";
+									echo "<td>".htmlentities($row['description'])		."</td>";
+									echo "<td>".htmlentities($row['quantity'])			."</td>";
+									echo "<td>".htmlentities($row['price'])				."</td>";
+									echo "<td>";
+									echo "<a class='btn btn-primary btn-xs' data-toggle='modal' data-target="."#".htmlentities($row['asset_tag'])."view href="."#".htmlentities($row['asset_tag'])."view><i class='fa fa-folder'></i> View </a>";
+									echo "<a href=\"editsoftware.php?id=".htmlentities($row['asset_tag'])."\" class=\"btn btn-info btn-xs\"><i class='fa fa-edit'></i>Edit</a>";
+									echo "</td>";
+									echo '</tr>';
+									#Modal for more information
+									echo "<div id='".htmlentities($row['asset_tag'])."view' class='modal fade' role='dialog'>";
+									echo 	"<div class='modal-dialog'>";
+									echo 		"<div class='modal-content'>";
+									echo 			"<div class='modal-header'>";
+									echo 				"<button type='button' class='close' data-dismiss='modal'>&times;</button>";
+									echo 					"<h3 class='modal-title'>Asset ".htmlentities($row['asset_ID'])." Information</h3>";
+									echo 			"</div>";
+									echo	 		"<div class='modal-body'>";
+									echo				"<h4>Asset Information</h4>";
+									echo				"<p>Description			: ".htmlentities($row['description'])			."</p>";
+									echo				"<p>Quantity			: ".htmlentities($row['quantity'])				."</p>";
+									echo				"<p>Price				: ".htmlentities($row['price'])					."</p>";
+									echo				"<p>CR / TR No			: ".htmlentities($row['crtrno']) 				."</p>";
+									echo				"<p>Purchase Order ID	: ".htmlentities($row['purchaseorder_id']) 		."</p>";
+									echo				"<p>Release Version		: ".htmlentities($row['release_version'])		."</p>";
+									echo				"<p>Expiry Date			: ".htmlentities($row['expirydate']) 			."</p>";
+									echo				"<p>Remarks				: ".htmlentities($row['remarks']) 				."</p>";
+									echo				"<h4>Software Information</h4>";
+									echo				"<p>Vendor				: ".htmlentities($row['vendor'])				."</p>";
+									echo				"<p>Procured From		: ".htmlentities($row['procured_from']) 		."</p>";
+									echo				"<p>Short Name			: ".htmlentities($row['shortname']) 			."</p>";
+									echo				"<p>Purpose				: ".htmlentities($row['purpose']) 				."</p>";
+									echo 				"<p>Contract type		: ".htmlentities($row['contract_type']) 		."</p>";
+									echo				"<p>Start Date			: ".htmlentities($row['start_date']) 			."</p>";
+									echo				"<p>License Explanation	: ".htmlentities($row['license_explanation']) 	."</p>";
+									echo				"<p>Verification		: ".htmlentities($row['verification']) 			."</p>";
+									echo 			"</div>";
+									echo 		"<div class='modal-footer'>";
+									echo			"<a href=\"editsoftware.php?id=".htmlentities($row['asset_tag'])."\" class=\"btn btn-info\"><i class='fa fa-edit'></i>Edit</a>";
+									echo 			"<button type='button' class='btn btn-default' data-dismiss='modal'>Close</button>";
+									echo		"</div>";
+									echo	"</div>";
+									echo "</div>";
+								}
+							}							
 						?>
                       </tbody>
                     </table>

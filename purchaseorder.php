@@ -34,7 +34,7 @@
 
 <?php 
 	include('config.php');
-	
+		
 	$result = $user->getDistinct();
 	
 	foreach($result as &$entry) {
@@ -54,6 +54,22 @@
 	unset($value);
 	
 	$result[2] = array_keys(array_flip($parsed)); 
+	
+	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+		do {
+			$purchaseorder = $user->getPurchaseOrder($_POST['purchaseorderid']);
+			if(!$purchaseorder['validation']) {
+				break;
+			}
+			if ($_FILES['file']['size'] > 0 && $_POST['action'] == 'upload') {
+				$user->savePurchaseOrderFile($purchaseorder, $_FILES['file']);
+			}
+			
+			if ($_POST['action'] == 'delete') {
+				$user->deletePurchaseOrderFile($purchaseorder['purchaseorder_id']);
+			}
+		} while (false);
+	}
 	
 ?>  
   
@@ -87,13 +103,13 @@
                   <div class="x_content">
 
                     <br />
-                    <form id="demo-form2" class="form-horizontal form-label-left" method="post" action="report.php">
+                    <form id="demo-form2" class="form-horizontal form-label-left" method="post">
 					  <div class="item form-group">
 						<label class="control-label col-md-3 col-sm-3 col-xs-12">Purchase Order ID
                         </label>
 						<div class="col-md-6 col-sm-6 col-xs-12">
 							<div class="input-group">
-								<input type="text" class="form-control" id="purchaseorderid" name="purchaseorderid">
+								<input type="text" class="form-control" id="purchaseorderid" name="purchaseorderid" value="<?php if (isset($_POST['purchaseorderid'])) {echo htmlentities($_POST['purchaseorderid']);}?>">
 								<span class="input-group-btn">
 								    <button type="button" class="btn btn-primary" onclick="getpurchaseorder();">Go!</button>
 							    </span>
@@ -201,6 +217,11 @@
 			xmlhttp.send(params);
 		}
 	};
+	<?php
+	if (isset($_POST['purchaseorderid'])) {
+				echo 'getpurchaseorder()';
+	}
+	?>
 	</script>
   </body>
 </html>

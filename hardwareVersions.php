@@ -69,6 +69,7 @@
 		}
 		
 		else {
+			/*
 			foreach($result[1] as $row) {
 				if ($row['version'] == $_POST['version']) {
 					$row['version'] = $currentversion + 1;
@@ -78,6 +79,7 @@
 			}
 			$result = $user->getHardwareVersions($_GET['id']);
 			$success = 1;
+			*/
 		}
 	}
 ?>  
@@ -219,6 +221,13 @@
                         </fieldset>
 						</div>
 					<div class="item form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Parent Asset
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input type="text" name="parent" id="parent" class="form-control col-md-7 col-xs-12" disabled>
+                        </div>
+                    </div>
+					<div class="item form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="vendor disabled">Remarks
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
@@ -288,7 +297,7 @@
 						<div class="item form-group">
                         <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
 						  <a class="btn btn-primary" href="adminassetlist.php">Cancel</a>
-						  <button type="submit" class="btn btn-danger">Revert</button>
+						  <!--<button type="submit" class="btn btn-danger">Revert</button>-->
                         </div>
                       </div>
                         
@@ -311,6 +320,7 @@
 				document.getElementsByName("pono")[0].value = versions[p1]["purchaseorder_id"];
 				document.getElementsByName("release")[0].value = versions[p1]["release_version"];
 				document.getElementsByName("expirydate")[0].value = versions[p1]["expirydate"];
+				document.getElementsByName("parent")[0].value= versions[p1]["parent"];
 				document.getElementsByName("remarks")[0].innerHTML = versions[p1]["remarks"];
 				
 				document.getElementsByName("class")[0].value = versions[p1]["class"];

@@ -60,6 +60,7 @@
 		$candidate['description']		= trim($_POST['description']);
 		$candidate['quantity']			= trim($_POST['quantity']);
 		$candidate['price']				= trim($_POST['price']);
+		$candidate['currency']			= trim($_POST['currency']);
 		$candidate['crtrno']			= trim($_POST['crtrno']);
 		$candidate['purchaseorder_id']	= trim($_POST['pono']);
 		$candidate['release_version']	= trim($_POST['release']);
@@ -115,6 +116,10 @@
 				$ParentError = 1;
 		}
 		
+		if (!(in_array($candidate['replacing'], $distinct[3])) and $candidate['replacing'] != "") {
+				$ParentError = 1;
+		}
+		
 		if (!$same and $DateError == 0 and $NumberError == 0 and $ParentError == 0) {
 			$candidate['version'] = $result[1]['version'] + 1;
 			$candidate['asset_tag'] = $result[1]['asset_tag'];
@@ -153,7 +158,7 @@
               <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel">
                   <div class="x_title">
-                    <h2>Edit Hardware Asset <?php echo $result[1]['asset_ID'];?></h2>
+                    <h2>Edit Hardware Asset <?php echo $result[1]['asset_ID'];?><small>Last Edited: <?php echo $result[1]['lastedited']?></small></h2>
                     
                     <div class="clearfix"></div>
                   </div>
@@ -203,7 +208,7 @@
                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="vendor">Description
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <textarea class="form-control col-md-7 col-xs-12" rows="5"  name="description"></textarea>
+                          <textarea class="form-control col-md-7 col-xs-12" name="description"></textarea>
                         </div>
                       </div>					  
                       <div class="item form-group">
@@ -220,6 +225,21 @@
                           <input type="text" class="form-control col-md-7 col-xs-12"  name="price">
                         </div>
                       </div>
+					  <div class="item form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Currency</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <select class="form-control required" name="currency">
+                            <?php 
+							echo '<option class="nochange" value="'.htmlentities($result[1]['currency']).'">'.htmlentities($result[1]['currency']).' (No Change)</option>';
+							?>
+                            <?php 
+                                foreach($options['currency'] as $row) {
+                                    echo '<option value="'.$row['currency_name'].'">'.$row['currency_name'].'</option>';
+                                }
+                            ?>
+                          </select>
+                        </div>
+                    </div>
                       <div class="item form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Change Request / Tech Refresh Number
                         </label>
@@ -238,11 +258,20 @@
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Release version
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" name="release" class="form-control col-md-7 col-xs-12">
+                          <select class="form-control required" name="release">
+                            <?php 
+							echo '<option class="nochange" value="'.htmlentities($result[1]['release_version']).'">'.htmlentities($result[1]['release_version']).' (No Change)</option>';
+							?>
+                            <?php 
+                                foreach($options['releaseversion'] as $row) {
+                                    echo '<option value="'.$row['releaseversion_name'].'">'.$row['releaseversion_name'].'</option>';
+                                }
+                            ?>
+                          </select>
                         </div>
                       </div>
 					<div class="item form-group">
-					  <label class="control-label col-md 3 col-sm-3 col-xs-12">Warranty Expiry Date
+					  <label class="control-label col-md 3 col-sm-3 col-xs-12">Warranty Expiry Date (MM/DD/YYYY)
 					  </label>
 					  <fieldset class="col-md-6 col-sm-6 col-xs-12">
                           <div class="control-group">
@@ -265,6 +294,21 @@
                         </div>
                     </div>
 					<div class="item form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Status</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <select class="form-control required" name="status">
+                            <?php 
+							echo '<option class="nochange" value="'.htmlentities($result[1]['status']).'">'.htmlentities($result[1]['status']).' (No Change)</option>';
+							?>
+                            <?php 
+                                foreach($options['status'] as $row) {
+                                    echo '<option value="'.$row['status_name'].'">'.$row['status_name'].'</option>';
+                                }
+                            ?>
+                          </select>
+                        </div>
+                    </div>
+					<div class="item form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="vendor">Remarks</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <textarea class="form-control col-md-7 col-xs-12"  name="remarks"></textarea>
@@ -284,7 +328,7 @@
                             ?>
                           </select>
                         </div>
-                      </div>
+                    </div>
 					  <div class="item form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Brand</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
@@ -330,27 +374,29 @@
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Location</label>
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" name="location" class="form-control col-md-7 col-xs-12" >
+                          <select class="form-control required" name="location">
+                            <?php 
+							echo '<option class="nochange" value="'.htmlentities($result[1]['location']).'">'.htmlentities($result[1]['location']).' (No Change)</option>';
+							?>
+                            <?php 
+                                foreach($options['location'] as $row) {
+                                    echo '<option value="'.$row['location_name'].'">'.$row['location_name'].'</option>';
+                                }
+                            ?>
+                          </select>
                         </div>
                       </div>
 					  <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Status</label>
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">RMA</label>
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" name="status" class="form-control col-md-7 col-xs-12" >
-                        </div>
-                      </div>
-					  <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Replacing</label>
-                        </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" name="replacing" class="form-control col-md-7 col-xs-12" >
+                          <input type="text" name="replacing" id="replacing" class="form-control col-md-7 col-xs-12" >
                         </div>
                       </div>
 						<div class="item form-group">
                         <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
 						  <a class="btn btn-primary" href="assetlist.php">Cancel</a>
-						  <button class="btn btn-primary" type="button" onclick="reset()">Reset</button>
+						  <button class="btn btn-primary" type="button" onclick="resetFields()">Reset</button>
                           <button type="submit" class="btn btn-success">Submit</button>
                         </div>
                       </div>
@@ -380,29 +426,26 @@
     <!-- jQuery -->
     <script src="vendors/jquery/dist/jquery.min.js"></script>
 	<script>
-			function reset() {
-				document.getElementsByName("assetid")[0].setAttribute("value", <?php echo json_encode($result[1]['asset_ID']);?>);
+			function resetFields() {
+				document.getElementById("demo-form2").reset();
+				document.getElementsByName("assetid")[0].value = <?php echo json_encode($result[1]['asset_ID']);?>;
 				document.getElementsByName("description")[0].innerHTML = <?php echo json_encode($result[1]['description']);?>;
-				document.getElementsByName("quantity")[0].setAttribute("value", <?php echo json_encode($result[1]['quantity']);?>);
-				document.getElementsByName("price")[0].setAttribute("value", <?php echo json_encode($result[1]['price']);?>);
-				document.getElementsByName("crtrno")[0].setAttribute("value", <?php echo json_encode($result[1]['crtrno']);?>);
-				document.getElementsByName("pono")[0].setAttribute("value", <?php echo json_encode($result[1]['purchaseorder_id']);?>);
-				document.getElementsByName("release")[0].setAttribute("value", <?php echo json_encode($result[1]['release_version']);?>);
-				document.getElementsByName("expirydate")[0].setAttribute("value", <?php echo json_encode($result[1]['expirydate']);?>);
+				document.getElementsByName("quantity")[0].value = <?php echo json_encode($result[1]['quantity']);?>;
+				document.getElementsByName("price")[0].value = <?php echo json_encode($result[1]['price']);?>;
+				document.getElementsByName("crtrno")[0].value = <?php echo json_encode($result[1]['crtrno']);?>;
+				document.getElementsByName("pono")[0].value = <?php echo json_encode($result[1]['purchaseorder_id']);?>;
+				document.getElementsByName("expirydate")[0].value = <?php echo json_encode($result[1]['expirydate']);?>;
 				document.getElementsByName("remarks")[0].innerHTML = <?php echo json_encode($result[1]['remarks']);?>;
-				document.getElementsByName("parent")[0].setAttribute("value", <?php echo json_encode($result[1]['parent']);?>);
-				$('.nochange').each(function() {
-					$(this).attr('selected', 'selected');
-				});
-				document.getElementsByName("auditdate")[0].setAttribute("value", <?php echo json_encode($result[1]['audit_date']);?>);
-				document.getElementsByName("component")[0].setAttribute("value", <?php echo json_encode($result[1]['component']);?>);
-				document.getElementsByName("label")[0].setAttribute("value", <?php echo json_encode($result[1]['label']);?>);
-				document.getElementsByName("serial")[0].setAttribute("value", <?php echo json_encode($result[1]['serial']);?>);
-				document.getElementsByName("location")[0].setAttribute("value", <?php echo json_encode($result[1]['location']);?>);
-				document.getElementsByName("status")[0].setAttribute("value", <?php echo json_encode($result[1]['status']);?>);
-				document.getElementsByName("replacing")[0].setAttribute("value", <?php echo json_encode($result[1]['replacing']);?>);
+				document.getElementsByName("parent")[0].value = <?php echo json_encode($result[1]['parent']);?>;
+				
+				document.getElementsByName("auditdate")[0].value = <?php echo json_encode($result[1]['audit_date']);?>;
+				document.getElementsByName("component")[0].value = <?php echo json_encode($result[1]['component']);?>;
+				document.getElementsByName("label")[0].value = <?php echo json_encode($result[1]['label']);?>;
+				document.getElementsByName("serial")[0].value = <?php echo json_encode($result[1]['serial']);?>;
+				document.getElementsByName("location")[0].value = <?php echo json_encode($result[1]['location']);?>;
+				document.getElementsByName("replacing")[0].value = <?php echo json_encode($result[1]['replacing']);?>;
 			}
-			reset();
+			resetFields();
 		</script>    
     <!-- Bootstrap -->
     <script src="vendors/bootstrap/dist/js/bootstrap.min.js"></script>
@@ -420,8 +463,14 @@
     <!-- Custom Theme Scripts -->
     <script src="build/js/custom.min.js"></script>
 	<script>
-	console.log(asset_ID);
+
 	$('#parent').autocomplete({
+		lookup: asset_ID,
+		onSelect: function () {
+
+    }
+	});
+	$('#replacing').autocomplete({
 		lookup: asset_ID,
 		onSelect: function () {
 

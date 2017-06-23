@@ -23,17 +23,19 @@
 			  <li><a><i class="fa fa-home"></i> Asset Management <span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu">
 				  <li id="addasset.php"><a href="addasset.php">Add Assets</a></li>
-                  <li id="bulkaddasset.php"><a href="bulkaddasset.php">Bulk Asset Import</a></li>
-				  <li id="assetlist.php"><a href="assetlist.php">Edit/Delete Assets</a></li>
+                  <!--<li id="bulkaddasset.php"><a href="bulkaddasset.php">Bulk Asset Import</a></li>-->
+				  <li id="assetlist.php"><a href="assetlist.php">Edit Assets</a></li>
 				  <li id="purchaseorder.php"><a href="purchaseorder.php">View/Edit Purchase Orders</a></li>
 				</ul>
 			  </li>
+			  <!--
 			  <li><a><i class="fa fa-paper-plane-o"></i> Notifications<span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu">
 				  <li id="addnotification.php"><a href="addnotification.php">Add Notification</a></li>
 				  <li id="notificationlist.php"><a href="notificationlist.php">Edit/Delete Notification</a></li>
 				</ul>
 			  </li>
+			  -->
 			  <li><a><i class="fa fa-bar-chart-o"></i> Reports <span class="fa fa-chevron-down"></span></a>
 				<ul class="nav child_menu">
 				  <li id="generatereport.php"><a href="generatereport.php">Generate Report</a></li>

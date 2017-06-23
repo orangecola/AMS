@@ -55,6 +55,7 @@
 	
 	date_default_timezone_set('Asia/Singapore');
 	$time = date("Y-m-d H:i:s");
+	
 ?>  
   
   <body class="nav-md footer_fixed">
@@ -64,6 +65,7 @@
 		<script>
 			document.getElementById('generatereport.php').setAttribute("class", "current-page");
 			var purchaseorderid = <?php echo json_encode($result[0]); ?>;
+			console.log(<?php echo json_encode($purchaseorder);?>);
 		</script>
         <!-- page content -->
         <div class="right_col" role="main">
@@ -135,7 +137,7 @@
                         <!-- /.col -->
                         <div class="col-xs-6">
                           <p class="lead pull-right">Calculated Total $<?php echo $total;?>
-						  <?php if(isset($_POST['purchaseorderid'])) {
+						  <?php if(isset($_POST['purchaseorderid']) and $purchaseorder['exists']) {
 							echo "<br />Discount \${$purchaseorder['purchaseorder']['discount']}";
 							echo "<br />Saved Total \${$purchaseorder['purchaseorder']['total']}";
 						}?>

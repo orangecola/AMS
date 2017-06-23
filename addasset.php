@@ -51,12 +51,14 @@
 		$asset['description'] 		= trim($_POST['description']);
 		$asset['quantity'] 			= trim($_POST['quantity']);
 		$asset['price']				= trim($_POST['price']);
+		$asset['currency']			= trim($_POST['currency']);
+		$asset['crtrno']	 		= trim($_POST['crtrno']);
 		$asset['purchaseorder_id'] 	= trim($_POST['pono']);
 		$asset['release_version']	= trim($_POST['release']);
 		$asset['expirydate']		= trim($_POST['expirydate']);
 		$asset['remarks']			= trim($_POST['remarks']);
-		$asset['crtrno']	 		= trim($_POST['crtrno']);
 		$asset['parent']			= trim($_POST['parent']);
+		$asset['status'] 			= trim($_POST['status']);
 		$asset['version']			= 1;
 		
 		if (isset($_POST['software']) and isset($_POST['hardware'])) {
@@ -71,7 +73,6 @@
 			$asset['contract_type']			= trim($_POST['contracttype']);
 			$asset['start_date']			= trim($_POST['startdate']);
 			$asset['license_explanation']	= trim($_POST['license']);
-			$asset['verification'] 			= trim($_POST['verification']);
 			
 			if (!($user->check_date($asset['start_date']))) {
 				$DateError = 1;
@@ -87,8 +88,11 @@
 			$asset['label']			= trim($_POST['label']);
 			$asset['serial'] 		= trim($_POST['serial']);
 			$asset['location'] 		= trim($_POST['location']);
-			$asset['status'] 		= trim($_POST['status']);
 			$asset['replacing']		= trim($_POST['replacing']);
+			
+			if (!(in_array($asset['replacing'], $distinct[3])) and $asset['replacing'] != "") {
+				$ParentError = 1;
+			}
 		}
 		
 		
@@ -182,47 +186,66 @@
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Asset ID <span class="required">*</span>
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text"  class="form-control col-md-7 col-xs-12 required"  name="assetid">
+                          <input type="text" pattern="[a-zA-Z0-9]+" placeholder="Alphanumeric" class="form-control col-md-7 col-xs-12 required"  name="assetid">
                         </div>
                       </div>
 					<div class="item form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="vendor">Description</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <textarea class="form-control col-md-7 col-xs-12"  name="description"></textarea>
+                          <textarea class="form-control col-md-7 col-xs-12" placeholder="Maximum 2000 Characters" maxlength="2000" name="description"></textarea>
                         </div>
                       </div>					  
                       <div class="item form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="vendor">Quantity</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" class="form-control col-md-7 col-xs-12"  name="quantity">
+                          <input type="number" class="form-control col-md-7 col-xs-12" placeholder="Numbers only" name="quantity">
                         </div>
                       </div>
 					  <div class="item form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="vendor">Price</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" class="form-control col-md-7 col-xs-12"  name="price">
+                          <input type="number" class="form-control col-md-7 col-xs-12" placeholder="Numbers only" name="price">
+                        </div>
+                      </div>
+					  <div class="item form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Currency</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+						  <select class="form-control required" name="currency">
+                            <?php 
+                                foreach($result['currency'] as $row) {
+                                    echo '<option value="'.$row['currency_name'].'">'.$row['currency_name'].'</option>';
+                                }
+                            ?>
+                          </select>
                         </div>
                       </div>
                       <div class="item form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Change Request / Tech Refresh Number</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" name="crtrno" class="form-control col-md-7 col-xs-12">
+                          <input type="text" pattern="[a-zA-Z0-9]+" placeholder="Alphanumeric" name="crtrno" class="form-control col-md-7 col-xs-12">
                         </div>
                       </div>
 					  <div class="item form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Purchase Order ID</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" name="pono" class="form-control col-md-7 col-xs-12">
+                          <input type="text" pattern="[a-zA-Z0-9]+" placeholder="Alphanumeric" name="pono" class="form-control col-md-7 col-xs-12">
                         </div>
                       </div>
 					  <div class="item form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Release version</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" name="release" class="form-control col-md-7 col-xs-12">
+						  <select class="form-control required" name="release">
+                            <option value="">Select Option</option>
+                            <?php 
+                                foreach($result['releaseversion'] as $row) {
+                                    echo '<option value="'.$row['releaseversion_name'].'">'.$row['releaseversion_name'].'</option>';
+                                }
+                            ?>
+                          </select>
                         </div>
                       </div>
 					  <div class="item form-group">
-					  <label class="control-label col-md 3 col-sm-3 col-xs-12">Expiry Date
+					  <label class="control-label col-md 3 col-sm-3 col-xs-12">Expiry Date (MM/DD/YYYY)
 					  </label>
 					  <fieldset class="col-md-6 col-sm-6 col-xs-12">
                           <div class="control-group">
@@ -244,9 +267,23 @@
                         </div>
 				    </div>
 					<div class="item form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Status</label><span class="required">*</span>
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <select class="form-control required" name="status">
+                            <option value="">Select Option</option>
+                            <?php 
+                                foreach($result['status'] as $row) {
+                                    echo '<option value="'.$row['status_name'].'">'.$row['status_name'].'</option>';
+                                }
+                            ?>
+                          </select>
+                        </div>
+                      </div>
+					<div class="item form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="vendor">Remarks</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <textarea class="form-control col-md-7 col-xs-12"  name="remarks"></textarea>
+                          <textarea class="form-control col-md-7 col-xs-12" placeholder="Maximum 2000 Characters" maxlength="2000" name="remarks"></textarea>
                         </div>
                       </div>
 
@@ -268,7 +305,6 @@
 								document.getElementsByName("contracttype")[0].removeAttribute("disabled");
 								document.getElementsByName("startdate")[0].removeAttribute("disabled");
 								document.getElementsByName("license")[0].removeAttribute("disabled");
-								document.getElementsByName("verification")[0].removeAttribute("disabled");
 								
 								document.getElementsByName("hardware")[0].setAttribute("disabled", "disabled");
 								document.getElementsByName("class")[0].setAttribute("disabled", "disabled");
@@ -278,7 +314,6 @@
 								document.getElementsByName("label")[0].setAttribute("disabled", "disabled");
 								document.getElementsByName("serial")[0].setAttribute("disabled", "disabled");
 								document.getElementsByName("location")[0].setAttribute("disabled", "disabled");
-								document.getElementsByName("status")[0].setAttribute("disabled", "disabled");
 								document.getElementsByName("replacing")[0].setAttribute("disabled", "disabled");
 							};
 							
@@ -291,7 +326,6 @@
 								document.getElementsByName("contracttype")[0].setAttribute("disabled", "disabled");
 								document.getElementsByName("startdate")[0].setAttribute("disabled", "disabled");
 								document.getElementsByName("license")[0].setAttribute("disabled", "disabled");
-								document.getElementsByName("verification")[0].setAttribute("disabled", "disabled");
 								
 								document.getElementsByName("hardware")[0].removeAttribute("disabled");
 								document.getElementsByName("class")[0].removeAttribute("disabled");
@@ -301,7 +335,6 @@
 								document.getElementsByName("label")[0].removeAttribute("disabled");
 								document.getElementsByName("serial")[0].removeAttribute("disabled");
 								document.getElementsByName("location")[0].removeAttribute("disabled");
-								document.getElementsByName("status")[0].removeAttribute("disabled");
 								document.getElementsByName("replacing")[0].removeAttribute("disabled");
 							};
 						</script>
@@ -310,7 +343,7 @@
                       <div id="myTabContent" class="tab-content">
                         <div role="tabpanel" class="tab-pane fade active in" id="tab_content1" aria-labelledby="home-tab">
                       <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Vendor
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Vendor<span class="required">*</span>
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <select class="form-control required" name="vendor">
@@ -324,7 +357,7 @@
                         </div>
                       </div>
 					  <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Procured From
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Procured From<span class="required">*</span>
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <select class="form-control required" name="procure">
@@ -338,7 +371,7 @@
                         </div>
                       </div>
 					  <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Short name
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Short name<span class="required">*</span>
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <select class="form-control required" name="shortname">
@@ -352,7 +385,7 @@
                         </div>
                       </div>
 					  <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Purpose
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Purpose<span class="required">*</span>
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <select class="form-control required" name="purpose">
@@ -366,7 +399,7 @@
                         </div>
                       </div>
 					  <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Contract Type 
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Contract Type <span class="required">*</span>
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <select class="form-control required" name="contracttype">
@@ -380,7 +413,7 @@
                         </div>
                       </div>
 					  <div class="item form-group">
-					  <label class="control-label col-md 3 col-sm-3 col-xs-12">Start Date
+					  <label class="control-label col-md 3 col-sm-3 col-xs-12">Start Date <span class="required">*</span>
 					  </label>
 					  <fieldset class="col-md-6 col-sm-6 col-xs-12">
                           <div class="control-group">
@@ -400,13 +433,6 @@
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <input type="text" name="license" class="form-control col-md-7 col-xs-12">
-                        </div>
-                      </div>
-					  <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Verification Status
-                        </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" name="verification" class="form-control col-md-7 col-xs-12">
                         </div>
                       </div>
 						<div class="item form-group">
@@ -474,21 +500,21 @@
                         <label class="control-label col-md-3 col-sm-3 col-xs-12">Location</label>
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" name="location" class="form-control col-md-7 col-xs-12" disabled="disabled">
+						  <select class="form-control required" name="location" disabled="disabled">
+                            <option value="">Select Option</option>
+                            <?php 
+                                foreach($result['location'] as $row) {
+                                    echo '<option value="'.$row['location_name'].'">'.$row['location_name'].'</option>';
+                                }
+                            ?>
+                          </select>
                         </div>
                       </div>
 					  <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Status</label>
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">RMA</label>
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" name="status" class="form-control col-md-7 col-xs-12" disabled="disabled">
-                        </div>
-                      </div>
-					  <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Replacing</label>
-                        </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" name="replacing" class="form-control col-md-7 col-xs-12" disabled="disabled">
+                          <input type="text" name="replacing" id="replacing" class="form-control col-md-7 col-xs-12" disabled="disabled">
                         </div>
                       </div>
 						<div class="item form-group">
@@ -541,8 +567,14 @@
     <!-- Custom Theme Scripts -->
     <script src="build/js/custom.min.js"></script>
 	<script>
-	console.log(asset_ID);
 	$('#parent').autocomplete({
+		lookup: asset_ID,
+		onSelect: function () {
+
+    }
+	});
+	
+	$('#replacing').autocomplete({
 		lookup: asset_ID,
 		onSelect: function () {
 
