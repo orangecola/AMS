@@ -38,46 +38,11 @@
         <?php
 			include('sidebar.php');
 			
-			$software = $user->getSoftwareList();
-			$hardware = $user->getHardwareList();
-			
-			function printAssetRow($asset) {
-				echo "<td>".htmlentities($asset['description'])			."</td>";
-				echo "<td>".htmlentities($asset['quantity'])			."</td>";
-				echo "<td>".htmlentities($asset['price'])			." ".htmlentities($asset['currency'])."</td>";
-				echo "<td>".htmlentities($asset['crtrno'])				."</td>";
-				echo "<td>".htmlentities($asset['purchaseorder_id'])	."</td>";
-				echo "<td>".htmlentities($asset['release_version'])		."</td>";
-				echo "<td>".htmlentities($asset['expirydate'])			."</td>";
-				echo "<td>".htmlentities($asset['remarks'])				."</td>";
-			}
-			
-			function printSoftwareRow($software) {
-				echo '<tr>';
-				echo "<td>".htmlentities($software['asset_ID'])."</td>";
-				echo "<td>Software</td>";
-				printAssetRow($software);
-				echo "<td>";
-				echo "<a class='btn btn-primary btn-xs' data-toggle='modal' data-target="."#".htmlentities($software['asset_tag'])."view href="."#".htmlentities($software['asset_tag'])."view><i class='fa fa-folder'></i> View </a>";
-				echo "<a href=\"editsoftware.php?id=".htmlentities($software['asset_tag'])."\" class=\"btn btn-info btn-xs\"><i class='fa fa-edit'></i>Edit</a>";
-				echo "</td>";
-				echo '</tr>';
-			}
-			
-			function printHardwareRow($hardware) {
-				echo '<tr>';
-				echo "<td>".htmlentities($hardware['asset_ID'])."</td>";
-				echo "<td>Hardware</td>";
-				printAssetRow($hardware);
-				echo "<td>";
-				echo "<a class='btn btn-primary btn-xs' data-toggle='modal' data-target="."#".htmlentities($hardware['asset_tag'])."view href="."#".htmlentities($hardware['asset_tag'])."view><i class='fa fa-folder'></i> View </a>";
-				echo "<a href=\"edithardware.php?id=".htmlentities($hardware['asset_tag'])."\" class=\"btn btn-info btn-xs\"><i class='fa fa-edit'></i>Edit</a>";
-				echo "</td>";
-				echo '</tr>';
-			}
+			$renewals = $user->getRenewals();
+						
 		?>
 		<script>
-			document.getElementById('assetlist.php').setAttribute("class", "current-page");
+			document.getElementById('renewallist.php').setAttribute("class", "current-page");
 		</script>
 
         <!-- page content -->
@@ -85,7 +50,7 @@
           <div class="">
             <div class="page-title">
               <div class="title_left">
-                <h3>Asset Management</h3>
+                <h3>Hardware Asset Management</h3>
               </div>
             </div>
             <div class="clearfix"></div>
@@ -103,15 +68,10 @@
                       <thead>
                         <tr>
                           <th>Asset ID</th>
-						  <th>Type</th>
-						  <th>Description</th>
-						  <th>Quantity</th>
-						  <th>Price</th>
-                          <th>CR / TR Number</th>
-                          <th>PO Number</th>
-						  <th>Release version</th>
-                          <th>Expiry Date</th>
-						  <th>Remarks</th>
+						  <th>Parent ID</th>
+						  <th>Purchase Order ID</th>
+						  <th>Start Date</th>
+						  <th>End Date</th>
 						  <th>Actions</th>
                         </tr>
                       </thead>
@@ -119,15 +79,19 @@
 
                       <tbody>
 						<?php 
-							foreach($hardware as $row) {
-								printHardwareRow($row);
-								$user->printHardwareModal($row);
+							foreach($renewals as $row) {
+								echo '<tr>';
+								echo "<td>".htmlentities($row['asset_ID'])."</td>";
+								echo "<td>".htmlentities($row['parent_ID'])."</td>";
+								echo "<td>".htmlentities($row['purchaseorder_id'])."</td>";
+								echo "<td>".htmlentities($row['startdate'])."</td>";
+								echo "<td>".htmlentities($row['expiry_date'])."</td>";
+								echo "<td>";
+								echo "<a href=\"editrenewal.php?id=".htmlentities($row['renewal_id'])."\" class=\"btn btn-info btn-xs\"><i class='fa fa-edit'></i>Edit</a>";
+								echo "</td>";
+								echo '</tr>';
 							}
 							
-							foreach($software as $row) {
-								printSoftwareRow($row);
-								$user->printSoftwareModal($row);
-							}
 						?>
                       </tbody>
                     </table>

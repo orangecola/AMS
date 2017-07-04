@@ -5,7 +5,7 @@ session_start();
 $DB_HOST = '127.0.0.1';
 $DB_USER = 'ams';
 $DB_PASS = 'somethinglikethat';
-$DB_NAME = 'ams';
+$DB_NAME = 'test';
 
 try
 {

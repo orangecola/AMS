@@ -41,6 +41,7 @@
 	$Success=0;
 	
 	$distinct = $user->getDistinct();
+	$options = $user->getOptions();
 	
 	foreach($distinct[3] as &$value) {
 		$value = $value[0];
@@ -50,7 +51,7 @@
 	}
 	
 	$result = $user->getSoftware($_GET['id']);
-	$options = $user->getOptions();
+	
 	if (!$result[0]) {
 		header('Location: assetlist.php');
 	}
@@ -194,233 +195,10 @@
 				  ?>
                     <br />
                     <form id="demo-form2" enctype="multipart/form-data" class="form-horizontal form-label-left" method="post">
-					  <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Asset ID <span class="required">*</span>
-                        </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text"  class="form-control col-md-7 col-xs-12 required"  name="assetid">
-                        </div>
-                      </div>
-					<div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="vendor">Description
-                        </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <textarea class="form-control col-md-7 col-xs-12" rows="5"  name="description"></textarea>
-                        </div>
-                      </div>					  
-                      <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="vendor">Quantity
-                        </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" class="form-control col-md-7 col-xs-12"  name="quantity">
-                        </div>
-                      </div>
-					  <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="vendor">Price
-                        </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" class="form-control col-md-7 col-xs-12"  name="price">
-                        </div>
-                      </div>
-					  <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Currency</label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <select class="form-control required" name="currency">
-                            <?php 
-							echo '<option class="nochange" value="'.htmlentities($result[1]['currency']).'">'.htmlentities($result[1]['currency']).' (No Change)</option>';
-							?>
-                            <?php 
-                                foreach($options['currency'] as $row) {
-                                    echo '<option value="'.$row['currency_name'].'">'.$row['currency_name'].'</option>';
-                                }
-                            ?>
-                          </select>
-                        </div>
-                    </div>
-                      <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Change Request / Tech Refresh Number
-                        </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" name="crtrno" class="form-control col-md-7 col-xs-12">
-                        </div>
-                      </div>
-					  <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Purchase Order ID
-                        </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" name="pono" class="form-control col-md-7 col-xs-12">
-                        </div>
-                      </div>
-					  <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Release version
-                        </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <select class="form-control required" name="release">
-                            <?php 
-							echo '<option class="nochange" value="'.htmlentities($result[1]['release_version']).'">'.htmlentities($result[1]['release_version']).' (No Change)</option>';
-							?>
-                            <?php 
-                                foreach($options['releaseversion'] as $row) {
-                                    echo '<option value="'.$row['releaseversion_name'].'">'.$row['releaseversion_name'].'</option>';
-                                }
-                            ?>
-                          </select>
-                        </div>
-                      </div>
-					<div class="item form-group">
-					  <label class="control-label col-md 3 col-sm-3 col-xs-12">Warranty Expiry Date (MM/DD/YYYY)
-					  </label>
-					  <fieldset class="col-md-6 col-sm-6 col-xs-12">
-                          <div class="control-group">
-                            <div class="controls">
-                              <div class="xdisplay_inputx form-group">
-							  
-                                <input type="text" class="form-control " id="single_cal3" name="expirydate" aria-describedby="inputSuccess2Status4">
-                                
-                                <span id="inputSuccess2Status4" class="sr-only">(success)</span>
-                              </div>
-                            </div>
-                          </div>
-                        </fieldset>
-					</div>
-					<div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Parent Asset
-                        </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" name="parent" id="parent" class="form-control col-md-7 col-xs-12">
-                        </div>
-                    </div>
-					<div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Status</label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <select class="form-control required" name="status">
-                            <?php 
-							echo '<option class="nochange" value="'.htmlentities($result[1]['status']).'">'.htmlentities($result[1]['status']).' (No Change)</option>';
-							?>
-                            <?php 
-                                foreach($options['status'] as $row) {
-                                    echo '<option value="'.$row['status_name'].'">'.$row['status_name'].'</option>';
-                                }
-                            ?>
-                          </select>
-                        </div>
-                    </div>
-					<div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="vendor">Remarks</label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <textarea class="form-control col-md-7 col-xs-12"  name="remarks"></textarea>
-                        </div>
-					</div>
-					  <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Vendor
-                        </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <select class="form-control required" name="vendor">
-                            <?php 
-							echo '<option class="nochange" value="'.htmlentities($result[1]['vendor']).'">'.htmlentities($result[1]['vendor']).' (No Change)</option>';
-							?>
-                            <?php 
-                                foreach($options['vendor'] as $row) {
-                                    echo '<option value="'.$row['vendor_name'].'">'.$row['vendor_name'].'</option>';
-                                }
-                            ?>
-							</select>
-                        </div>
-                      </div>
-					  <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Procured From
-                        </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <select class="form-control required" name="procure">
-                            <?php 
-							echo '<option class="nochange" value="'.htmlentities($result[1]['procured_from']).'">'.htmlentities($result[1]['procured_from']).' (No Change)</option>';
-							?>
-                            <?php 
-                                foreach($options['procured_from'] as $row) {
-                                    echo '<option value="'.$row['procured_from_name'].'">'.$row['procured_from_name'].'</option>';
-                                }
-                            ?>
-						  </select>
-                        </div>
-                      </div>
-					  <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Short name
-                        </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <select class="form-control required" name="shortname">
-                            <?php 
-							echo '<option class="nochange" value="'.htmlentities($result[1]['shortname']).'">'.htmlentities($result[1]['shortname']).' (No Change)</option>';
-							?>
-                            <?php 
-                                foreach($options['shortname'] as $row) {
-                                    echo '<option value="'.$row['shortname_name'].'">'.$row['shortname_name'].'</option>';
-                                }
-                            ?>
-                          </select>
-                        </div>
-                      </div>
-					  <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Purpose
-                        </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <select class="form-control required" name="purpose">
-                            <?php 
-							echo '<option class="nochange" value="'.htmlentities($result[1]['purpose']).'">'.htmlentities($result[1]['purpose']).' (No Change)</option>';
-							?>
-                            <?php 
-                                foreach($options['purpose'] as $row) {
-                                    echo '<option value="'.$row['purpose_name'].'">'.$row['purpose_name'].'</option>';
-                                }
-                            ?>
-                          </select>
-                        </div>
-                      </div>
-					  <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Contract Type 
-                        </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <select class="form-control required" name="contracttype">
-                            <?php 
-							echo '<option class="nochange" value="'.htmlentities($result[1]['contract_type']).'">'.htmlentities($result[1]['contract_type']).' (No Change)</option>';
-							?>
-                            <?php 
-                                foreach($options['contracttype'] as $row) {
-                                    echo '<option value="'.$row['contracttype_name'].'">'.$row['contracttype_name'].'</option>';
-                                }
-                            ?>
-                          </select>
-                        </div>
-                      </div>
-					  <div class="item form-group">
-					  <label class="control-label col-md 3 col-sm-3 col-xs-12">Start Date
-					  </label>
-					  <fieldset class="col-md-6 col-sm-6 col-xs-12">
-                          <div class="control-group">
-                            <div class="controls">
-                              <div class="xdisplay_inputx form-group">
-							  
-                                <input type="text" class="form-control" name="startdate" id="single_cal4" aria-describedby="inputSuccess2Status4">
-                                
-                                <span id="inputSuccess2Status4" class="sr-only">(success)</span>
-                              </div>
-                            </div>
-                          </div>
-                        </fieldset>
-						</div>
-					  <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">License Explanation
-                        </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" name="license" class="form-control col-md-7 col-xs-12">
-                        </div>
-                      </div>
-					  <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Verification Status
-                        </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" name="verification" class="form-control col-md-7 col-xs-12">
-                        </div>
-                      </div>
+					  <?php
+						require 'asset.php';
+						require 'software.php';
+					  ?>
 						<div class="item form-group">
                         <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
 						  <a class="btn btn-primary" href="assetlist.php">Cancel</a>

@@ -150,6 +150,17 @@
                       <div class="row no-print">
                         <div class="col-xs-12">
                           <button class="btn btn-default" onclick="window.print();"><i class="fa fa-print"></i> Print</button>
+						  <a class="btn btn-default" href="downloadreport.php?<?php
+							if(isset($_POST['purchaseorderid'])) {
+								echo 'purchaseorderid='.$_POST['purchaseorderid'];
+							}
+							else if(isset($_POST['release'])) {
+								echo 'release='.$_POST['release'];
+							}
+							else if (isset($_POST['crtrno'])) {
+								echo 'crtrno='. $_POST['crtrno'];
+							};
+						  ?>"><i class="fa fa-save"></i> Download Report</a>
                         </div>
                       </div>
                     </section>

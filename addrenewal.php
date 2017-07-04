@@ -27,69 +27,62 @@
     <link href="vendors/starrr/dist/starrr.css" rel="stylesheet">
     <!-- bootstrap-daterangepicker -->
     <link href="vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
-
+	
     <!-- Custom Theme Style -->
     <link href="build/css/custom.min.css" rel="stylesheet">
   </head>
 
 <?php 
-	include('config.php');
-	$Success = 0;
-	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $type = $_POST['type'];
-        $inputFileName= $_FILES['csv']['tmp_name'];
-		$data = array();
-		include('vendors/PHPExcel/Classes/PHPExcel/IOFactory.php');
-		ini_set('memory_limit', '1024M');
-		try {
-            $inputFileType = PHPExcel_IOFactory::identify($inputFileName); //Identify the file
-			$objReader = PHPExcel_IOFactory::createReader($inputFileType); //Creating the reader
-            
-			$objReader->setReadDataOnly(true);
-			
-			
-			$objPHPExcel = $objReader->load($inputFileName); //Loading the file
-			
-			$sheet = $objPHPExcel->getSheet(0);     		//Selecting sheet 0
-			$highestRow = $sheet->getHighestRow();     		//Getting number of rows
-			$highestColumn = $sheet->getHighestColumn();    //Getting number of columns
-			
-
-			$headers = $sheet->rangeToArray('A3:' . $highestColumn . '3', NULL, TRUE, FALSE);
-		
-		
-			for ($row = 4; $row <= $highestRow; $row++) {
-				$rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
-				$newrow = array();
-				foreach($headers[0] as $key=>$value) {
-					if (isset($rowData[0][$key])) {
-						$newrow[$value] = $rowData[0][$key];
-					}
-					$data[$row-4] = $newrow;
-				}
-			}
-			
-        } catch (Exception $e) {
-            die('Error loading file "' . pathinfo($inputFileName, PATHINFO_BASENAME) 
-            . '": ' . $e->getMessage());
-        }
-		
-		if ($type == 'software') {
-			$user->bulkaddsoftware($data);
-		}
-		if ($type == 'hardware') {
-			$user->bulkaddhardware($data);
-		}
-		$Success = 1;
+	include_once('config.php');
+	$DateError=0;
+	$Success=0;
+	$ParentError=0;
+	$options = $user->getOptions();
+	$distinct = $user->getDistinct();
+	
+	foreach($distinct[3] as &$value) {
+		$value = $value[0];
 	}
+	
+	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+		
+		$renewal['asset_ID']					= $_POST['assetid'];
+		$renewal['parent_ID']					= $_POST['parent'];
+		$renewal['purchaseorder_id']			= $_POST['pono'];			
+		$renewal['startdate']					= $_POST['startdate'];
+		$renewal['expiry_date']					= $_POST['expiry_date'];
+		
+		if ($renewal['asset_ID'] == "") {
+			$renewal['asset_ID'] = $renewal['parent_ID'];
+		}
+		
+		if (!($user->check_date($renewal['expiry_date']) and $user->check_date($renewal['startdate']))) {
+				$DateError = 1;
+		}
+		
+		if (!(in_array($renewal['parent_ID'], $distinct[3]))) {
+				$ParentError = 1;
+		}
+		
+		if ($DateError == 0 and $ParentError == 0) {
+			$user->addRenewal($renewal);
+			$Success = 1;
+		}
+	}
+
+
+
 ?>  
   
   <body class="nav-md footer_fixed">
     <div class="container body">
       <div class="main_container">
-        <?php include('sidebar.php')?>
-        <script>
-			document.getElementById('bulkaddasset.php').setAttribute("class", "current-page");
+        <?php
+			include('sidebar.php');
+		?>
+		<script>
+			document.getElementById('addrenewal.php').setAttribute("class", "current-page");
+			var asset_ID = <?php echo json_encode($distinct[3]); ?>;
 		</script>
         <!-- page content -->
         <div class="right_col" role="main">
@@ -101,47 +94,45 @@
             </div>
             <div class="clearfix"></div>
             <div class="row">
+				
+
               <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel">
                   <div class="x_title">
-                    <h2>Bulk Asset Import</h2>
+                    <h2>Add Renewal</h2>
                     
                     <div class="clearfix"></div>
                   </div>
                   <div class="x_content">
-				  <?php 
+				  <?php				  
+				  if ($DateError == 1) {echo '<div class="alert alert-danger alert-dismissible fade in" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                    </button>
+                    <strong>Error</strong> Date Error
+                  </div>';}
+				  
+				  if ($ParentError == 1) {echo '<div class="alert alert-danger alert-dismissible fade in" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                    </button>
+                    <strong>Error</strong> Parent Asset ID Does not exist
+                  </div>';}
 				  
 				  if ($Success == 1) {echo '<div class="alert alert-success alert-dismissible fade in" role="alert">
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
                     </button>
-                    <strong>Success</strong> Data Added Successfully
+                    <strong>Success</strong> Renewal created successfully
                   </div>';}
+				  
 				  ?>
                     <br />
-                    <form id="demo-form2" class="form-horizontal form-label-left" method="post" enctype="multipart/form-data">
+                    <form id="demo-form2" enctype="multipart/form-data" class="form-horizontal form-label-left" method="post">
+					  <?php require 'renewal.php'; ?>
 
-                      <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Excel File to import
-                        </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="file" class="form-control col-md-7 col-xs-12"  name="csv">
-                        </div>
-                      </div>
-                      <div class="item form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Import Type</label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <select class="form-control" name="type">
-                            <option value="software">Software</option>
-                            <option value="hardware">Hardware</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div class="item form-group">
+                  <div class="item form-group">
                         <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
                           <button type="submit" class="btn btn-success">Submit</button>
                         </div>
                       </div>
-
                     </form>
                   </div>
                 </div>
@@ -172,9 +163,20 @@
     <script src="vendors/nprogress/nprogress.js"></script>
     <!-- validator -->
     <script src="vendors/validator/validator.js"></script>
-
+	<!--Bootstrap-daterangepicker-->
+	<script src="vendors/moment/min/moment.min.js"></script>
+	<script src="vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+	<!-- jQuery autocomplete -->
+    <script src="vendors/devbridge-autocomplete/dist/jquery.autocomplete.min.js"></script>
     <!-- Custom Theme Scripts -->
     <script src="build/js/custom.min.js"></script>
-	
-  </body>
+	<script>
+	$('#parent').autocomplete({
+		lookup: asset_ID,
+		onSelect: function () {
+
+    }
+	});
+	</script>
+	</body>
 </html>

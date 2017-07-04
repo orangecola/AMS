@@ -109,14 +109,14 @@ class USER
 	
 	public function bulkaddhardware($data) {
 		$assetv 	= $this->db->prepare("INSERT INTO asset_version(current_version) VALUES (:version)");
-		$assets		= $this->db->prepare("INSERT INTO asset(asset_tag, asset_ID, description, quantity, price, purchaseorder_id, release_version, expirydate, remarks, crtrno, version) VALUES (LAST_INSERT_ID(), :asset_ID, :description, :quantity, :price, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :version)");
-		$hardware	= $this->db->prepare("INSERT INTO hardware(asset_tag, class, brand, audit_date, component, label, serial, location, status, replacing, version) VALUES (LAST_INSERT_ID(), :class, :brand, :audit_date, :component, :label, :serial, :location, :status, :replacing, :version)");
+		$assets		= $this->db->prepare("INSERT INTO asset(asset_tag, asset_ID, description, quantity, price, purchaseorder_id, release_version, expirydate, remarks, crtrno, version, lastedited, status) VALUES (LAST_INSERT_ID(), :asset_ID, :description, :quantity, :price, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :version, :lastedited, :status)");
+		$hardware	= $this->db->prepare("INSERT INTO hardware(asset_tag, class, brand, audit_date, component, label, serial, location, replacing, excelsheet, version) VALUES (LAST_INSERT_ID(), :class, :brand, :audit_date, :component, :label, :serial, :location, :replacing, :excelsheet, :version)");
 		
 			
 		
 		$asset_ID = $description = $quantity = $price = $purchaseorder_id = $release_version = $expirydate = $remarks = $crtrno = "";
 		
-		$class = $brand = $audit_date = $component = $label = $serial = $location = $status = $replacing = "";
+		$class = $brand = $audit_date = $component = $label = $serial = $location = $status = $replacing = $excelsheet = "";
 		
 		$assetv->bindValue(':version', 1);
 		
@@ -129,6 +129,10 @@ class USER
 		$assets->bindParam(':expirydate', 			$expirydate);
 		$assets->bindParam(':remarks', 				$remarks);
 		$assets->bindParam(':crtrno', 				$crtrno);
+		$assets->bindParam(':status', 			$status);
+		date_default_timezone_set('Asia/Singapore');
+		$time = date("Y-m-d H:i:s");
+		$assets->bindParam(':lastedited',			$time);
 		$assets->bindValue(':version',				1);
 		
 		$hardware->bindParam(':class', 				$class);
@@ -138,8 +142,8 @@ class USER
 		$hardware->bindParam(':label', 				$label);
 		$hardware->bindParam(':serial', 			$serial);
 		$hardware->bindParam(':location', 			$location);
-		$hardware->bindParam(':status', 			$status);
 		$hardware->bindParam(':replacing', 			$replacing);
+		$hardware->bindParam(':excelsheet',			$excelsheet);
 		$hardware->bindValue(':version',			1);
 		
 		foreach($data as $row) {
@@ -193,7 +197,10 @@ class USER
 				$serial = $row['Serial'];
 			}
 			if(isset($row['Excel Sheet'])) {
-				$location = $row['Excel Sheet'];
+				$excelsheet = $row['Excel Sheet'];
+			}
+			if(isset($row['Location'])) {
+				$location = $row['Location'];
 			}
 			if(isset($row['Status'])) {
 				$status= $row['Status'];
@@ -215,7 +222,7 @@ class USER
 	
 	public function bulkaddsoftware($data) {
 		$assetv 	= $this->db->prepare("INSERT INTO asset_version(current_version) VALUES (:version)");
-		$assets		= $this->db->prepare("INSERT INTO asset(asset_tag, asset_ID, description, quantity, price, purchaseorder_id, release_version, expirydate, remarks, crtrno, version) VALUES (LAST_INSERT_ID(), :asset_ID, :description, :quantity, :price, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :version)");
+		$assets		= $this->db->prepare("INSERT INTO asset(asset_tag, asset_ID, description, quantity, price, purchaseorder_id, release_version, expirydate, remarks, crtrno, lastedited, version) VALUES (LAST_INSERT_ID(), :asset_ID, :description, :quantity, :price, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :lastedited , :version)");
 		$software 	= $this->db->prepare("INSERT INTO software(asset_tag, vendor, procured_from, shortname, purpose, contract_type, start_date, license_explanation, version) VALUES (LAST_INSERT_ID(), :vendor, :procured_from, :shortname, :purpose, :contract_type, :start_date, :license_explanation, :version)");
 				
 		$asset_ID = $description = $quantity = $price = $purchaseorder_id = $release_version = $expirydate = $remarks = $crtrno = "";
@@ -233,6 +240,9 @@ class USER
 		$assets->bindParam(':expirydate', 				$expirydate);
 		$assets->bindParam(':remarks', 					$remarks);
 		$assets->bindParam(':crtrno', 					$crtrno);
+		date_default_timezone_set('Asia/Singapore');
+		$time = date("Y-m-d H:i:s");
+		$assets->bindParam(':lastedited',				$time);
 		$assets->bindValue(':version',					1);
 		
 		$software->bindParam(':vendor', 				$vendor);
@@ -521,6 +531,31 @@ class USER
 		$this->savelog($_SESSION['username'], "batch imported users");
     }
  
+ 
+	public function getRenewals() {
+		//Retrieves the user list
+		//Returns an array of users
+		$stmt = $this->db->prepare("SELECT * from renewal");
+		$stmt->execute();
+		return $stmt->fetchAll();
+	}
+	
+	public function getRenewal($renewal_ID) {
+		//Return format
+		//Array: {true/false, array of user information}
+		//[0]: Result of retrieving. True if successful, False if failed
+		//[1]: Array of user information
+		$result = array(false, false);
+		$stmt = $this->db->prepare("SELECT * from renewal where renewal_ID=:renewal_ID");
+		$stmt->bindParam(':renewal_ID', $renewal_ID);
+		$stmt->execute();
+		if ($stmt->rowCount() == 1) {
+			$result[0] = true;
+			$result[1] = $stmt->fetch();
+		}
+		return $result;
+	}
+	
     public function login($username,$password)
 	//Checks the username / password combination for logging in. 
 	//Sets session variables
@@ -789,7 +824,7 @@ class USER
 	
 	public function getDistinct() {
 		$result = array();
-		$stmt = $this->db->prepare("SELECT DISTINCT asset.purchaseorder_id FROM asset, asset_version WHERE asset.version = asset_version.current_version AND asset.asset_tag = asset_version.asset_tag ORDER BY purchaseorder_id");
+		$stmt = $this->db->prepare("SELECT DISTINCT asset.purchaseorder_id FROM asset, asset_version WHERE asset.version = asset_version.current_version AND asset.asset_tag = asset_version.asset_tag UNION SELECT purchaseorder_id from renewal");
 		$stmt->execute();
 		$result[0] = $stmt->fetchAll();
 		
@@ -822,7 +857,9 @@ class USER
 	
 	public function generateReport($type, $filter) {
 		  $entry = '%'.$filter.'%';
-		  $stmt = $this->db->prepare("SELECT * FROM asset WHERE ".$type." LIKE :filter");
+		  $stmt = $this->db->prepare("SELECT * FROM asset, asset_version WHERE ".$type." LIKE :filter AND
+		  asset_version.asset_tag = asset.asset_tag AND
+		  asset_version.current_version 	= asset.version");
 		  $stmt->bindparam(":filter", $entry);
 		  $stmt->execute();
 		  
@@ -830,6 +867,36 @@ class USER
 		  return $stmt->fetchAll();
 	}
     
+	public function downloadReport($type, $filter) {
+		  $entry = '%'.$filter.'%';
+		  $stmt = $this->db->prepare("SELECT 	asset.*, hardware.*
+			FROM asset_version INNER JOIN hardware, asset 
+			WHERE 
+            asset_version.asset_tag = hardware.asset_tag AND
+            asset_version.asset_tag = asset.asset_tag AND
+			asset_version.current_version 	= asset.version AND
+            asset_version.current_version = hardware.version AND
+			$type LIKE :filter");
+		  $stmt->bindparam(":filter", $entry);
+		  $stmt->execute();
+		  
+		  $result['hardware'] = $stmt->fetchAll();
+		  
+		  $stmt = $this->db->prepare("SELECT 	asset.*, software.*
+			FROM asset_version INNER JOIN software, asset 
+			WHERE 
+            asset_version.asset_tag = software.asset_tag AND
+            asset_version.asset_tag = asset.asset_tag AND
+			asset_version.current_version 	= asset.version AND
+            asset_version.current_version = software.version AND
+			$type LIKE :filter");
+		  $stmt->bindparam(":filter", $entry);
+		  $stmt->execute();
+		  
+		  $result['software'] = $stmt->fetchAll();
+		  
+		  return $result;
+	}
     public function addOption($type, $value) {
 			
 		  $stmt = $this->db->prepare("INSERT INTO ".$type." (".$type."_name) VALUES(:filter)");
@@ -877,22 +944,15 @@ class USER
 		}
 	}
 	
-	public function getChildren($asset, $savedIDs = array()) {
-		$stmt = $this->db->prepare("SELECT 	asset.asset_ID, asset.purchaseorder_id, asset.parent 
-									FROM 	asset, asset_version 
-									WHERE 	asset.parent=:asset_ID
-									AND 	asset.version=asset_version.current_version
-									AND		asset.asset_tag=asset_version.asset_tag");
-		$stmt->bindparam(":asset_ID", $asset['asset_ID']);
+	public function getChildren($asset) {
+		$stmt = $this->db->prepare("SELECT 	* from renewal where parent_ID=:parent_ID");
+		$stmt->bindparam(":parent_ID", $asset['asset_ID']);
 		$stmt->execute();
 		foreach($stmt->fetchAll() as $child) {
-			if (!in_array($child, $savedIDs)) {
-				array_push($savedIDs, $child);
-				echo "<div class='col-xs-6'>".htmlentities($child['asset_ID'])."</div>"; 
-					
-				echo "<div class='col-xs-6'>".htmlentities($child['purchaseorder_id'])."</div>";
-				$this->getChildren($child, $savedIDs);
-			}
+			echo "<div class='col-xs-3'>".htmlentities($child['asset_ID'])."</div>"; 
+			echo "<div class='col-xs-3'>".htmlentities($child['purchaseorder_id'])."</div>";
+			echo "<div class='col-xs-3'>".htmlentities($child['startdate'])."</div>";
+			echo "<div class='col-xs-3'>".htmlentities($child['expiry_date'])."</div>";
 		}
 	}
 	
@@ -973,14 +1033,9 @@ class USER
 		echo 				"<p>Contract type		: ".htmlentities($software['contract_type']) 		."</p>";
 		echo				"<p>Start Date			: ".htmlentities($software['start_date']) 			."</p>";
 		echo				"<p>License Explanation	: ".htmlentities($software['license_explanation']) 	."</p>";
-		echo				"<h4>Parent Information</h4>";
-		echo				"<div class='row'>";
-		echo				"<div class='col-xs-6'>Asset ID</div><div class='col-xs-6'>Purchase Order No</div>";
-		echo				$this->getParents($software);
-		echo				"</div>";
 		echo				"<h4>Children Information</h4>";
 		echo				"<div class='row'>";
-		echo				"<div class='col-xs-6'>Asset ID</div><div class='col-xs-6'>Purchase Order No</div>";
+		echo				"<div class='col-xs-3'>Asset ID</div><div class='col-xs-3'>Purchase Order No</div><div class='col-xs-3'>Start Date</div><div class='col-xs-3'>End Date</div>";
 		echo				$this->getChildren($software);
 		echo				"</div>";
 		echo 			"</div>";
@@ -1003,14 +1058,9 @@ class USER
 		echo				"<p>Serial				: ".htmlentities($hardware['serial']) 			."</p>";
 		echo				"<p>Location 			: ".htmlentities($hardware['location']) 		."</p>";
 		echo				"<p>RMA					: ".htmlentities($hardware['replacing']) 		."</p>";
-		echo				"<h4>Parent Information</h4>";
-		echo				"<div class='row'>";
-		echo				"<div class='col-xs-6'>Asset ID</div><div class='col-xs-6'>Purchase Order No</div>";
-		echo				$this->getParents($hardware);
-		echo				"</div>";
 		echo				"<h4>Children Information</h4>";
 		echo				"<div class='row'>";
-		echo				"<div class='col-xs-6'>Asset ID</div><div class='col-xs-6'>Purchase Order No</div>";
+		echo				"<div class='col-xs-3'>Asset ID</div><div class='col-xs-3'>Purchase Order No</div><div class='col-xs-3'>Start Date</div><div class='col-xs-3'>End Date</div>";
 		echo				$this->getChildren($hardware);
 		echo				"</div>";
 		echo 			"</div>";
@@ -1020,6 +1070,38 @@ class USER
 		echo		"</div>";
 		echo	"</div>";
 		echo "</div>";
+	}
+	
+	public function addRenewal($renewal) {
+       try
+       {
+			$stmt = $this->db->prepare("INSERT INTO renewal(asset_ID,parent_ID,purchaseorder_id,startdate,expiry_date) 
+                                                       VALUES(:asset_ID,:parent_ID,:purchaseorder_id,:startdate,:expiry_date)");
+			
+			$stmt->bindparam(":asset_ID", 			$renewal['asset_ID']);
+			$stmt->bindparam(":parent_ID", 			$renewal['parent_ID']);
+			$stmt->bindparam(":purchaseorder_id", 	$renewal['purchaseorder_id']);
+			$stmt->bindparam(":startdate", 			$renewal['startdate']);
+			$stmt->bindparam(":expiry_date", 		$renewal['expiry_date']);
+			$stmt->execute(); 
+			$this->savelog($_SESSION['username'], "created renewal for asset {$renewal['parent_ID']}");
+			return $stmt; 
+       }
+       catch(PDOException $e)
+       {
+           echo $e->getMessage();
+       }    
+    }
+	
+	public function printAssetRow($asset) {
+				echo "<td>".htmlentities($asset['description'])			."</td>";
+				echo "<td>".htmlentities($asset['quantity'])			."</td>";
+				echo "<td>".htmlentities($asset['price'])			." ".htmlentities($asset['currency'])."</td>";
+				echo "<td>".htmlentities($asset['crtrno'])				."</td>";
+				echo "<td>".htmlentities($asset['purchaseorder_id'])	."</td>";
+				echo "<td>".htmlentities($asset['release_version'])		."</td>";
+				echo "<td>".htmlentities($asset['expirydate'])			."</td>";
+				echo "<td>".htmlentities($asset['remarks'])				."</td>";
 	}
 }
 ?>

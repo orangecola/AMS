@@ -24,7 +24,10 @@
 				<ul class="nav child_menu">
 				  <li id="addasset.php"><a href="addasset.php">Add Assets</a></li>
                   <!--<li id="bulkaddasset.php"><a href="bulkaddasset.php">Bulk Asset Import</a></li>-->
-				  <li id="assetlist.php"><a href="assetlist.php">Edit Assets</a></li>
+				  <li id="softwarelist.php"><a href="softwarelist.php">View/Edit Software Assets</a></li>
+				  <li id="hardwarelist.php"><a href="hardwarelist.php">View/Edit Hardware Assets</a></li>
+				  <li id="addrenewal.php"><a href="addrenewal.php">Add Renewal</a></li>
+				  <li id="renewallist.php"><a href="renewallist.php">View / Edit Renewals</a></li>
 				  <li id="purchaseorder.php"><a href="purchaseorder.php">View/Edit Purchase Orders</a></li>
 				</ul>
 			  </li>
