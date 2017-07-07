@@ -581,6 +581,9 @@ class USER
 			 //Password verify 
              if(password_verify($password, $userRow['password']))
              {
+				$_SESSION['user_ID'] = $userRow['user_ID'];
+				$_SESSION['username'] = $username;
+				$_SESSION['role'] = $userRow['role'];
 				$this->savelog($_SESSION['username'], 'logged in');
                 return true;
              }

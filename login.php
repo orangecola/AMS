@@ -37,9 +37,6 @@
 		$result = $user->login($username, $password);
 		
 		if ($result) {
-				$_SESSION['user_ID'] = $userRow['user_ID'];
-				$_SESSION['username'] = $username;
-				$_SESSION['role'] = $userRow['role'];
 			header("Location: hardwarelist.php");
 		}
 		else {
