@@ -1,6 +1,6 @@
 <?php
 	
-	include('config.php');
+	include('components/config.php');
 	
 	$result = $user->getPurchaseOrderFile($_GET['id']);
 	

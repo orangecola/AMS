@@ -454,6 +454,15 @@ class USER
 			$result['validation'] = true;
 			$result['hardware'] = $stmt->fetchAll();
 		}
+		
+		$stmt = $this->db->prepare("SELECT * FROM renewal where purchaseorder_id=:purchaseorder_id");
+		
+		$stmt->bindParam(":purchaseorder_id", $purchaseorder_id);
+		$stmt->execute();
+		if($stmt->rowCount() > 0) {
+			$result['validation'] = true;
+			$result['renewal'] = $stmt->fetchAll();
+		}
 
 		
 		$stmt = $this->db->prepare("SELECT * FROM purchaseorder where purchaseorder_id = :purchaseorder_id");
@@ -572,9 +581,6 @@ class USER
 			 //Password verify 
              if(password_verify($password, $userRow['password']))
              {
-                $_SESSION['user_ID'] = $userRow['user_ID'];
-				$_SESSION['username'] = $username;
-				$_SESSION['role'] = $userRow['role'];
 				$this->savelog($_SESSION['username'], 'logged in');
                 return true;
              }
@@ -724,6 +730,38 @@ class USER
 		if ($stmt->rowCount() == 1) {
 			$result[0] = true;
 			$result[1] = $stmt->fetch();
+		}
+		return $result;
+	}
+	
+	public function getParents($asset_ID) {
+		$result = null;
+		$stmt = $this->db->prepare("SELECT 	asset.*, hardware.*
+			FROM asset_version INNER JOIN hardware, asset 
+			WHERE 
+            asset.asset_ID = :asset_ID AND
+            asset_version.asset_tag = hardware.asset_tag AND
+            asset_version.asset_tag = asset.asset_tag AND
+			asset_version.current_version 	= asset.version AND
+            asset_version.current_version = hardware.version");
+		$stmt->bindParam(':asset_ID', $asset_ID);
+		$stmt->execute();
+		if ($stmt->rowCount() > 0) {
+			$result['hardware'] = $stmt->fetchAll();
+		}
+		
+		$stmt = $this->db->prepare("SELECT 	asset.*, software.*
+			FROM asset_version INNER JOIN software, asset 
+			WHERE 
+            asset.asset_ID = :asset_ID AND
+            asset_version.asset_tag = software.asset_tag AND
+            asset_version.asset_tag = asset.asset_tag AND
+			asset_version.current_version 	= asset.version AND
+            asset_version.current_version = software.version");
+		$stmt->bindParam(':asset_ID', $asset_ID);
+		$stmt->execute();
+		if ($stmt->rowCount() > 0) {
+			$result['software'] = $stmt->fetchAll();
 		}
 		return $result;
 	}
@@ -919,7 +957,7 @@ class USER
 		$stmt->execute();
 		return $stmt->fetch();
 	}
-	
+	/*
 	public function getParents($asset, &$savedIDs = array()) {
 		
 		$stmt = $this->db->prepare("SELECT 	asset.asset_ID, asset.purchaseorder_id, asset.parent 
@@ -943,7 +981,7 @@ class USER
 			}
 		}
 	}
-	
+	*/
 	public function getChildren($asset) {
 		$stmt = $this->db->prepare("SELECT 	* from renewal where parent_ID=:parent_ID");
 		$stmt->bindparam(":parent_ID", $asset['asset_ID']);
@@ -1085,7 +1123,24 @@ class USER
 			$stmt->bindparam(":expiry_date", 		$renewal['expiry_date']);
 			$stmt->execute(); 
 			$this->savelog($_SESSION['username'], "created renewal for asset {$renewal['parent_ID']}");
-			return $stmt; 
+			
+			//Changing of the parent
+			$parents = $this->getParents($renewal['parent_ID']);
+			
+			if(isset($parents['hardware'])) {
+				foreach ($parents['hardware'] as $row) {
+					$row['expirydate'] = $renewal['expiry_date'];
+					$row['version'] = $row['version'] + 1;
+					$this->editSoftware($row);
+				}										
+			}
+			if(isset($parents['software'])) {
+				foreach ($parents['software'] as $row) {
+					$row['expirydate'] = $renewal['expiry_date'];
+					$row['version'] = $row['version'] + 1;
+					$this->editHardware($row);
+				}										
+			}
        }
        catch(PDOException $e)
        {
@@ -1102,6 +1157,52 @@ class USER
 				echo "<td>".htmlentities($asset['release_version'])		."</td>";
 				echo "<td>".htmlentities($asset['expirydate'])			."</td>";
 				echo "<td>".htmlentities($asset['remarks'])				."</td>";
+	}
+	
+	public function printRenewalRow($row) {
+		$parents = $this->getParents($row['parent_ID']);
+		echo '<tr>';
+		echo "<td>".htmlentities($row['asset_ID'])."</td>";
+		echo "<td>".htmlentities($row['parent_ID'])."</td>";
+		echo "<td>".htmlentities($row['purchaseorder_id'])."</td>";
+		echo "<td>".htmlentities($row['startdate'])."</td>";
+		echo "<td>".htmlentities($row['expiry_date'])."</td>";
+		echo "<td>";
+		echo "<a href=\"editrenewal.php?id=".htmlentities($row['renewal_id'])."\" class=\"btn btn-info btn-xs\"><i class='fa fa-edit'></i>Edit</a>";
+		if(isset($parents['hardware'])) {
+			foreach ($parents['hardware'] as $row) {
+				echo "<a class='btn btn-primary btn-xs' data-toggle='modal' data-target="."#".htmlentities($row['asset_tag'])."view href="."#".htmlentities($row['asset_tag'])."view><i class='fa fa-folder'></i> View </a>";
+				$this->printHardwareModal($row);
+			}										
+		}
+		if(isset($parents['software'])) {
+			foreach ($parents['software'] as $row) {
+				echo "<a class='btn btn-primary btn-xs' data-toggle='modal' data-target="."#".htmlentities($row['asset_tag'])."view href="."#".htmlentities($row['asset_tag'])."view><i class='fa fa-folder'></i> View </a>";
+				$this->printSoftwareModal($row);
+			}										
+		}
+		echo "</td>";
+		echo '</tr>';
+	}
+	
+	public function getHeaders($type) {
+		if ($type == 'renewal') {
+			$sql = "SELECT DISTINCT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME=:type and not COLUMN_NAME='renewal_id'";
+		}
+		else if ($type == 'hardware' or $type == 'software') {
+			$sql = "SELECT DISTINCT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+					WHERE (TABLE_NAME= 'asset' or TABLE_NAME = :type)
+					AND  
+					(not COLUMN_NAME='asset_tag' or COLUMN_NAME='version')
+					";
+		}
+		else {
+			return null;
+		}
+		$stmt = $this->db->prepare($sql);
+		$stmt->bindParam(':type', $type);
+		$stmt->execute();
+		return $stmt->fetchAll();
 	}
 }
 ?>

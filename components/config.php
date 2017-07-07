@@ -5,7 +5,7 @@ session_start();
 $DB_HOST = '127.0.0.1';
 $DB_USER = 'ams';
 $DB_PASS = 'somethinglikethat';
-$DB_NAME = 'test';
+$DB_NAME = 'ams';
 
 try
 {
@@ -18,6 +18,6 @@ catch(PDOException $e)
 }
 
 
-include_once 'user.php';
+include_once 'components/user.php';
 $user = new USER($DB_con);
 ?>

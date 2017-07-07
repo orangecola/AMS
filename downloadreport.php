@@ -1,5 +1,5 @@
 <?php 
-	include ('config.php');
+	include ('components/config.php');
 	include('vendors/PHPExcel/Classes/PHPExcel/IOFactory.php');
 	ini_set('memory_limit', '1024M');
 	date_default_timezone_set('Asia/Singapore');
@@ -23,10 +23,6 @@
 	else {
 		header('Location: generatereport.php');
 	}
-	//echo '<script>';
-	//echo "console.log(".json_encode($result).");";
-	//echo '</script>';
-	
 	
 	$objPHPExcel = new PHPExcel();
 	$objPHPExcel->setActiveSheetIndex(0);
@@ -94,7 +90,6 @@
 	header('Pragma: public');
 	header("Content-Type: application/force-download");
 	header("Content-Type: application/download");
-	header("Content-Length: ".filesize($path));
-	readfile($path);
+	$objWriter->save('php://output');
 	exit;
 ?>

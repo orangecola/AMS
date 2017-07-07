@@ -20,10 +20,10 @@
     <link href="./build/css/custom.min.css" rel="stylesheet">
   </head>
 <?php 
-	include_once('config.php');
+	include_once('components/config.php');
 	//Redirect user to dashboard if logged in
 	if (isset($_SESSION['user_ID'])) {
-		header('Location: assetlist.php');
+		header('Location: hardwarelist.php');
 	}
 	$Login_Failed=0;
 	
@@ -37,7 +37,10 @@
 		$result = $user->login($username, $password);
 		
 		if ($result) {
-			header("Location: assetlist.php");
+				$_SESSION['user_ID'] = $userRow['user_ID'];
+				$_SESSION['username'] = $username;
+				$_SESSION['role'] = $userRow['role'];
+			header("Location: hardwarelist.php");
 		}
 		else {
 			$Login_Failed = 1;
@@ -64,14 +67,10 @@
               <div>
                 <button class="btn btn-default submit" type="submit">Log in</button>
               </div>
-
               <div class="clearfix"></div>
-
               <div class="separator">
-
-                <div class="clearfix"></div>
-                <br />
-
+              <div class="clearfix"></div>
+              <br />
               </div>
             </form>
           </section>

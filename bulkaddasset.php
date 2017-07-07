@@ -1,39 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <!-- Meta, title, CSS, favicons, etc. -->
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-	  
-    <title>NEHR AMS</title>
-
-    <!-- Bootstrap -->
-    <link href="vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-    <!-- NProgress -->
-    <link href="vendors/nprogress/nprogress.css" rel="stylesheet">
-    <!-- iCheck -->
-    <link href="vendors/iCheck/skins/flat/green.css" rel="stylesheet">
-    <!-- bootstrap-wysiwyg -->
-    <link href="vendors/google-code-prettify/bin/prettify.min.css" rel="stylesheet">
-    <!-- Select2 -->
-    <link href="vendors/select2/dist/css/select2.min.css" rel="stylesheet">
-    <!-- Switchery -->
-    <link href="vendors/switchery/dist/switchery.min.css" rel="stylesheet">
-    <!-- starrr -->
-    <link href="vendors/starrr/dist/starrr.css" rel="stylesheet">
-    <!-- bootstrap-daterangepicker -->
-    <link href="vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
-
-    <!-- Custom Theme Style -->
-    <link href="build/css/custom.min.css" rel="stylesheet">
-  </head>
-
 <?php 
-	include('config.php');
+	include('components/config.php');
 	$Success = 0;
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $type = $_POST['type'];
@@ -82,12 +48,9 @@
 		}
 		$Success = 1;
 	}
+	include 'components/sidebar.php';
 ?>  
   
-  <body class="nav-md footer_fixed">
-    <div class="container body">
-      <div class="main_container">
-        <?php include('sidebar.php')?>
         <script>
 			document.getElementById('bulkaddasset.php').setAttribute("class", "current-page");
 		</script>
@@ -147,34 +110,8 @@
                 </div>
               </div>
             </div>
-
-            
         <!-- /page content -->
-
-        <!-- footer content -->
-        <footer>
-          <div class="pull-right">
-            Gentelella - Bootstrap Admin Template by <a href="https://colorlib.com">Colorlib</a>
-          </div>
-          <div class="clearfix"></div>
-        </footer>
-        <!-- /footer content -->
-      </div>
-    </div>
-
-    <!-- jQuery -->
-    <script src="vendors/jquery/dist/jquery.min.js"></script>
-    <!-- Bootstrap -->
-    <script src="vendors/bootstrap/dist/js/bootstrap.min.js"></script>
-    <!-- FastClick -->
-    <script src="vendors/fastclick/lib/fastclick.js"></script>
-    <!-- NProgress -->
-    <script src="vendors/nprogress/nprogress.js"></script>
-    <!-- validator -->
-    <script src="vendors/validator/validator.js"></script>
-
-    <!-- Custom Theme Scripts -->
-    <script src="build/js/custom.min.js"></script>
-	
-  </body>
-</html>
+        <?php
+			include 'components/footer.php';
+			include 'components/closing.php';
+		?>
