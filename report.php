@@ -71,7 +71,7 @@
 					</thead>
 					<tbody>
 					<?php 
-						foreach($result as $row) {
+						foreach($result['asset'] as $row) {
 							echo '<tr>';
 							echo "<td>".htmlentities($row['quantity'])		."</td>";
 							echo "<td>".htmlentities($row['asset_ID'])		."</td>";
@@ -80,6 +80,17 @@
 							echo "<td>$".htmlentities($row['price'])		."</td>";
 							echo '</tr>';
 							$total += $row['price'];
+						}
+						if (isset($result['renewal'])) {
+							foreach($result['renewal'] as $row) {
+								echo '<tr>';
+								echo "<td>1</td>";
+								echo "<td>"						.htmlentities($row['asset_ID'])		."</td>";
+								echo "<td>Renewal for Asset "	.htmlentities($row['parent_ID'])	."</td>";
+								echo "<td>"						.htmlentities($row['expiry_date'])	."</td>";
+								echo "<td>NA</td>";
+								echo '</tr>';
+							}
 						}
 					?>
 
@@ -127,6 +138,7 @@
 	  </div>
 	  </div>
 	</div>
+  </div>
 <!-- /page content -->
 
 <?php 

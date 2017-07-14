@@ -1,13 +1,11 @@
 <!-- footer content -->
 	<footer>
 	  <div class="pull-right">
-		Gentelella - Bootstrap Admin Template by <a href="https://colorlib.com">Colorlib</a>
+		Accenture IHIS 2017
 	  </div>
 	  <div class="clearfix"></div>
 	</footer>
 	<!-- /footer content -->
-  </div>
-</div>
 
 <!-- Scripts -->
 <!-- jQuery -->

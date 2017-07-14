@@ -6,7 +6,7 @@
 		<option value="">Select Option</option>
 		<?php 
 			foreach($options['vendor'] as $row) {
-				echo '<option value="'.$row['vendor_name'].'">'.$row['vendor_name'].'</option>';
+				echo '<option value="'.$row['nehr_Options_Name'].'">'.$row['nehr_Options_Name'].'</option>';
 			}
 		?>
 	  </select>
@@ -20,7 +20,7 @@
 		<option value="">Select Option</option>
 		<?php 
 			foreach($options['procured_from'] as $row) {
-				echo '<option value="'.$row['procured_from_name'].'">'.$row['procured_from_name'].'</option>';
+				echo '<option value="'.$row['nehr_Options_Name'].'">'.$row['nehr_Options_Name'].'</option>';
 			}
 		?>
 	  </select>
@@ -34,7 +34,7 @@
 		<option value="">Select Option</option>
 		<?php 
 			foreach($options['shortname'] as $row) {
-				echo '<option value="'.$row['shortname_name'].'">'.$row['shortname_name'].'</option>';
+				echo '<option value="'.$row['nehr_Options_Name'].'">'.$row['nehr_Options_Name'].'</option>';
 			}
 		?>
 	  </select>
@@ -48,7 +48,7 @@
 		<option value="">Select Option</option>
 		<?php 
 			foreach($options['purpose'] as $row) {
-				echo '<option value="'.$row['purpose_name'].'">'.$row['purpose_name'].'</option>';
+				echo '<option value="'.$row['nehr_Options_Name'].'">'.$row['nehr_Options_Name'].'</option>';
 			}
 		?>
 	  </select>
@@ -62,7 +62,7 @@
 		<option value="">Select Option</option>
 		<?php 
 			foreach($options['contracttype'] as $row) {
-				echo '<option value="'.$row['contracttype_name'].'">'.$row['contracttype_name'].'</option>';
+				echo '<option value="'.$row['nehr_Options_Name'].'">'.$row['nehr_Options_Name'].'</option>';
 			}
 		?>
 	  </select>
@@ -76,7 +76,7 @@
 		<div class="controls">
 		  <div class="xdisplay_inputx form-group">
 		  
-			<input type="text" class="form-control" name="startdate" id="single_cal4" aria-describedby="inputSuccess2Status4">
+			<input type="text" class="form-control required" name="startdate" id="single_cal4" aria-describedby="inputSuccess2Status4">
 			
 			<span id="inputSuccess2Status4" class="sr-only">(success)</span>
 		  </div>

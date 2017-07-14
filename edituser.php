@@ -151,7 +151,8 @@
 		</div>
 	  </div>
 	</div>
-
+  </div>
+</div>
 <script>
 	document.getElementById("username").setAttribute("value", <?php echo json_encode($result[1]['username']);?>);
 	document.getElementById(<?php echo json_encode($result[1]['role']);?>).setAttribute("selected", "selected");

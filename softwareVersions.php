@@ -145,7 +145,7 @@
 		document.getElementsByName("pono")[0].value = versions[p1]["purchaseorder_id"];
 		document.getElementsByName("release")[0].value = versions[p1]["release_version"];
 		document.getElementsByName("expirydate")[0].value = versions[p1]["expirydate"];
-		document.getElementsByName("parent")[0].value= versions[p1]["parent"];
+		document.getElementsByName("status")[0].value = versions[p1]["status"];
 		document.getElementsByName("remarks")[0].innerHTML = versions[p1]["remarks"];
 		
 		document.getElementsByName("vendor")[0].value = versions[p1]["vendor"];
@@ -155,9 +155,27 @@
 		document.getElementsByName("contracttype")[0].value = versions[p1]["contract_type"];
 		document.getElementsByName("startdate")[0].value = versions[p1]["start_date"];
 		document.getElementsByName("license")[0].value = versions[p1]["license_explanation"];
-		document.getElementsByName("verification")[0].value = versions[p1]["verification"];
 	}
 	document.getElementsByTagName("BODY")[0].setAttribute("class", "nav-md");
+	
+	document.getElementsByName("assetid")[0].disabled = true;
+	document.getElementsByName("description")[0].disabled = true;
+	document.getElementsByName("quantity")[0].disabled = true;
+	document.getElementsByName("price")[0].disabled = true;
+	document.getElementsByName("crtrno")[0].disabled = true;
+	document.getElementsByName("pono")[0].disabled = true;
+	document.getElementsByName("release")[0].disabled = true;
+	document.getElementsByName("expirydate")[0].disabled = true;
+	document.getElementsByName("status")[0].disabled = true;
+	document.getElementsByName("remarks")[0].disabled = true;
+	document.getElementsByName("currency")[0].disabled = true;
+	document.getElementsByName("vendor")[0].disabled = true;
+	document.getElementsByName("procure")[0].disabled = true;
+	document.getElementsByName("shortname")[0].disabled = true;
+	document.getElementsByName("purpose")[0].disabled = true;
+	document.getElementsByName("contracttype")[0].disabled = true;
+	document.getElementsByName("startdate")[0].disabled = true;
+	document.getElementsByName("license")[0].disabled = true;
 </script>    
 <!-- /page content -->
 

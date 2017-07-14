@@ -1,6 +1,7 @@
 <?php 
 	include('components/config.php');
 	$Success = 0;
+	$errorRow = array();
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $type = $_POST['type'];
         $inputFileName= $_FILES['csv']['tmp_name'];
@@ -11,42 +12,121 @@
             $inputFileType = PHPExcel_IOFactory::identify($inputFileName); //Identify the file
 			$objReader = PHPExcel_IOFactory::createReader($inputFileType); //Creating the reader
             
-			$objReader->setReadDataOnly(true);
-			
-			
+			//$objReader->setReadDataOnly(true);	
 			$objPHPExcel = $objReader->load($inputFileName); //Loading the file
 			
 			$sheet = $objPHPExcel->getSheet(0);     		//Selecting sheet 0
 			$highestRow = $sheet->getHighestRow();     		//Getting number of rows
 			$highestColumn = $sheet->getHighestColumn();    //Getting number of columns
 			
-
-			$headers = $sheet->rangeToArray('A3:' . $highestColumn . '3', NULL, TRUE, FALSE);
-		
-		
-			for ($row = 4; $row <= $highestRow; $row++) {
-				$rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
-				$newrow = array();
-				foreach($headers[0] as $key=>$value) {
-					if (isset($rowData[0][$key])) {
-						$newrow[$value] = $rowData[0][$key];
-					}
-					$data[$row-4] = $newrow;
-				}
+			$distinct = $user->getDistinct();
+			
+			foreach($distinct[3] as &$value) {
+				$value = $value[0];
 			}
 			
+
+			for ($row = 3; $row <= $highestRow; $row++) {
+				$asset[$row]['asset_ID'] 			= $sheet->getCell('A'.$row)->getValue();
+				$asset[$row]['description'] 		= $sheet->getCell('B'.$row)->getValue();
+				$asset[$row]['quantity']			= $sheet->getCell('C'.$row)->getValue();
+				$asset[$row]['price']				= $sheet->getCell('D'.$row)->getValue();
+				$asset[$row]['currency']			= $sheet->getCell('E'.$row)->getValue();
+				$asset[$row]['crtrno']				= $sheet->getCell('F'.$row)->getValue();
+				$asset[$row]['purchaseorder_id']	= $sheet->getCell('G'.$row)->getValue();
+				$asset[$row]['release_version']		= $sheet->getCell('H'.$row)->getValue();
+				$asset[$row]['expirydate']			= $sheet->getCell('I'.$row)->getValue();
+				$asset[$row]['remarks']				= $sheet->getCell('J'.$row)->getValue();
+				$asset[$row]['status']				= $sheet->getCell('K'.$row)->getValue();
+				
+								
+				//Check quantity, price
+				if (!(($user->validatesAsInt($asset[$row]['price']) or $user->validatesAsDouble($asset[$row]['price'])) and $user->validatesAsInt($asset[$row]['quantity']))) {
+					$errorRow['number'][] = $row;
+				}
+				
+				//Convert Date to Format
+				if (PHPExcel_Shared_Date::isDateTime($sheet->getCell('I'.$row))) {
+					$asset[$row]['expirydate'] = date('m/d/Y', PHPExcel_Shared_Date::ExcelToPHP($asset[$row]['expirydate']));
+				}
+				
+				//Date Check
+				if (!($user->check_date($asset[$row]['expirydate']))) {
+					$errorRow['date'][] = $row;
+				}	
+				
+				if ($type == 'hardware') {
+					$asset[$row]['class']			= $sheet->getCell('L'.$row)->getValue();
+					$asset[$row]['brand']			= $sheet->getCell('M'.$row)->getValue();
+					$asset[$row]['audit_date']		= $sheet->getCell('N'.$row)->getValue();
+					$asset[$row]['component']		= $sheet->getCell('O'.$row)->getValue();
+					$asset[$row]['label']			= $sheet->getCell('P'.$row)->getValue();
+					$asset[$row]['serial']			= $sheet->getCell('Q'.$row)->getValue();
+					$asset[$row]['location']		= $sheet->getCell('R'.$row)->getValue();
+					$asset[$row]['replacing']		= $sheet->getCell('S'.$row)->getValue();
+					$asset[$row]['excelsheet']		= $sheet->getCell('T'.$row)->getValue();
+					$asset[$row]['version']			= 1;
+					//Ensure non null values
+					foreach ($asset[$row] as $key=>$value) {
+						if ($value === "" and 
+							$key != 'remarks' and 
+							$key != 'replacing' and 
+							$key != 'excelsheet') {
+							$errorRow['null'][] = $row.$key;
+						}
+					}
+					
+					//Ensure that if the replacing field is entered, the parent exists in the system
+					if ($asset[$row]['replacing'] != "") {
+						if (!(in_array($asset[$row]['replacing'], $distinct[3]))) {
+								$errorRow['parent'][] = $row;
+						}
+					}
+				}
+				else if ($type == 'software') {
+					$asset[$row]['vendor']				= $sheet->getCell('L'.$row)->getValue();
+					$asset[$row]['procured_from']		= $sheet->getCell('M'.$row)->getValue();
+					$asset[$row]['shortname']			= $sheet->getCell('N'.$row)->getValue();
+					$asset[$row]['purpose']				= $sheet->getCell('O'.$row)->getValue();
+					$asset[$row]['contract_type']		= $sheet->getCell('P'.$row)->getValue();
+					$asset[$row]['start_date']			= $sheet->getCell('Q'.$row)->getValue();
+					$asset[$row]['license_explanation']	= $sheet->getCell('R'.$row)->getValue();
+					$asset[$row]['version']				= 1;
+					
+					if (PHPExcel_Shared_Date::isDateTime($sheet->getCell('Q'.$row))) {
+						$asset[$row]['start_date'] = date('m/d/Y', PHPExcel_Shared_Date::ExcelToPHP($asset[$row]['start_date']));
+					}
+					
+					//Date Check
+					if (!($user->check_date($asset[$row]['start_date']))) {
+						$errorRow['date'][] = $row;
+					}
+					
+					//Null Check
+					foreach ($asset[$row] as $key=>$value) {
+						if ($value === "" and 
+							$key != 'remarks' and 
+							$key != 'replacing' and 
+							$key != 'license_explanation') {
+							$errorRow['null'][] = $row;
+						}
+					}
+				}
+			}
+			if (sizeof($errorRow) == 0 and sizeof($asset) > 0) {
+				if ($type == 'software') {
+					$user->bulkAddSoftware($asset);
+				}
+				else if ($type == 'hardware') {
+					$user->bulkAddHardware($asset);
+				}
+				$Success = 1;
+			}
+			echo '<script>console.log('.json_encode($errorRow).');</script>';
         } catch (Exception $e) {
-            die('Error loading file "' . pathinfo($inputFileName, PATHINFO_BASENAME) 
-            . '": ' . $e->getMessage());
+			echo $e->getMessage();
+            $FileUploadError = 1;
         }
-		
-		if ($type == 'software') {
-			$user->bulkaddsoftware($data);
-		}
-		if ($type == 'hardware') {
-			$user->bulkaddhardware($data);
-		}
-		$Success = 1;
 	}
 	include 'components/sidebar.php';
 ?>  
@@ -59,7 +139,7 @@
           <div class="">
             <div class="page-title">
               <div class="title_left">
-                <h3>Asset Management</h3>
+                <h3>NEHR Asset Management</h3>
               </div>
             </div>
             <div class="clearfix"></div>
@@ -77,8 +157,44 @@
 				  if ($Success == 1) {echo '<div class="alert alert-success alert-dismissible fade in" role="alert">
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
                     </button>
-                    <strong>Success</strong> Data Added Successfully
+                    <strong>Success</strong> '.sizeof($asset).' Assets Added Successfully
                   </div>';}
+				  if (isset($errorRow['number'])) 
+				  {
+					echo 
+					'<div class="alert alert-danger alert-dismissible fade in" role="alert">
+						<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+						<strong>Error</strong> Number Errors in Rows';
+					foreach ($errorRow['number'] as $row) echo $row." ";
+					echo '</div>';
+				  }
+				  if (isset($errorRow['null'])) 
+				  {
+					echo 
+					'<div class="alert alert-danger alert-dismissible fade in" role="alert">
+						<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+						<strong>Error</strong> Missing Fields in Rows';
+					foreach ($errorRow['null'] as $row) echo $row." ";
+					echo '</div>';
+				  }
+				  if (isset($errorRow['date'])) 
+				  {
+					echo 
+					'<div class="alert alert-danger alert-dismissible fade in" role="alert">
+						<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+						<strong>Error</strong> Date Format Error in Rows';
+					foreach ($errorRow['date'] as $row) echo $row." ";
+					echo '</div>';
+				  }
+				  if (isset($errorRow['parent'])) 
+				  {
+					echo 
+					'<div class="alert alert-danger alert-dismissible fade in" role="alert">
+						<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+						<strong>Error</strong> RMA Asset Not Found in Rows';
+					foreach ($errorRow['parent'] as $row) echo $row." ";
+					echo '</div>';
+				  }
 				  ?>
                     <br />
                     <form id="demo-form2" class="form-horizontal form-label-left" method="post" enctype="multipart/form-data">
@@ -101,7 +217,9 @@
                       </div>
                       <div class="item form-group">
                         <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-                          <button type="submit" class="btn btn-success">Submit</button>
+                          <a class="btn btn-default" href="downloadtemplate.php?type=hardware"><i class="fa fa-download"></i> Hardware Template</a></a>
+						  <a class="btn btn-default" href="downloadtemplate.php?type=software"><i class="fa fa-download"></i> Software Template</a></a>
+						  <button type="submit" class="btn btn-success">Submit</button>
                         </div>
                       </div>
 
@@ -110,6 +228,8 @@
                 </div>
               </div>
             </div>
+			</div>
+			</div>
         <!-- /page content -->
         <?php
 			include 'components/footer.php';

@@ -6,7 +6,7 @@
 	$Success=0;
 	$ParentError = 0;
 	$distinct = $user->getDistinct();
-	$options = $user->getOptions();
+	$options = $user->getOptions('nehr_Options', ['currency', 'releaseversion', 'status', 'class', 'brand']);;
 	
 	foreach($distinct[3] as &$value) {
 		$value = $value[0];
@@ -32,7 +32,6 @@
 		$candidate['release_version']	= trim($_POST['release']);
 		$candidate['expirydate']		= trim($_POST['expirydate']);
 		$candidate['remarks']			= trim($_POST['remarks']);
-		$candidate['parent']			= trim($_POST['parent']);
 		
 		$candidate['class']				= trim($_POST['class']);
 		$candidate['brand']				= trim($_POST['brand']);
@@ -78,10 +77,6 @@
 				$DateError = 1;
 		}
 		
-		if (!(in_array($candidate['parent'], $distinct[3])) and $candidate['parent'] != "") {
-				$ParentError = 1;
-		}
-		
 		if (!(in_array($candidate['replacing'], $distinct[3])) and $candidate['replacing'] != "") {
 				$ParentError = 1;
 		}
@@ -99,7 +94,7 @@
 ?>  
   
 <script>
-	document.getElementById('assetlist.php').setAttribute("class", "current-page");
+	document.getElementById('hardwarelist.php').setAttribute("class", "current-page");
 	var asset_ID = <?php echo json_encode($distinct[3]); ?>;
 </script>
 <!-- page content -->
@@ -157,8 +152,8 @@
 			<br />
 			<form id="demo-form2" enctype="multipart/form-data" class="form-horizontal form-label-left" method="post">
 			  <?php 
-				require 'asset.php';
-				require 'hardware.php';
+				require 'components/asset.php';
+				require 'components/hardware.php';
 			  ?>
 				<div class="item form-group">
 				<div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
@@ -167,10 +162,9 @@
 				  <button type="submit" class="btn btn-success">Submit</button>
 				</div>
 			  </div>
-				
+			</form>
 			</div>
 		  </div>
-			</form>
 		  </div>
 		</div>
 	  </div>
@@ -179,12 +173,6 @@
 
 <?php include 'components/footer.php';?>
 <script>
-	$('#parent').autocomplete({
-		lookup: asset_ID,
-		onSelect: function () {
-
-    }
-	});
 	$('#replacing').autocomplete({
 		lookup: asset_ID,
 		onSelect: function () {
@@ -202,7 +190,6 @@
 				document.getElementsByName("pono")[0].value = <?php echo json_encode($result[1]['purchaseorder_id']);?>;
 				document.getElementsByName("expirydate")[0].value = <?php echo json_encode($result[1]['expirydate']);?>;
 				document.getElementsByName("remarks")[0].innerHTML = <?php echo json_encode($result[1]['remarks']);?>;
-				document.getElementsByName("parent")[0].value = <?php echo json_encode($result[1]['parent']);?>;
 				
 				document.getElementsByName("auditdate")[0].value = <?php echo json_encode($result[1]['audit_date']);?>;
 				document.getElementsByName("component")[0].value = <?php echo json_encode($result[1]['component']);?>;
@@ -210,7 +197,20 @@
 				document.getElementsByName("serial")[0].value = <?php echo json_encode($result[1]['serial']);?>;
 				document.getElementsByName("location")[0].value = <?php echo json_encode($result[1]['location']);?>;
 				document.getElementsByName("replacing")[0].value = <?php echo json_encode($result[1]['replacing']);?>;
+				document.getElementsByName("excelsheet")[0].value = <?php echo json_encode($result[1]['excelsheet']);?>;
 			}
 			resetFields();
+			
+	//Change "Select Option" To Saved Fields
+	document.getElementsByName("release")[0].children[0].innerHTML 		= <?php echo json_encode($result[1]['release_version'].' (No Change)');?>;
+	document.getElementsByName("release")[0].children[0].value 			= <?php echo json_encode($result[1]['release_version']);?>;
+	document.getElementsByName("currency")[0].children[0].innerHTML 	= <?php echo json_encode($result[1]['currency'].' (No Change)');?>;
+	document.getElementsByName("currency")[0].children[0].value 		= <?php echo json_encode($result[1]['currency']);?>;
+	document.getElementsByName("status")[0].children[0].innerHTML		= <?php echo json_encode($result[1]['status'].' (No Change)');?>;
+	document.getElementsByName("status")[0].children[0].value			= <?php echo json_encode($result[1]['status']);?>;
+	document.getElementsByName("class")[0].children[0].innerHTML		= <?php echo json_encode($result[1]['class'].' (No Change)');?>;
+	document.getElementsByName("class")[0].children[0].value			= <?php echo json_encode($result[1]['class']);?>;
+	document.getElementsByName("brand")[0].children[0].innerHTML		= <?php echo json_encode($result[1]['brand'].' (No Change)');?>;
+	document.getElementsByName("brand")[0].children[0].value			= <?php echo json_encode($result[1]['brand']);?>;
 	</script>
 <?php require 'components/closing.php'; ?>

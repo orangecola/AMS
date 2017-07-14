@@ -3,7 +3,6 @@
 	$DateError=0;
 	$Success=0;
 	$ParentError=0;
-	$options = $user->getOptions();
 	$distinct = $user->getDistinct();
 	
 	foreach($distinct[3] as &$value) {
@@ -57,8 +56,6 @@
 	</div>
 	<div class="clearfix"></div>
 	<div class="row">
-		
-
 	  <div class="col-md-12 col-sm-12 col-xs-12">
 		<div class="x_panel">
 		  <div class="x_title">
@@ -90,16 +87,17 @@
 			<br />
 			<form id="demo-form2" enctype="multipart/form-data" class="form-horizontal form-label-left" method="post">
 			  <?php require 'components/renewal.php'; ?>
-
-		  <div class="item form-group">
-				<div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-				  <button type="submit" class="btn btn-success">Submit</button>
+				<div class="item form-group">
+					<div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+					  <button type="submit" class="btn btn-success">Submit</button>
 				</div>
 			  </div>
 			</form>
 		  </div>
 		</div>
 	  </div>
+	</div>
+	</div>
 	</div>
 <!-- /page content -->
 <?php require 'components/footer.php' ?>

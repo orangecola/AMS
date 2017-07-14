@@ -3,11 +3,10 @@
 	$NoChanges=0;
 	$DateError=0;
 	$NumberError = 0;
-	$ParentError = 0;
 	$Success=0;
 	
 	$distinct = $user->getDistinct();
-	$options = $user->getOptions();
+	$options = $user->getOptions('nehr_Options', ['currency', 'releaseversion', 'status', 'vendor', 'procured_from', 'shortname', 'purpose', 'contracttype']);
 	
 	foreach($distinct[3] as &$value) {
 		$value = $value[0];
@@ -33,7 +32,6 @@
 		$candidate['release_version']		= trim($_POST['release']);
 		$candidate['expirydate']			= trim($_POST['expirydate']);
 		$candidate['remarks']				= trim($_POST['remarks']);
-		$candidate['parent']				= trim($_POST['parent']);
 		$candidate['status']				= trim($_POST['status']);
 		
 		$candidate['vendor']				= trim($_POST['vendor']);
@@ -79,10 +77,6 @@
 				$DateError = 1;
 		}
 		
-		if (!(in_array($candidate['parent'], $distinct[3])) and $candidate['parent'] != "") {
-				$ParentError = 1;
-		}
-		
 		if ($NoChanges == 0 and $DateError == 0 and $NumberError == 0 and $ParentError == 0) {
 			$candidate['version'] = $result[1]['version'] + 1;
 			$candidate['asset_tag'] = $result[1]['asset_tag'];
@@ -97,8 +91,7 @@
 ?>  
   
 <script>
-	document.getElementById('assetlist.php').setAttribute("class", "current-page");
-	var asset_ID = <?php echo json_encode($distinct[3]); ?>;
+	document.getElementById('softwarelist.php').setAttribute("class", "current-page");
 </script>
 <!-- page content -->
 <div class="right_col" role="main">
@@ -141,13 +134,6 @@
 			</button>
 			<strong>Success</strong> Software edits successful
 		  </div>';}
-		  
-		  if ($ParentError == 1) {echo '<div class="alert alert-danger alert-dismissible fade in" role="alert">
-			<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
-			</button>
-			<strong>Error</strong> Parent Asset ID Does not exist
-		  </div>';}
-		  
 		  ?>
 			<br />
 			<form id="demo-form2" enctype="multipart/form-data" class="form-horizontal form-label-left" method="post">
@@ -169,6 +155,7 @@
 		</div>
 	  </div>
 	</div>
+  </div>	
 <!-- /page content -->
 
 <?php require ('components/footer.php');?>
@@ -183,18 +170,27 @@
 			document.getElementsByName("pono")[0].value = <?php echo json_encode($result[1]['purchaseorder_id']);?>;
 			document.getElementsByName("expirydate")[0].value = <?php echo json_encode($result[1]['expirydate']);?>;
 			document.getElementsByName("remarks")[0].innerHTML = <?php echo json_encode($result[1]['remarks']);?>;
-			document.getElementsByName("parent")[0].value = <?php echo json_encode($result[1]['parent']);?>;
-			
 			document.getElementsByName("startdate")[0].value = <?php echo json_encode($result[1]['start_date']);?>;
 			document.getElementsByName("license")[0].value = <?php echo json_encode($result[1]['license_explanation']);?>;
 		}
 		reset();
-		console.log(asset_ID);
-		$('#parent').autocomplete({
-			lookup: asset_ID,
-			onSelect: function () {
 
-		}
-		});
+		//Change "Select Option" To Saved Fields
+		document.getElementsByName("release")[0].children[0].innerHTML 		= <?php echo json_encode($result[1]['release_version'].' (No Change)');?>;
+		document.getElementsByName("release")[0].children[0].value 			= <?php echo json_encode($result[1]['release_version']);?>;
+		document.getElementsByName("currency")[0].children[0].innerHTML 	= <?php echo json_encode($result[1]['currency'].' (No Change)');?>;
+		document.getElementsByName("currency")[0].children[0].value 		= <?php echo json_encode($result[1]['currency']);?>;
+		document.getElementsByName("status")[0].children[0].innerHTML		= <?php echo json_encode($result[1]['status'].' (No Change)');?>;
+		document.getElementsByName("status")[0].children[0].value			= <?php echo json_encode($result[1]['status']);?>;
+		document.getElementsByName("vendor")[0].children[0].innerHTML		= <?php echo json_encode($result[1]['vendor'].' (No Change)');?>;
+		document.getElementsByName("vendor")[0].children[0].value			= <?php echo json_encode($result[1]['vendor']);?>;
+		document.getElementsByName("procure")[0].children[0].innerHTML		= <?php echo json_encode($result[1]['procured_from'].' (No Change)');?>;
+		document.getElementsByName("procure")[0].children[0].value			= <?php echo json_encode($result[1]['procured_from']);?>;
+		document.getElementsByName("shortname")[0].children[0].innerHTML	= <?php echo json_encode($result[1]['shortname'].' (No Change)');?>;
+		document.getElementsByName("shortname")[0].children[0].value		= <?php echo json_encode($result[1]['shortname']);?>;
+		document.getElementsByName("purpose")[0].children[0].innerHTML		= <?php echo json_encode($result[1]['purpose'].' (No Change)');?>;
+		document.getElementsByName("purpose")[0].children[0].value			= <?php echo json_encode($result[1]['purpose']);?>;
+		document.getElementsByName("contracttype")[0].children[0].innerHTML	= <?php echo json_encode($result[1]['contract_type'].' (No Change)');?>;
+		document.getElementsByName("contracttype")[0].children[0].value		= <?php echo json_encode($result[1]['contract_type']);?>;
 </script>  
 <?php require ('components/closing.php');

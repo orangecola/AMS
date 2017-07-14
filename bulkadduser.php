@@ -72,6 +72,8 @@
 		</div>
 	  </div>
 	</div>
+  </div>
+</div> 
 	<?php 
 		require 'components/footer.php';
 		require 'components/closing.php';

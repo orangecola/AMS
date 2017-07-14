@@ -44,13 +44,13 @@
     <link href="build/css/custom.min.css" rel="stylesheet">
   </head>
 
-  <body class="nav-md footer_fixed">
+  <body class="nav-md">
     <div class="container body">
       <div class="main_container">
 		<div class="col-md-3 left_col">
 			  <div class="left_col scroll-view">
 				<div class="navbar nav_title" style="border: 0;">
-				  <span class="site_title">NEHR AMS</span>
+				  <span class="site_title">Asset Management</span>
 				</div>
 
 				<div class="clearfix"></div>
@@ -61,16 +61,22 @@
 				<div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
 				  <div class="menu_section">
 					<ul class="nav side-menu">
-					  <li><a><i class="fa fa-home"></i> Asset Management <span class="fa fa-chevron-down"></span></a>
+					  <li><a><i class="fa fa-home"></i>NEHR<span class="fa fa-chevron-down"></span></a>
 						<ul class="nav child_menu">
 						  <li id="addasset.php"><a href="addasset.php">Add Assets</a></li>
-						  <!--<li id="bulkaddasset.php"><a href="bulkaddasset.php">Bulk Asset Import</a></li>-->
-						  <li id="softwarelist.php"><a href="softwarelist.php">View/Edit Software Assets</a></li>
-						  <li id="hardwarelist.php"><a href="hardwarelist.php">View/Edit Hardware Assets</a></li>
+						  <li id="bulkaddasset.php"><a href="bulkaddasset.php">Bulk Asset Import</a></li>
+						  <li id="softwarelist.php"><a href="softwarelist.php">NEHR Software List</a></li>
+						  <li id="hardwarelist.php"><a href="hardwarelist.php">NEHR Hardware List</a></li>
 						  <li id="addrenewal.php"><a href="addrenewal.php">Add Renewal</a></li>
 						  <li id="bulkaddrenewal.php"><a href="bulkaddrenewal.php">Bulk Renewal Import</a></li>
 						  <li id="renewallist.php"><a href="renewallist.php">View / Edit Renewals</a></li>
-						  <li id="purchaseorder.php"><a href="purchaseorder.php">View/Edit Purchase Orders</a></li>
+						  <li id="purchaseorder.php"><a href="purchaseorder.php">Purchase Orders Information</a></li>
+						</ul>
+					  </li>
+					  <li><a><i class="fa fa-home"></i>GPC<span class="fa fa-chevron-down"></span></a>
+						<ul class="nav child_menu">
+						  <li id="addgpc_asset.php"><a href="addgpc_asset.php">Add GPC Assets</a></li>
+						  <li id="gpcassetlist.php"><a href="gpcassetlist.php">GPC Asset List</a></li>
 						</ul>
 					  </li>
 					  <!--
@@ -95,7 +101,8 @@
 								echo '<li id="bulkadduser.php"><a href="bulkadduser.php">Bulk Add Users</a></li>' ;
 								echo '<li id="userlist.php"><a href="userlist.php">Edit User</a></li>' ;
 								echo '<li id="adminassetlist.php"><a href="adminassetlist.php">Previous Versions</a></li>' ;
-								echo '<li id="optionsedit.php"><a href="optionsedit.php">Asset options list</a></li>' ;
+								echo '<li id="options_nehr.php"><a href="options_nehr.php">NEHR Asset options list</a></li>';
+								echo '<li id="options_gpc.php"><a href="options_gpc.php">GPC Asset options list</a></li>';
 								echo '<li id="logs.php"><a href="logs.php">Logs</a></li>';
 								echo '</ul>';
 								echo '</li>';

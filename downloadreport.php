@@ -25,25 +25,26 @@
 	}
 	
 	$objPHPExcel = new PHPExcel();
-	$objPHPExcel->setActiveSheetIndex(0);
-	
-	$objPHPExcel->getActiveSheet()->SetCellValue('A1', $header);
-	$objPHPExcel->getActiveSheet()->SetCellValue('A2', $time);
-	$rownumber = 3;
-	if (sizeof($result['hardware'] > 0)) {
-		$objPHPExcel->getActiveSheet()->SetCellValue('A'.$rownumber, 'Software');
-		$rownumber++;
-		$headers = array_merge($user->assetFields, $user->hardwareFields);
+	$ActiveSheetIndex = 0;
+	if (sizeof($result['hardware']) > 0) {
+		if ($ActiveSheetIndex > 0) {
+			$objPHPExcel->createSheet();
+		}
+		$objPHPExcel->setActiveSheetIndex($ActiveSheetIndex);
+		$objPHPExcel->getActiveSheet()->setTitle('Hardware');
 		
+		$headers = $user->getHeaders('hardware');
+		$rownumber = 1;
+	
 		foreach ($headers as $key=>$data) {
-			$objPHPExcel->getActiveSheet()->SetCellValue(chr($key + 65).$rownumber, $data);
+			$objPHPExcel->getActiveSheet()->SetCellValue(chr($key + 65).$rownumber, $data['COLUMN_NAME']);
 			$objPHPExcel->getActiveSheet()->getColumnDimension(chr($key + 65))->setAutoSize(true);
 		}
 		$rownumber++;
 		foreach ($result['hardware'] as $row) {
 			
 			foreach ($headers as $key=>$data) {
-				$objPHPExcel->getActiveSheet()->SetCellValue(chr($key + 65).$rownumber, $row[$data]);
+				$objPHPExcel->getActiveSheet()->SetCellValue(chr($key + 65).$rownumber, $row[$data['COLUMN_NAME']]);
 			}
 			$rownumber++;
 		}
@@ -51,22 +52,55 @@
 		foreach ($headers as $key=>$data) {
 			$objPHPExcel->getActiveSheet()->getColumnDimension(chr($key + 65))->setAutoSize(true);
 		}
+		
+		$ActiveSheetIndex++;
 	}
 	
-	if (sizeof($result['software'] > 0)) {
-		$objPHPExcel->getActiveSheet()->SetCellValue('A'.$rownumber, 'Hardware');
-		$rownumber++;
-		$headers = array_merge($user->assetFields, $user->hardwareFields);
+	if (sizeof($result['software']) > 0) {
+		if ($ActiveSheetIndex > 0) {
+			$objPHPExcel->createSheet();
+		}
+		$objPHPExcel->setActiveSheetIndex($ActiveSheetIndex);
+		$objPHPExcel->getActiveSheet()->setTitle('Software');
+		$rownumber = 1;
+		$headers = $user->getHeaders('software');
 		
 		foreach ($headers as $key=>$data) {
-			$objPHPExcel->getActiveSheet()->SetCellValue(chr($key + 65).$rownumber, $data);
+			$objPHPExcel->getActiveSheet()->SetCellValue(chr($key + 65).$rownumber, $data['COLUMN_NAME']);
 			$objPHPExcel->getActiveSheet()->getColumnDimension(chr($key + 65))->setAutoSize(true);
 		}
 		$rownumber++;
-		foreach ($result['hardware'] as $row) {
+		foreach ($result['software'] as $row) {
 			
 			foreach ($headers as $key=>$data) {
-				$objPHPExcel->getActiveSheet()->SetCellValue(chr($key + 65).$rownumber, $row[$data]);
+				$objPHPExcel->getActiveSheet()->SetCellValue(chr($key + 65).$rownumber, $row[$data['COLUMN_NAME']]);
+			}
+			$rownumber++;
+		}
+		
+		foreach ($headers as $key=>$data) {
+			$objPHPExcel->getActiveSheet()->getColumnDimension(chr($key + 65))->setAutoSize(true);
+		}
+	}
+	
+	if (sizeof($result['renewal']) > 0) {
+		if ($ActiveSheetIndex > 0) {
+			$objPHPExcel->createSheet();
+		}
+		$objPHPExcel->setActiveSheetIndex($ActiveSheetIndex);
+		$objPHPExcel->getActiveSheet()->setTitle('Renewals');
+		$rownumber = 1;
+		$headers = $user->getHeaders('renewal');
+		
+		foreach ($headers as $key=>$data) {
+			$objPHPExcel->getActiveSheet()->SetCellValue(chr($key + 65).$rownumber, $data['COLUMN_NAME']);
+			$objPHPExcel->getActiveSheet()->getColumnDimension(chr($key + 65))->setAutoSize(true);
+		}
+		$rownumber++;
+		foreach ($result['renewal'] as $row) {
+			
+			foreach ($headers as $key=>$data) {
+				$objPHPExcel->getActiveSheet()->SetCellValue(chr($key + 65).$rownumber, $row[$data['COLUMN_NAME']]);
 			}
 			$rownumber++;
 		}
@@ -77,7 +111,6 @@
 	}
 	
 	$objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);
-	$objWriter->save($path);
 	
 	//Serve the file to the client
 	ob_clean();
@@ -91,5 +124,5 @@
 	header("Content-Type: application/force-download");
 	header("Content-Type: application/download");
 	$objWriter->save('php://output');
-	exit;
+	
 ?>

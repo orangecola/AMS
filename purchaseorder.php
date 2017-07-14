@@ -84,6 +84,8 @@
 		</div>
 	  </div>
 	</div>
+	</div>
+	</div>
 <!-- /page content -->
 
 <?php include 'components/footer.php'; ?>
@@ -158,4 +160,4 @@
 	}
 ?>
 </script>
-<?php echo 'components/closing.php';?>
+<?php require 'components/closing.php';?>

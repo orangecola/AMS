@@ -4,7 +4,7 @@
 	$AssetError=0;
 	$Success=0;
 	$ParentError=0;
-	$options = $user->getOptions();
+	$options = $user->getOptions('nehr_Options', ['currency', 'releaseversion', 'status', 'vendor', 'procured_from', 'shortname', 'purpose', 'contracttype', 'class', 'brand']);
 	$distinct = $user->getDistinct();
 	
 	foreach($distinct[3] as &$value) {
@@ -184,7 +184,7 @@
 	</div>
   </div>
 </div>
-
+</div>
 <!-- /page content -->
 
 <?php require 'components/footer.php'; ?>
@@ -245,5 +245,6 @@
 		document.getElementsByName("replacing")[0].removeAttribute("disabled");
 	};
 	software();
+	
 </script>
 <?php require 'components/closing.php'?>

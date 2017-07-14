@@ -6,12 +6,20 @@
 	
 	function printSoftwareRow($software) {
 		echo '<tr>';
-		echo "<td>".htmlentities($software['asset_ID'])."</td>";
-		$GLOBALS['user']->printAssetRow($software);
 		echo "<td>";
 		echo "<a class='btn btn-primary btn-xs' data-toggle='modal' data-target="."#".htmlentities($software['asset_tag'])."view href="."#".htmlentities($software['asset_tag'])."view><i class='fa fa-folder'></i> View </a>";
 		echo "<a href=\"editsoftware.php?id=".htmlentities($software['asset_tag'])."\" class=\"btn btn-info btn-xs\"><i class='fa fa-edit'></i>Edit</a>";
 		echo "</td>";
+		echo "<td>".htmlentities($software['asset_ID'])."</td>";
+		$GLOBALS['user']->printAssetRow($software);
+		echo "<td>".htmlentities($software['vendor'])				."</td>";
+		echo "<td>".htmlentities($software['procured_from'])		."</td>";
+		echo "<td>".htmlentities($software['shortname'])			."</td>";
+		echo "<td>".htmlentities($software['purpose'])				."</td>";
+		echo "<td>".htmlentities($software['contract_type'])		."</td>";
+		echo "<td>".htmlentities($software['start_date'])			."</td>";
+		echo "<td>".htmlentities($software['license_explanation'])	."</td>";
+		echo "<td>".htmlentities($software['remarks'])				."</td>";
 		echo '</tr>';
 	}
 ?>
@@ -38,9 +46,10 @@
 		  <div class="x_content">
 
 			
-			<table id="datatable" class="table table-striped table-bordered">
+			<table id="datatable" class="table table-striped table-bordered dt-responsive">
 			  <thead>
 				<tr>
+				  <th>Actions</th>
 				  <th>Asset ID</th>
 				  <th>Description</th>
 				  <th>Quantity</th>
@@ -49,8 +58,14 @@
 				  <th>PO Number</th>
 				  <th>Release version</th>
 				  <th>Expiry Date</th>
+				  <th>Vendor</th>
+				  <th>Procured From</th>
+				  <th>Short Name</th>
+				  <th>Purpose</th>
+				  <th>Contract Type</th>
+				  <th>Start Date</th>
+				  <th>License Explanation</th>
 				  <th>Remarks</th>
-				  <th>Actions</th>
 				</tr>
 			  </thead>
 

@@ -12,25 +12,25 @@
 	
 	function printHardwareRow($hardware) {
 		echo '<tr>';
+		echo "<td>";
+		echo "<a class='btn btn-primary btn-xs' data-toggle='modal' data-target="."#".htmlentities($hardware['asset_tag'])."view href="."#".htmlentities($hardware['asset_tag'])."view><i class='fa fa-folder'></i> View </a>";
+		echo "<a href=\"hardwareversions.php?id=".htmlentities($hardware['asset_tag'])."\" class=\"btn btn-info btn-xs\"><i class='fa fa-edit'></i>Versions</a>";
+		echo "</td>";
 		echo "<td>".htmlentities($hardware['asset_ID'])."</td>";
 		echo "<td>Hardware</td>";
 		$GLOBALS['user']->printAssetRow($hardware);
-		echo "<td>";
-		echo "<a class='btn btn-primary btn-xs' data-toggle='modal' data-target="."#".htmlentities($hardware['asset_tag'])."view href="."#".htmlentities($hardware['asset_tag'])."view><i class='fa fa-folder'></i> View </a>";
-		echo "<a href=\"hardwareversions.php?id=".htmlentities($hardware['asset_tag'])."\" class=\"btn btn-info btn-xs\"><i class='fa fa-edit'></i>Edit</a>";
-		echo "</td>";
 		echo '</tr>';
 	}
 	
 	function printSoftwareRow($software) {
 		echo '<tr>';
+		echo "<td>";
+		echo "<a class='btn btn-primary btn-xs' data-toggle='modal' data-target="."#".htmlentities($software['asset_tag'])."view href="."#".htmlentities($software['asset_tag'])."view><i class='fa fa-folder'></i> View </a>";
+		echo "<a href=\"softwareversions.php?id=".htmlentities($software['asset_tag'])."\" class=\"btn btn-info btn-xs\"><i class='fa fa-edit'></i>Versions</a>";
+		echo "</td>";
 		echo "<td>".htmlentities($software['asset_ID'])."</td>";
 		echo "<td>Software</td>";
 		$GLOBALS['user']->printAssetRow($software);
-		echo "<td>";
-		echo "<a class='btn btn-primary btn-xs' data-toggle='modal' data-target="."#".htmlentities($software['asset_tag'])."view href="."#".htmlentities($software['asset_tag'])."view><i class='fa fa-folder'></i> View </a>";
-		echo "<a href=\"softwareversions.php?id=".htmlentities($software['asset_tag'])."\" class=\"btn btn-info btn-xs\"><i class='fa fa-edit'></i>Edit</a>";
-		echo "</td>";
 		echo '</tr>';
 	}
 ?>
@@ -58,6 +58,7 @@
 			<table id="datatable" class="table table-striped table-bordered">
 			  <thead>
 				<tr>
+				  <th>Actions</th>
 				  <th>Asset ID</th>
 				  <th>Type</th>
 				  <th>Description</th>
@@ -66,9 +67,7 @@
 				  <th>CR / TR Number</th>
 				  <th>PO Number</th>
 				  <th>Release version</th>
-				  <th>Expiry Date</th>
-				  <th>Remarks</th>
-				  <th>Actions</th>
+				  <th>Expiry Date</th>				  
 				</tr>
 			  </thead>
 			  <tbody>
@@ -88,6 +87,9 @@
 		  </div>
 		</div>
 	  </div>
+	</div>
+  </div>
+</div>
 <!-- /page content -->
 <?php
 	require 'components/footer.php';

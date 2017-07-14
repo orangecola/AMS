@@ -1,8 +1,14 @@
 <?php 
 	include_once('components/config.php');
 	$Success=0;
-	$noChanges=0;
-		
+	$DateError=0;
+	$ParentError=0;
+	$distinct = $user->getDistinct();
+	
+	foreach($distinct[3] as &$value) {
+		$value = $value[0];
+	}
+	
 	if(!(isset($_GET['id']))) {
 			header('Location: userlist.php');
 	}
@@ -14,27 +20,29 @@
 	}
 	
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-		/*
-		$candidate['username'] 	= trim($_POST['username']);
-		$candidate['password'] 	= password_hash(trim($_POST['password']), PASSWORD_DEFAULT);
-		$candidate['role'] 		= trim($_POST['role']);
-		$candidate['status']	= trim($_POST['status']);
+		$renewal['asset_ID']					= $_POST['assetid'];
+		$renewal['parent_ID']					= $_POST['parent'];
+		$renewal['purchaseorder_id']			= $_POST['pono'];			
+		$renewal['startdate']					= $_POST['startdate'];
+		$renewal['expiry_date']					= $_POST['expiry_date'];
+		$renewal['renewal_id']					= $result[1]['renewal_id'];
 		
-		$same = true;
-		
-		foreach ($user->userFields as $value) {
-			
-			if ($candidate[$value] != $result[1][$value]) {
-				$same = false;
-				break;
-			}
+		if ($renewal['asset_ID'] == "") {
+			$renewal['asset_ID'] = $renewal['parent_ID'];
 		}
-		unset($value);
 		
-		if ($same) {
-			$noChanges = 1;
+		if (!($user->check_date($renewal['expiry_date']) and $user->check_date($renewal['startdate']))) {
+				$DateError = 1;
 		}
-		*/
+		
+		if (!(in_array($renewal['parent_ID'], $distinct[3]))) {
+				$ParentError = 1;
+		}
+		
+		if ($DateError == 0 and $ParentError == 0) {
+			$user->editRenewal($renewal);
+			$Success = 1;
+		}
 	}
 
 	include 'components/sidebar.php';
@@ -64,7 +72,23 @@
 		  </div>
 		  <div class="x_content">
 		  <?php
-				// Error / Success Messages
+				if ($DateError == 1) {echo '<div class="alert alert-danger alert-dismissible fade in" role="alert">
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+				</button>
+				<strong>Error</strong> Date Error
+			  </div>';}
+			  
+			  if ($ParentError == 1) {echo '<div class="alert alert-danger alert-dismissible fade in" role="alert">
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+				</button>
+				<strong>Error</strong> Parent Asset ID Does not exist
+			  </div>';}
+			  
+			  if ($Success == 1) {echo '<div class="alert alert-success alert-dismissible fade in" role="alert">
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+				</button>
+				<strong>Success</strong> Renewal created successfully
+			  </div>';}
 		  ?>
 			<br />
 			<form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post">

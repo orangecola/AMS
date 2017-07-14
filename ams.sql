@@ -7,20 +7,19 @@ SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
 CREATE TABLE `asset` (
   `asset_tag` int(11) NOT NULL,
+  `version` int(11) NOT NULL,
+  `lastedited` text,
   `asset_ID` varchar(200) DEFAULT NULL,
   `description` text,
   `quantity` int(11) DEFAULT NULL,
   `price` double DEFAULT NULL,
   `currency` text NOT NULL,
+  `crtrno` text,
   `purchaseorder_id` text,
   `release_version` text,
   `expirydate` text,
-  `remarks` text,
-  `crtrno` text,
-  `parent` text,
   `status` text,
-  `version` int(11) NOT NULL,
-  `lastedited` text,
+  `remarks` text,
   KEY `asset_tag` (`asset_tag`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -32,36 +31,52 @@ CREATE TABLE `asset_version` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1168 DEFAULT CHARSET=latin1;
 
 
-CREATE TABLE `brand` (
-  `brand_id` int(11) NOT NULL AUTO_INCREMENT,
-  `brand_name` text NOT NULL,
-  PRIMARY KEY (`brand_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=latin1;
+CREATE TABLE `gpc_Asset` (
+  `gpc_asset_tag` int(11) NOT NULL AUTO_INCREMENT,
+  `gpc_version` int(11) NOT NULL DEFAULT '1',
+  `gpc_Environment` varchar(50) NOT NULL,
+  `gpc_Tier` varchar(50) NOT NULL,
+  `gpc_Phase` varchar(50) NOT NULL,
+  `gpc_Item` text NOT NULL,
+  `gpc_Remarks` text,
+  `gpc_Ami` varchar(50) NOT NULL,
+  `gpc_Startdate` varchar(20) NOT NULL,
+  `gpc_Expirydate` varchar(20) NOT NULL,
+  `gpc_halb` varchar(10) NOT NULL,
+  `gpc_quantity` int(11) NOT NULL,
+  `gpc_Application` int(11) NOT NULL,
+  `gpc_Data` int(11) NOT NULL,
+  `gpc_IOPS` int(11) NOT NULL,
+  `gpc_Backup` int(11) NOT NULL,
+  `gpc_OS` varchar(50) NOT NULL,
+  `gpc_Y1_Qt` int(11) NOT NULL,
+  `gpc_Y2_Qt` int(11) NOT NULL,
+  `gpc_Y1_Ops` varchar(50) NOT NULL,
+  `gpc_Y2_Ops` varchar(50) NOT NULL,
+  `gpc_Gwgc` varchar(50) NOT NULL,
+  `gpc_Lastedited` varchar(50) NOT NULL,
+  PRIMARY KEY (`gpc_asset_tag`)
+) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=latin1;
 
 
-CREATE TABLE `class` (
-  `class_id` int(11) NOT NULL AUTO_INCREMENT,
-  `class_name` text NOT NULL,
-  PRIMARY KEY (`class_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=latin1;
+CREATE TABLE `gpc_Asset_version` (
+  `gpc_asset_tag` int(11) NOT NULL AUTO_INCREMENT,
+  `current_version` int(11) NOT NULL,
+  PRIMARY KEY (`gpc_asset_tag`)
+) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=latin1;
 
 
-CREATE TABLE `contracttype` (
-  `contracttype_id` int(11) NOT NULL AUTO_INCREMENT,
-  `contracttype_name` text NOT NULL,
-  PRIMARY KEY (`contracttype_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
-
-
-CREATE TABLE `currency` (
-  `currency_id` int(11) NOT NULL AUTO_INCREMENT,
-  `currency_name` text NOT NULL,
-  PRIMARY KEY (`currency_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+CREATE TABLE `gpc_Options` (
+  `gpc_Options_Id` int(11) NOT NULL AUTO_INCREMENT,
+  `gpc_Options_Name` text NOT NULL,
+  `gpc_Options_Type` text NOT NULL,
+  PRIMARY KEY (`gpc_Options_Id`)
+) ENGINE=InnoDB AUTO_INCREMENT=90 DEFAULT CHARSET=latin1;
 
 
 CREATE TABLE `hardware` (
   `asset_tag` int(11) NOT NULL,
+  `version` int(11) NOT NULL,
   `class` text,
   `brand` text,
   `audit_date` text,
@@ -71,17 +86,9 @@ CREATE TABLE `hardware` (
   `location` text,
   `replacing` text,
   `excelsheet` text,
-  `version` int(11) NOT NULL,
   KEY `asset_tag` (`asset_tag`),
   CONSTRAINT `hardware_ibfk_1` FOREIGN KEY (`asset_tag`) REFERENCES `asset_version` (`asset_tag`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-
-CREATE TABLE `location` (
-  `location_id` int(11) NOT NULL AUTO_INCREMENT,
-  `location_name` text NOT NULL,
-  PRIMARY KEY (`location_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=latin1;
 
 
 CREATE TABLE `log` (
@@ -90,14 +97,15 @@ CREATE TABLE `log` (
   `time` text NOT NULL,
   `log` text NOT NULL,
   PRIMARY KEY (`log_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=225 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=242 DEFAULT CHARSET=latin1;
 
 
-CREATE TABLE `procured_from` (
-  `procured_from_id` int(11) NOT NULL AUTO_INCREMENT,
-  `procured_from_name` text NOT NULL,
-  PRIMARY KEY (`procured_from_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=latin1;
+CREATE TABLE `nehr_Options` (
+  `nehr_Options_Id` int(11) NOT NULL AUTO_INCREMENT,
+  `nehr_Options_Name` text NOT NULL,
+  `nehr_Options_Type` text NOT NULL,
+  PRIMARY KEY (`nehr_Options_Id`)
+) ENGINE=InnoDB AUTO_INCREMENT=392 DEFAULT CHARSET=latin1;
 
 
 CREATE TABLE `purchaseorder` (
@@ -111,20 +119,6 @@ CREATE TABLE `purchaseorder` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
-CREATE TABLE `purpose` (
-  `purpose_id` int(11) NOT NULL AUTO_INCREMENT,
-  `purpose_name` text NOT NULL,
-  PRIMARY KEY (`purpose_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=latin1;
-
-
-CREATE TABLE `releaseversion` (
-  `releaseversion_id` int(11) NOT NULL AUTO_INCREMENT,
-  `releaseversion_name` text NOT NULL,
-  PRIMARY KEY (`releaseversion_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=latin1;
-
-
 CREATE TABLE `renewal` (
   `renewal_id` int(11) NOT NULL AUTO_INCREMENT,
   `asset_ID` text NOT NULL,
@@ -134,20 +128,6 @@ CREATE TABLE `renewal` (
   `expiry_date` text NOT NULL,
   PRIMARY KEY (`renewal_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=342 DEFAULT CHARSET=latin1;
-
-
-CREATE TABLE `server` (
-  `server_id` int(11) NOT NULL AUTO_INCREMENT,
-  `server_name` text NOT NULL,
-  PRIMARY KEY (`server_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
-
-
-CREATE TABLE `shortname` (
-  `shortname_id` int(11) NOT NULL AUTO_INCREMENT,
-  `shortname_name` text NOT NULL,
-  PRIMARY KEY (`shortname_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=70 DEFAULT CHARSET=latin1;
 
 
 CREATE TABLE `software` (
@@ -165,13 +145,6 @@ CREATE TABLE `software` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
-CREATE TABLE `status` (
-  `status_id` int(11) NOT NULL AUTO_INCREMENT,
-  `status_name` text NOT NULL,
-  PRIMARY KEY (`status_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1037 DEFAULT CHARSET=latin1;
-
-
 CREATE TABLE `user` (
   `user_ID` int(11) NOT NULL AUTO_INCREMENT,
   `username` text NOT NULL,
@@ -182,11 +155,4 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=latin1;
 
 
-CREATE TABLE `vendor` (
-  `vendor_id` int(11) NOT NULL AUTO_INCREMENT,
-  `vendor_name` text NOT NULL,
-  PRIMARY KEY (`vendor_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=latin1;
-
-
--- 2017-07-07 08:06:18
+-- 2017-07-14 07:41:23

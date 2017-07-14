@@ -3,10 +3,9 @@ class USER
 {
     private $db;
 	public $softwareFields 		= array('vendor', 'procured_from', 'shortname', 'purpose', 'contract_type', 'start_date', 'license_explanation');
-	public $assetFields 		= array('asset_ID', 'description', 'quantity', 'price', 'currency', 'crtrno', 'purchaseorder_id', 'release_version', 'expirydate', 'remarks', 'parent', 'status');
+	public $assetFields 		= array('asset_ID', 'description', 'quantity', 'price', 'currency', 'crtrno', 'purchaseorder_id', 'release_version', 'expirydate', 'remarks', 'status');
 	public $hardwareFields 		= array('class', 'brand', 'audit_date', 'component', 'label', 'serial', 'location', 'replacing'); 
 	public $userFields 			= array('username', 'password', 'role', 'status');
-    public $options = ['status', 'vendor', 'procured_from', 'shortname', 'purpose', 'contracttype', 'releaseversion', 'class', 'brand', 'location', 'server', 'currency'];
 	function __construct($DB_con)
     {
       $this->db = $DB_con;
@@ -47,9 +46,9 @@ class USER
 		
 		$stmt = $this->db->prepare("INSERT INTO 
 			asset(
-			asset_tag, asset_ID, description, quantity, price, currency, purchaseorder_id, release_version, expirydate, remarks, crtrno, status, parent, version, lastedited
+			asset_tag, asset_ID, description, quantity, price, currency, purchaseorder_id, release_version, expirydate, remarks, crtrno, status, version, lastedited
 			) VALUES (
-			LAST_INSERT_ID(), :asset_ID, :description, :quantity, :price, :currency, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :status, :parent, :version, :lastedited)");
+			LAST_INSERT_ID(), :asset_ID, :description, :quantity, :price, :currency, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :status, :version, :lastedited)");
 		$stmt->bindParam(':asset_ID', 			$asset['asset_ID']);
 		$stmt->bindParam(':description', 		$asset['description']);
 		$stmt->bindParam(':quantity', 			$asset['quantity']);
@@ -62,7 +61,6 @@ class USER
 		$stmt->bindParam(':crtrno', 			$asset['crtrno']);
 		$stmt->bindParam(':version',			$asset['version']);
 		$stmt->bindParam(':status',				$asset['status']);
-		$stmt->bindParam(':parent',				$asset['parent']);
 		date_default_timezone_set('Asia/Singapore');
 		$time = date("Y-m-d H:i:s");
 		$stmt->bindParam(':lastedited',			$time);
@@ -107,218 +105,26 @@ class USER
 		$this->savelog($_SESSION['username'], "created hardware asset ".$asset['asset_ID']." version ".$asset['version']);
 	}
 	
-	public function bulkaddhardware($data) {
-		$assetv 	= $this->db->prepare("INSERT INTO asset_version(current_version) VALUES (:version)");
-		$assets		= $this->db->prepare("INSERT INTO asset(asset_tag, asset_ID, description, quantity, price, purchaseorder_id, release_version, expirydate, remarks, crtrno, version, lastedited, status) VALUES (LAST_INSERT_ID(), :asset_ID, :description, :quantity, :price, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :version, :lastedited, :status)");
-		$hardware	= $this->db->prepare("INSERT INTO hardware(asset_tag, class, brand, audit_date, component, label, serial, location, replacing, excelsheet, version) VALUES (LAST_INSERT_ID(), :class, :brand, :audit_date, :component, :label, :serial, :location, :replacing, :excelsheet, :version)");
-		
-			
-		
-		$asset_ID = $description = $quantity = $price = $purchaseorder_id = $release_version = $expirydate = $remarks = $crtrno = "";
-		
-		$class = $brand = $audit_date = $component = $label = $serial = $location = $status = $replacing = $excelsheet = "";
-		
-		$assetv->bindValue(':version', 1);
-		
-		$assets->bindParam(':asset_ID', 			$asset_ID);
-		$assets->bindParam(':description', 			$description);
-		$assets->bindParam(':quantity', 			$quantity);
-		$assets->bindParam(':price', 				$price);
-		$assets->bindParam(':purchaseorder_id', 	$purchaseorder_id);
-		$assets->bindParam(':release_version', 		$release_version);
-		$assets->bindParam(':expirydate', 			$expirydate);
-		$assets->bindParam(':remarks', 				$remarks);
-		$assets->bindParam(':crtrno', 				$crtrno);
-		$assets->bindParam(':status', 			$status);
-		date_default_timezone_set('Asia/Singapore');
-		$time = date("Y-m-d H:i:s");
-		$assets->bindParam(':lastedited',			$time);
-		$assets->bindValue(':version',				1);
-		
-		$hardware->bindParam(':class', 				$class);
-		$hardware->bindParam(':brand', 				$brand);
-		$hardware->bindParam(':audit_date', 		$audit_date);
-		$hardware->bindParam(':component', 			$component);
-		$hardware->bindParam(':label', 				$label);
-		$hardware->bindParam(':serial', 			$serial);
-		$hardware->bindParam(':location', 			$location);
-		$hardware->bindParam(':replacing', 			$replacing);
-		$hardware->bindParam(':excelsheet',			$excelsheet);
-		$hardware->bindValue(':version',			1);
-		
-		foreach($data as $row) {
-			
-			if(isset($row['Unique Asset ID'])) {
-				$asset_ID = $row['Unique Asset ID'];
-			}
-			if(isset($row['Details'])) {
-				$description = $row['Details'];
-			}
-			if(isset($row['Qty'])) {
-				$quantity = $row['Qty'];
-			}
-			if(isset($row['RRP (SGD)'])) {
-				$price = $row['RRP (SGD)'];
-			}
-			if(isset($row['PO Number'])) {
-				$purchaseorder_id = $row['PO Number'];
-			}
-			if(isset($row['Release'])) {
-				$release_version = $row['Release'];
-			}
-			if(isset($row['Warranty End Date'])) {
-				$expirydate = $row['Warranty End Date'];
-			}
-			if(isset($row['Comments'])) {
-				$remarks = $row['Comments'];
-			}
-			if(isset($row['CR/TR Grouping'])) {
-				$crtrno = $row['CR/TR Grouping'];
-			}
-
-
-
-			if(isset($row['Class'])) {
-				$class = $row['Class'];
-			}
-			if(isset($row['Brand'])) {
-				$brand = $row['Brand'];
-			}
-			if(isset($row['Audit Date'])) {
-				$audit_date = $row['Audit Date'];
-			}
-			if(isset($row['Component'])) {
-				$component = $row['Component'];
-			}
-			if(isset($row['Label'])) {
-				$label = $row['Label'];
-			}
-			if(isset($row['Serial'])) {
-				$serial = $row['Serial'];
-			}
-			if(isset($row['Excel Sheet'])) {
-				$excelsheet = $row['Excel Sheet'];
-			}
-			if(isset($row['Location'])) {
-				$location = $row['Location'];
-			}
-			if(isset($row['Status'])) {
-				$status= $row['Status'];
-			}
-			if(isset($row['Refresh/Replacement'])){
-				$replacing = $row['Refresh/Replacement'];
-			}
-			
-			$assetv->execute();
-			$assets->execute();
-			$hardware->execute();
-			
-			$asset_ID = $description = $quantity = $price = $purchaseorder_id = $release_version = $expirydate = $remarks = $crtrno = "";
-		
-			$class = $brand = $audit_date = $component = $label = $serial = $location = $status = $replacing = "";
+	public function bulkAddSoftware($assets) {
+		foreach ($assets as $asset) {
+			$this->addSoftware($asset);
 		}
-		$this->savelog($_SESSION['username'], "batch imported hardware assets");
 	}
 	
-	public function bulkaddsoftware($data) {
-		$assetv 	= $this->db->prepare("INSERT INTO asset_version(current_version) VALUES (:version)");
-		$assets		= $this->db->prepare("INSERT INTO asset(asset_tag, asset_ID, description, quantity, price, purchaseorder_id, release_version, expirydate, remarks, crtrno, lastedited, version) VALUES (LAST_INSERT_ID(), :asset_ID, :description, :quantity, :price, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :lastedited , :version)");
-		$software 	= $this->db->prepare("INSERT INTO software(asset_tag, vendor, procured_from, shortname, purpose, contract_type, start_date, license_explanation, version) VALUES (LAST_INSERT_ID(), :vendor, :procured_from, :shortname, :purpose, :contract_type, :start_date, :license_explanation, :version)");
-				
-		$asset_ID = $description = $quantity = $price = $purchaseorder_id = $release_version = $expirydate = $remarks = $crtrno = "";
-		
-		$vendor = $procured_from = $shortname = $purpose = $contract_type = $start_date = $license_explanation = "";
-		
-		$assetv->bindValue(':version', 1);
-		
-		$assets->bindParam(':asset_ID', 				$asset_ID);
-		$assets->bindParam(':description', 				$description);
-		$assets->bindParam(':quantity', 				$quantity);
-		$assets->bindParam(':price', 					$price);
-		$assets->bindParam(':purchaseorder_id', 		$purchaseorder_id);
-		$assets->bindParam(':release_version', 			$release_version);
-		$assets->bindParam(':expirydate', 				$expirydate);
-		$assets->bindParam(':remarks', 					$remarks);
-		$assets->bindParam(':crtrno', 					$crtrno);
-		date_default_timezone_set('Asia/Singapore');
-		$time = date("Y-m-d H:i:s");
-		$assets->bindParam(':lastedited',				$time);
-		$assets->bindValue(':version',					1);
-		
-		$software->bindParam(':vendor', 				$vendor);
-		$software->bindParam(':procured_from', 			$procured_from);
-		$software->bindParam(':shortname', 				$shortname);
-		$software->bindParam(':purpose', 				$purpose);
-		$software->bindParam(':contract_type', 			$contract_type);
-		$software->bindParam(':start_date', 			$start_date);
-		$software->bindParam(':license_explanation',	$license_explanation);
-		$software->bindValue(':version', 1);
-		
-		foreach($data as $row) {
-			
-			if(isset($row['Reference ID'])) {
-				$asset_ID = $row['Reference ID'];
-			}
-			if(isset($row['Description'])) {
-				$description = $row['Description'];
-			}
-			if(isset($row['Quantity'])) {
-				$quantity = $row['Quantity'];
-			}
-			if(isset($row['Price'])) {
-				$price = $row['Price'];
-			}
-			if(isset($row['CR/TR'])) {
-				$crtrno = $row['CR/TR'];
-			}
-			if(isset($row['PO'])) {
-				$purchaseorder_id = $row['PO'];
-			}
-			if(isset($row['Release'])) {
-				$release_version = $row['Release'];
-			}
-			if(isset($row['End Date'])) {
-				$expirydate = $row['End Date'];
-			}
-			if(isset($row['Purpose'])) {
-				$purpose = $row['Purpose'];
-			}
-			if(isset($row['Remarks'])) {
-				$remarks = $row['Remarks'];
-			}
-			if(isset($row['Vendor'])) {
-				$vendor = $row['Vendor'];
-			}
-			if(isset($row['Procured from'])) {
-				$procured_from = $row['Procured from'];
-			}
-			if(isset($row['Shortname'])) {
-				$shortname = $row['Shortname'];
-			}
-			if(isset($row['Contract Type'])) {
-				$contract_type = $row['Contract Type'];
-			}
-			if(isset($row['Start Date'])) {
-				$start_date = $row['Start Date'];
-			}
-			if(isset($row['license explanation'])) {
-				$license_explanation = $row['license explanation'];
-			}
-			
-			$assetv->execute();
-			$assets->execute();
-			$software->execute();
-			
-			$asset_ID = $description = $quantity = $price = $purchaseorder_id = $release_version = $expirydate = $remarks = $crtrno = "";
-		
-			$vendor = $procured_from = $shortname = $purpose = $contract_type = $start_date = $license_explanation = "";
-		
+	public function bulkAddHardware($assets) {
+		foreach ($assets as $asset) {
+			$this->addHardware($asset);
 		}
-		$this->savelog($_SESSION['username'], "batch imported software assets");
+	}
+	
+	public function bulkAddRenewal($renewals) {
+		foreach ($renewals as $renewal) {
+			$this->addRenewal($renewal);
+		}
 	}
 	
 	public function editasset($asset) {
-		$stmt = $this->db->prepare("INSERT INTO asset(asset_tag, asset_ID, description, quantity, price, currency, purchaseorder_id, release_version, expirydate, remarks, crtrno, version, parent, status, lastedited) VALUES (:asset_tag, :asset_ID, :description, :quantity, :price, :currency, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :version, :parent, :status, :lastedited)");
+		$stmt = $this->db->prepare("INSERT INTO asset(asset_tag, asset_ID, description, quantity, price, currency, purchaseorder_id, release_version, expirydate, remarks, crtrno, version, status, lastedited) VALUES (:asset_tag, :asset_ID, :description, :quantity, :price, :currency, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :version, :status, :lastedited)");
 		$stmt->bindParam(':asset_tag',			$asset['asset_tag']);
 		$stmt->bindParam(':asset_ID', 			$asset['asset_ID']);
 		$stmt->bindParam(':description', 		$asset['description']);
@@ -331,7 +137,6 @@ class USER
 		$stmt->bindParam(':remarks', 			$asset['remarks']);
 		$stmt->bindParam(':crtrno', 			$asset['crtrno']);
 		$stmt->bindParam(':version',			$asset['version']);
-		$stmt->bindParam(':parent', 			$asset['parent']);
 		$stmt->bindParam(':status', 			$asset['status']);
 		date_default_timezone_set('Asia/Singapore');
 		$time = date("Y-m-d H:i:s");
@@ -346,7 +151,6 @@ class USER
 	
 	public function editSoftware($asset) {
 		$this->editAsset($asset);
-		
 		$stmt = $this->db->prepare("INSERT INTO software(asset_tag, vendor, procured_from, shortname, purpose, contract_type, start_date, license_explanation, version) VALUES (:asset_tag, :vendor, :procured_from, :shortname, :purpose, :contract_type, :start_date, :license_explanation, :version)");
 		$stmt->bindParam(':asset_tag',				$asset['asset_tag']);
 		$stmt->bindParam(':vendor', 				$asset['vendor']);
@@ -413,6 +217,16 @@ class USER
             asset_version.asset_tag = asset.asset_tag AND
             asset_version.current_version = asset.version AND
             asset_version.current_version = hardware.version");
+		$stmt->execute();
+		return $stmt->fetchAll();
+	}
+	
+	public function getGPCAssetList() {
+		$stmt = $this->db->prepare("SELECT * from gpc_Asset 
+		INNER JOIN gpc_Asset_version
+		WHERE 
+		gpc_Asset.gpc_asset_tag = gpc_Asset_version.gpc_asset_tag AND
+		gpc_Asset_version.current_version = gpc_Asset_version.current_version");
 		$stmt->execute();
 		return $stmt->fetchAll();
 	}
@@ -883,20 +697,31 @@ class USER
 		
 		return $result;
 	}
-    
-    public function getOptions() {
-		
+    	
+	public function getOptions($table, $options) {
 		$result = array();
+		if ($table == 'nehr_Options') {
+			$stmt = $this->db->prepare("SELECT * from nehr_Options 
+			where nehr_Options_Type=:Options_Type 
+			ORDER BY nehr_Options_name");
+		}
+		else if ($table == 'gpc_Options') {
+			$stmt = $this->db->prepare("SELECT * from gpc_Options 
+			where gpc_Options_Type=:Options_Type 
+			ORDER BY gpc_Options_name");
+		}
+		else return;
 		
-		foreach ($this->options as $option) {
-			$stmt = $this->db->prepare("SELECT * from {$option} ORDER BY {$option}_name");
+		$stmt->bindParam(':Options_Type', $Options_Type);
+		foreach($options as $option) {
+			$Options_Type = $option;
 			$stmt->execute();
 			$result[$option] = $stmt->fetchAll();
 		}
 		return $result;
 	}
-	
 	public function generateReport($type, $filter) {
+		  $result = array();
 		  $entry = '%'.$filter.'%';
 		  $stmt = $this->db->prepare("SELECT * FROM asset, asset_version WHERE ".$type." LIKE :filter AND
 		  asset_version.asset_tag = asset.asset_tag AND
@@ -905,7 +730,15 @@ class USER
 		  $stmt->execute();
 		  
 		  $this->savelog($_SESSION['username'], "generated report for $type $filter");
-		  return $stmt->fetchAll();
+		  $result['asset'] = $stmt->fetchAll();
+		  
+		  if ($type == 'purchaseorder_id') {
+			  $stmt = $this->db->prepare("SELECT * FROM renewal WHERE ".$type." LIKE :filter");
+			  $stmt->bindparam(":filter", $entry);
+			  $stmt->execute();
+			  $result['renewal'] = $stmt->fetchAll();	
+		  }  
+		  return $result;
 	}
     
 	public function downloadReport($type, $filter) {
@@ -936,22 +769,44 @@ class USER
 		  
 		  $result['software'] = $stmt->fetchAll();
 		  
+		  if ($type == 'purchaseorder_id') {
+			  $stmt = $this->db->prepare("SELECT * FROM renewal WHERE ".$type." LIKE :filter");
+			  $stmt->bindparam(":filter", $entry);
+			  $stmt->execute();
+			  $result['renewal'] = $stmt->fetchAll();
+		  }
 		  return $result;
 	}
-    public function addOption($type, $value) {
-			
-		  $stmt = $this->db->prepare("INSERT INTO ".$type." (".$type."_name) VALUES(:filter)");
-		  $stmt->bindparam(":filter", $value);
-		  $stmt->execute();
-		  $this->savelog($_SESSION['username'], "added option $value for $type");
+    public function addOption($table, $type, $value) {
+		if ($table == 'nehr_Options') {
+			$stmt = $this->db->prepare("INSERT INTO nehr_Options(nehr_Options_Name, nehr_Options_Type)
+			VALUES (:value, :type)");
+		}
+		else if ($table == 'gpc_Options') {
+			$stmt = $this->db->prepare("INSERT INTO gpc_Options(gpc_Options_Name, gpc_Options_Type)
+			VALUES (:value, :type)");
+		}
+		else return;
+		
+		$stmt->bindparam(":value", $value);
+		$stmt->bindparam(":type", $type);
+		$stmt->execute();
+		$this->savelog($_SESSION['username'], "added option $value for $type");
 	}
     
-    public function deleteOption($type, $value) {
-			
-		  $stmt = $this->db->prepare("DELETE FROM ".$type." WHERE ".$type."_id= :filter");
-		  $stmt->bindparam(":filter", $value);
-		  $stmt->execute();
-		  $this->savelog($_SESSION['username'], "removed option $value for $type");
+	
+    public function deleteOption($table, $value) {
+		if ($table == 'nehr_Options') {
+			$stmt = $this->db->prepare("DELETE FROM nehr_Options WHERE nehr_Options_Id=:value");
+		}
+		else if ($table == 'gpc_Options') {
+			$stmt = $this->db->prepare("DELETE FROM gpc_Options WHERE gpc_Options_Id=:value");
+		}
+		else return;
+		
+		$stmt->bindparam(":value", $value);
+		$stmt->execute();
+		$this->savelog($_SESSION['username'], "removed option $value");
 	}
 	
 	public function getCurrentVersion($asset_tag) {
@@ -960,31 +815,7 @@ class USER
 		$stmt->execute();
 		return $stmt->fetch();
 	}
-	/*
-	public function getParents($asset, &$savedIDs = array()) {
-		
-		$stmt = $this->db->prepare("SELECT 	asset.asset_ID, asset.purchaseorder_id, asset.parent 
-									FROM 	asset, asset_version 
-									WHERE 	asset.asset_ID=:asset_ID
-									AND 	asset.version=asset_version.current_version
-									AND		asset.asset_tag=asset_version.asset_tag");
-									
-		if ($asset['parent'] != "") {
-			$stmt->bindparam(":asset_ID", $asset['parent']);
-			$stmt->execute();
-			foreach($stmt->fetchAll() as $parent) {
-				if (!in_array($parent, $savedIDs)) {
-					array_push($savedIDs, $parent);
-					
-					echo "<div class='col-xs-6'>".htmlentities($parent['asset_ID'])."</div>"; 
-					
-					echo "<div class='col-xs-6'>".htmlentities($parent['purchaseorder_id'])."</div>";
-					$this->getParents($parent, $savedIDs);
-				}
-			}
-		}
-	}
-	*/
+	
 	public function getChildren($asset) {
 		$stmt = $this->db->prepare("SELECT 	* from renewal where parent_ID=:parent_ID");
 		$stmt->bindparam(":parent_ID", $asset['asset_ID']);
@@ -1134,14 +965,14 @@ class USER
 				foreach ($parents['hardware'] as $row) {
 					$row['expirydate'] = $renewal['expiry_date'];
 					$row['version'] = $row['version'] + 1;
-					$this->editSoftware($row);
+					$this->editHardware($row);
 				}										
 			}
 			if(isset($parents['software'])) {
 				foreach ($parents['software'] as $row) {
 					$row['expirydate'] = $renewal['expiry_date'];
 					$row['version'] = $row['version'] + 1;
-					$this->editHardware($row);
+					$this->editSoftware($row);
 				}										
 			}
        }
@@ -1151,15 +982,111 @@ class USER
        }    
     }
 	
+	public function editRenewal($renewal) {
+       try
+       {
+			$stmt = $this->db->prepare("UPDATE renewal
+										SET asset_ID	=:asset_ID,
+										parent_ID		=:parent_ID,
+										purchaseorder_id=:purchaseorder_id,
+										startdate		=:startdate,
+										expiry_date		=:expiry_date
+										WHERE renewal_id=:renewal_id");
+			
+			$stmt->bindparam(":asset_ID", 			$renewal['asset_ID']);
+			$stmt->bindparam(":parent_ID", 			$renewal['parent_ID']);
+			$stmt->bindparam(":purchaseorder_id", 	$renewal['purchaseorder_id']);
+			$stmt->bindparam(":startdate", 			$renewal['startdate']);
+			$stmt->bindparam(":expiry_date", 		$renewal['expiry_date']);
+			$stmt->bindparam(":renewal_id",			$renewal['renewal_id']);
+			$stmt->execute(); 
+			$this->savelog($_SESSION['username'], "edited renewal for asset {$renewal['parent_ID']}");
+			
+			//Changing of the parent
+			$parents = $this->getParents($renewal['parent_ID']);
+			
+			if(isset($parents['hardware'])) {
+				foreach ($parents['hardware'] as $row) {
+					$row['expirydate'] = $renewal['expiry_date'];
+					$row['version'] = $row['version'] + 1;
+					$this->editHardware($row);
+				}										
+			}
+			if(isset($parents['software'])) {
+				foreach ($parents['software'] as $row) {
+					$row['expirydate'] = $renewal['expiry_date'];
+					$row['version'] = $row['version'] + 1;
+					$this->editSoftware($row);
+				}										
+			}
+       }
+       catch(PDOException $e)
+       {
+           echo $e->getMessage();
+       }    
+    }
+	
+	public function addGPCAsset($asset) {
+		$stmt = $this->db->prepare("INSERT INTO gpc_Asset_version(current_version) VALUES (:version)");
+		$stmt->bindValue(':version', 1);
+		$stmt->execute();
+		
+		$stmt = $this->db->prepare("
+			INSERT INTO gpc_Asset 
+			(
+			gpc_asset_tag, gpc_version,
+			gpc_Environment, gpc_Tier, gpc_Phase, gpc_Item, gpc_Remarks,
+			gpc_Ami, gpc_Startdate, gpc_Expirydate, gpc_halb, gpc_quantity,
+			gpc_Application, gpc_Data, gpc_IOPS, gpc_Backup, gpc_OS, 
+			gpc_Y1_Qt, gpc_Y2_Qt, gpc_Y1_Ops, gpc_Y2_Ops, gpc_Gwgc, 
+			gpc_Lastedited
+			)
+			VALUES (
+			LAST_INSERT_ID(), 1,
+			:gpc_Environment, :gpc_Tier, :gpc_Phase, :gpc_Item, :gpc_Remarks,
+			:gpc_Ami, :gpc_Startdate, :gpc_Expirydate, :gpc_halb, :gpc_quantity,
+			:gpc_Application, :gpc_Data, :gpc_IOPS, :gpc_Backup, :gpc_OS,
+			:gpc_Y1_Qt, :gpc_Y2_Qt, :gpc_Y1_Ops, :gpc_Y2_Ops, :gpc_Gwgc,
+			:gpc_Lastedited
+			)
+			");
+			$stmt->bindParam(':gpc_Environment',	$asset['gpc_Environment']);
+			$stmt->bindParam(':gpc_Tier', 			$asset['gpc_Tier']);
+			$stmt->bindParam(':gpc_Phase', 			$asset['gpc_Phase']);
+			$stmt->bindParam(':gpc_Item', 			$asset['gpc_Item']);
+			$stmt->bindParam(':gpc_Remarks', 		$asset['gpc_Remarks']);
+			$stmt->bindParam(':gpc_Ami', 			$asset['gpc_Ami']);
+			$stmt->bindParam(':gpc_Startdate', 		$asset['gpc_Startdate']);
+			$stmt->bindParam(':gpc_Expirydate', 	$asset['gpc_Expirydate']);
+			$stmt->bindParam(':gpc_halb', 			$asset['gpc_halb']);
+			$stmt->bindParam(':gpc_quantity',		$asset['gpc_quantity']);
+			$stmt->bindParam(':gpc_Application', 	$asset['gpc_Application']);
+			$stmt->bindParam(':gpc_Data', 			$asset['gpc_Data']);
+			$stmt->bindParam(':gpc_IOPS',			$asset['gpc_IOPS']);
+			$stmt->bindParam(':gpc_Backup', 		$asset['gpc_Backup']);
+			$stmt->bindParam(':gpc_OS', 			$asset['gpc_OS']);
+			$stmt->bindParam(':gpc_Y1_Qt',			$asset['gpc_Y1_Qt']);
+			$stmt->bindParam(':gpc_Y2_Qt', 			$asset['gpc_Y2_Qt']);
+			$stmt->bindParam(':gpc_Y1_Ops',			$asset['gpc_Y1_Ops']);
+			$stmt->bindParam(':gpc_Y2_Ops', 		$asset['gpc_Y2_Ops']);
+			$stmt->bindParam(':gpc_Gwgc', 			$asset['gpc_Gwgc']);
+			$stmt->bindParam(':gpc_Lastedited',		$asset['gpc_Lastedited']);
+			
+			date_default_timezone_set('Asia/Singapore');
+			$asset['gpc_Lastedited'] = date("Y-m-d H:i:s");
+			$stmt->execute();
+						
+			$this->savelog($_SESSION['username'], "created GPC asset".$asset['gpc_Item']);
+	}
+	
 	public function printAssetRow($asset) {
-				echo "<td>".htmlentities($asset['description'])			."</td>";
+				echo "<td style='width: 59%'>".htmlentities($asset['description'])			."</td>";
 				echo "<td>".htmlentities($asset['quantity'])			."</td>";
 				echo "<td>".htmlentities($asset['price'])			." ".htmlentities($asset['currency'])."</td>";
 				echo "<td>".htmlentities($asset['crtrno'])				."</td>";
 				echo "<td>".htmlentities($asset['purchaseorder_id'])	."</td>";
 				echo "<td>".htmlentities($asset['release_version'])		."</td>";
 				echo "<td>".htmlentities($asset['expirydate'])			."</td>";
-				echo "<td>".htmlentities($asset['remarks'])				."</td>";
 	}
 	
 	public function printRenewalRow($row) {
@@ -1190,13 +1117,21 @@ class USER
 	
 	public function getHeaders($type) {
 		if ($type == 'renewal') {
-			$sql = "SELECT DISTINCT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME=:type and not COLUMN_NAME='renewal_id'";
+			$sql = "SELECT DISTINCT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+					WHERE TABLE_NAME=:type 
+					AND 
+					NOT COLUMN_NAME='renewal_id'
+					AND
+					TABLE_SCHEMA='ams'
+					";
 		}
 		else if ($type == 'hardware' or $type == 'software') {
 			$sql = "SELECT DISTINCT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
 					WHERE (TABLE_NAME= 'asset' or TABLE_NAME = :type)
 					AND  
-					(not COLUMN_NAME='asset_tag' or COLUMN_NAME='version')
+					NOT (COLUMN_NAME='asset_tag' or COLUMN_NAME='version' or COLUMN_NAME='lastedited')
+					AND
+					TABLE_SCHEMA='ams'
 					";
 		}
 		else {
