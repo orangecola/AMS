@@ -42,7 +42,7 @@
 		$candidate['location']			= trim($_POST['location']);
 		$candidate['status']			= trim($_POST['status']);
 		$candidate['replacing']			= trim($_POST['replacing']);
-		
+		$candidate['excelsheet']		= trim($_POST['excelsheet']);
 		$same = true;
 		//Similarility Check
 		foreach ($user->assetFields as $value) {
@@ -107,8 +107,6 @@
 	</div>
 	<div class="clearfix"></div>
 	<div class="row">
-		
-
 	  <div class="col-md-12 col-sm-12 col-xs-12">
 		<div class="x_panel">
 		  <div class="x_title">
@@ -150,14 +148,14 @@
 		  
 		  ?>
 			<br />
-			<form id="demo-form2" enctype="multipart/form-data" class="form-horizontal form-label-left" method="post">
+			<form id="demo-form2" enctype="multipart/form-data" class="form-horizontal form-label-left" method="post" novalidate>
 			  <?php 
 				require 'components/asset.php';
 				require 'components/hardware.php';
 			  ?>
 				<div class="item form-group">
 				<div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-				  <a class="btn btn-primary" href="assetlist.php">Cancel</a>
+				  <a class="btn btn-primary" href="hardwarelist.php">Cancel</a>
 				  <button class="btn btn-primary" type="button" onclick="resetFields()">Reset</button>
 				  <button type="submit" class="btn btn-success">Submit</button>
 				</div>
@@ -173,6 +171,7 @@
 
 <?php include 'components/footer.php';?>
 <script>
+	validator.message.empty = 'Mandatory Field';
 	$('#replacing').autocomplete({
 		lookup: asset_ID,
 		onSelect: function () {

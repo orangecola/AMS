@@ -4,7 +4,7 @@ class USER
     private $db;
 	public $softwareFields 		= array('vendor', 'procured_from', 'shortname', 'purpose', 'contract_type', 'start_date', 'license_explanation');
 	public $assetFields 		= array('asset_ID', 'description', 'quantity', 'price', 'currency', 'crtrno', 'purchaseorder_id', 'release_version', 'expirydate', 'remarks', 'status');
-	public $hardwareFields 		= array('class', 'brand', 'audit_date', 'component', 'label', 'serial', 'location', 'replacing'); 
+	public $hardwareFields 		= array('class', 'brand', 'audit_date', 'component', 'label', 'serial', 'location', 'replacing', 'excelsheet'); 
 	public $userFields 			= array('username', 'password', 'role', 'status');
 	function __construct($DB_con)
     {
@@ -13,7 +13,7 @@ class USER
  
 	public function check($username) {
 		//Checks if the username that has been taken. True if not taken, false if taken.
-		$stmt = $this->db->prepare("SELECT * FROM user WHERE username=:username");
+		$stmt = $this->db->prepare("SELECT * FROM ihis_User WHERE username=:username");
 		$stmt->bindParam(':username', $username);
 		$stmt->execute();
 		$userRow = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -40,12 +40,12 @@ class USER
 	}
 	
 	public function addasset($asset) {
-		$stmt = $this->db->prepare("INSERT INTO asset_version(current_version) VALUES (:version)");
+		$stmt = $this->db->prepare("INSERT INTO nehr_Asset_version(current_version) VALUES (:version)");
 		$stmt->bindParam(':version', $asset['version']);
 		$stmt->execute();
 		
 		$stmt = $this->db->prepare("INSERT INTO 
-			asset(
+			nehr_Asset(
 			asset_tag, asset_ID, description, quantity, price, currency, purchaseorder_id, release_version, expirydate, remarks, crtrno, status, version, lastedited
 			) VALUES (
 			LAST_INSERT_ID(), :asset_ID, :description, :quantity, :price, :currency, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :status, :version, :lastedited)");
@@ -70,7 +70,7 @@ class USER
 	public function addSoftware($asset) {
 		$this->addAsset($asset);
 		
-		$stmt = $this->db->prepare("INSERT INTO software(
+		$stmt = $this->db->prepare("INSERT INTO nehr_Software(
 		
 		asset_tag, vendor, procured_from, shortname, purpose, contract_type, start_date, license_explanation, version
 		) VALUES (
@@ -91,7 +91,7 @@ class USER
 	public function addHardware($asset) {
 		$this->addAsset($asset);
 		
-		$stmt = $this->db->prepare("INSERT INTO hardware(asset_tag, class, brand, audit_date, component, label, serial, location, replacing, version) VALUES (LAST_INSERT_ID(), :class, :brand, :audit_date, :component, :label, :serial, :location, :replacing, :version)");
+		$stmt = $this->db->prepare("INSERT INTO nehr_Hardware(asset_tag, class, brand, audit_date, component, label, serial, location, replacing, version, excelsheet) VALUES (LAST_INSERT_ID(), :class, :brand, :audit_date, :component, :label, :serial, :location, :replacing, :version, :excelsheet)");
 		$stmt->bindParam(':class', 		$asset['class']);
 		$stmt->bindParam(':brand', 		$asset['brand']);
 		$stmt->bindParam(':audit_date', $asset['audit_date']);
@@ -100,6 +100,7 @@ class USER
 		$stmt->bindParam(':serial', 	$asset['serial']);
 		$stmt->bindParam(':location', 	$asset['location']);
 		$stmt->bindParam(':replacing', 	$asset['replacing']);
+		$stmt->bindParam(':excelsheet', $asset['excelsheet']);
 		$stmt->bindParam(':version',	$asset['version']);
 		$stmt->execute();
 		$this->savelog($_SESSION['username'], "created hardware asset ".$asset['asset_ID']." version ".$asset['version']);
@@ -124,7 +125,7 @@ class USER
 	}
 	
 	public function editasset($asset) {
-		$stmt = $this->db->prepare("INSERT INTO asset(asset_tag, asset_ID, description, quantity, price, currency, purchaseorder_id, release_version, expirydate, remarks, crtrno, version, status, lastedited) VALUES (:asset_tag, :asset_ID, :description, :quantity, :price, :currency, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :version, :status, :lastedited)");
+		$stmt = $this->db->prepare("INSERT INTO nehr_Asset(asset_tag, asset_ID, description, quantity, price, currency, purchaseorder_id, release_version, expirydate, remarks, crtrno, version, status, lastedited) VALUES (:asset_tag, :asset_ID, :description, :quantity, :price, :currency, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :version, :status, :lastedited)");
 		$stmt->bindParam(':asset_tag',			$asset['asset_tag']);
 		$stmt->bindParam(':asset_ID', 			$asset['asset_ID']);
 		$stmt->bindParam(':description', 		$asset['description']);
@@ -143,7 +144,7 @@ class USER
 		$stmt->bindParam(':lastedited',			$time);
 		$stmt->execute();
 		
-		$stmt = $this->db->prepare("UPDATE asset_version SET current_version=:version where asset_tag=:asset_tag");
+		$stmt = $this->db->prepare("UPDATE nehr_Asset_version SET current_version=:version where asset_tag=:asset_tag");
 		$stmt->bindParam(':asset_tag', $asset['asset_tag']);
 		$stmt->bindParam(':version', $asset['version']);
 		$stmt->execute();
@@ -151,7 +152,7 @@ class USER
 	
 	public function editSoftware($asset) {
 		$this->editAsset($asset);
-		$stmt = $this->db->prepare("INSERT INTO software(asset_tag, vendor, procured_from, shortname, purpose, contract_type, start_date, license_explanation, version) VALUES (:asset_tag, :vendor, :procured_from, :shortname, :purpose, :contract_type, :start_date, :license_explanation, :version)");
+		$stmt = $this->db->prepare("INSERT INTO nehr_Software(asset_tag, vendor, procured_from, shortname, purpose, contract_type, start_date, license_explanation, version) VALUES (:asset_tag, :vendor, :procured_from, :shortname, :purpose, :contract_type, :start_date, :license_explanation, :version)");
 		$stmt->bindParam(':asset_tag',				$asset['asset_tag']);
 		$stmt->bindParam(':vendor', 				$asset['vendor']);
 		$stmt->bindParam(':procured_from', 			$asset['procured_from']);
@@ -168,7 +169,7 @@ class USER
 	public function editHardware($asset) {
 		$this->editAsset($asset);
 		
-		$stmt = $this->db->prepare("INSERT INTO hardware(asset_tag, class, brand, audit_date, component, label, serial, location, replacing, version) VALUES (:asset_tag, :class, :brand, :audit_date, :component, :label, :serial, :location, :replacing, :version)");
+		$stmt = $this->db->prepare("INSERT INTO nehr_Hardware(asset_tag, class, brand, audit_date, component, label, serial, location, replacing, version, excelsheet) VALUES (:asset_tag, :class, :brand, :audit_date, :component, :label, :serial, :location, :replacing, :version, :excelsheet)");
 		$stmt->bindParam(':asset_tag',	$asset['asset_tag']);
 		$stmt->bindParam(':class', 		$asset['class']);
 		$stmt->bindParam(':brand', 		$asset['brand']);
@@ -178,6 +179,7 @@ class USER
 		$stmt->bindParam(':serial', 	$asset['serial']);
 		$stmt->bindParam(':location', 	$asset['location']);
 		$stmt->bindParam(':replacing', 	$asset['replacing']);
+		$stmt->bindParam(':excelsheet', $asset['excelsheet']);
 		$stmt->bindParam(':version',	$asset['version']);
 		$stmt->execute();
 		$this->savelog($_SESSION['username'], "edited hardware asset ".$asset['asset_ID']." (version ".$asset['version'].")");
@@ -188,7 +190,7 @@ class USER
 		
 		date_default_timezone_set('Asia/Singapore');
 		$time = date("Y-m-d H:i:s");
-		$stmt = $this->db->prepare("INSERT INTO log(user, time, log) VALUES (:user, :time, :log)");
+		$stmt = $this->db->prepare("INSERT INTO ihis_Log(user, time, log) VALUES (:user, :time, :log)");
 		$stmt->bindParam(':user', $user);
 		$stmt->bindParam(':time', $time);
 		$stmt->bindParam(':log', $log);
@@ -197,26 +199,26 @@ class USER
 		
 	public function getSoftwareList() {
 		//Gets all of the software details
-		$stmt = $this->db->prepare("SELECT 	asset.*, software.*
-			FROM asset_version INNER JOIN software, asset 
+		$stmt = $this->db->prepare("SELECT 	nehr_Asset.*, nehr_Software.*
+			FROM nehr_Asset_version INNER JOIN nehr_Software, nehr_Asset 
 			WHERE 
-            asset_version.asset_tag = software.asset_tag AND
-            asset_version.asset_tag = asset.asset_tag AND
-            asset_version.current_version = asset.version AND
-            asset_version.current_version = software.version");
+            nehr_Asset_version.asset_tag = nehr_Software.asset_tag AND
+            nehr_Asset_version.asset_tag = nehr_Asset.asset_tag AND
+            nehr_Asset_version.current_version = nehr_Asset.version AND
+            nehr_Asset_version.current_version = nehr_Software.version");
 		$stmt->execute();
 		return $stmt->fetchAll();
 	}
 	
 	public function getHardwareList() {
 		//Gets all of the hardware details
-		$stmt = $this->db->prepare("SELECT 	asset.*, hardware.*
-			FROM asset_version INNER JOIN hardware, asset 
+		$stmt = $this->db->prepare("SELECT 	nehr_Asset.*, nehr_Hardware.*
+			FROM nehr_Asset_version INNER JOIN nehr_Hardware, nehr_Asset 
 			WHERE 
-            asset_version.asset_tag = hardware.asset_tag AND
-            asset_version.asset_tag = asset.asset_tag AND
-            asset_version.current_version = asset.version AND
-            asset_version.current_version = hardware.version");
+            nehr_Asset_version.asset_tag = nehr_Hardware.asset_tag AND
+            nehr_Asset_version.asset_tag = nehr_Asset.asset_tag AND
+            nehr_Asset_version.current_version = nehr_Asset.version AND
+            nehr_Asset_version.current_version = nehr_Hardware.version");
 		$stmt->execute();
 		return $stmt->fetchAll();
 	}
@@ -226,7 +228,8 @@ class USER
 		INNER JOIN gpc_Asset_version
 		WHERE 
 		gpc_Asset.gpc_asset_tag = gpc_Asset_version.gpc_asset_tag AND
-		gpc_Asset_version.current_version = gpc_Asset_version.current_version");
+		gpc_Asset.gpc_version = gpc_Asset_version.current_version
+		ORDER BY gpc_Asset.gpc_asset_tag");
 		$stmt->execute();
 		return $stmt->fetchAll();
 	}
@@ -235,14 +238,14 @@ class USER
 		$result['purchaseorder_id'] = $purchaseorder_id;
 		$result['validation'] = false;
 		//Gets all of the software details
-		$stmt = $this->db->prepare("SELECT 	asset.*, software.*
-			FROM asset_version INNER JOIN software, asset 
+		$stmt = $this->db->prepare("SELECT 	nehr_Asset.*, nehr_Software.*
+			FROM nehr_Asset_version INNER JOIN nehr_Software, nehr_Asset 
 			WHERE 
-            asset_version.asset_tag = software.asset_tag AND
-            asset_version.asset_tag = asset.asset_tag AND
-            asset_version.current_version = asset.version AND
-            asset_version.current_version = software.version AND
-			asset.purchaseorder_id = :purchaseorder_id");
+            nehr_Asset_version.asset_tag = nehr_Software.asset_tag AND
+            nehr_Asset_version.asset_tag = nehr_Asset.asset_tag AND
+            nehr_Asset_version.current_version = nehr_Asset.version AND
+            nehr_Asset_version.current_version = nehr_Software.version AND
+			nehr_Asset.purchaseorder_id = :purchaseorder_id");
 		
 		$stmt->bindParam(":purchaseorder_id", $purchaseorder_id);
 		$stmt->execute();
@@ -253,14 +256,14 @@ class USER
 
 	
 		//Gets all of the hardware details
-		$stmt = $this->db->prepare("SELECT 	asset.*, hardware.*
-			FROM asset_version INNER JOIN hardware, asset 
+		$stmt = $this->db->prepare("SELECT 	nehr_Asset.*, nehr_Hardware.*
+			FROM nehr_Asset_version INNER JOIN nehr_Hardware, nehr_Asset 
 			WHERE 
-            asset_version.asset_tag = hardware.asset_tag AND
-            asset_version.asset_tag = asset.asset_tag AND
-            asset_version.current_version = asset.version AND
-            asset_version.current_version = hardware.version AND
-			asset.purchaseorder_id = :purchaseorder_id");
+            nehr_Asset_version.asset_tag = nehr_Hardware.asset_tag AND
+            nehr_Asset_version.asset_tag = nehr_Asset.asset_tag AND
+            nehr_Asset_version.current_version = nehr_Asset.version AND
+            nehr_Asset_version.current_version = nehr_Hardware.version AND
+			nehr_Asset.purchaseorder_id = :purchaseorder_id");
 		
 		$stmt->bindParam(":purchaseorder_id", $purchaseorder_id);
 		$stmt->execute();
@@ -269,7 +272,7 @@ class USER
 			$result['hardware'] = $stmt->fetchAll();
 		}
 		
-		$stmt = $this->db->prepare("SELECT * FROM renewal where purchaseorder_id=:purchaseorder_id");
+		$stmt = $this->db->prepare("SELECT * FROM nehr_Renewal where purchaseorder_id=:purchaseorder_id");
 		
 		$stmt->bindParam(":purchaseorder_id", $purchaseorder_id);
 		$stmt->execute();
@@ -279,7 +282,7 @@ class USER
 		}
 
 		
-		$stmt = $this->db->prepare("SELECT * FROM purchaseorder where purchaseorder_id = :purchaseorder_id");
+		$stmt = $this->db->prepare("SELECT * FROM nehr_Purchaseorder where purchaseorder_id = :purchaseorder_id");
 		$stmt->bindParam(":purchaseorder_id", $purchaseorder_id);
 		$stmt->execute();
 		if($stmt->rowCount() == 1) {
@@ -293,14 +296,14 @@ class USER
 	}
 	
 	public function updatePurchaseOrder($purchaseorder_id, $field, $value) {
-		$stmt = $this->db->prepare("UPDATE purchaseorder SET ".$field."=:value where purchaseorder_id=:purchaseorder_id");
+		$stmt = $this->db->prepare("UPDATE nehr_Purchaseorder SET ".$field."=:value where purchaseorder_id=:purchaseorder_id");
 		$stmt->bindParam(':value', $value);
 		$stmt->bindParam(':purchaseorder_id', $purchaseorder_id);
 		$stmt->execute();
 	}
 	
 	public function newPurchaseOrder($purchaseorder_id, $field, $value) {
-		$stmt = $this->db->prepare("INSERT INTO purchaseorder (purchaseorder_id, ".$field.")VALUES (:purchaseorder_id, :value)");
+		$stmt = $this->db->prepare("INSERT INTO nehr_Purchaseorder (purchaseorder_id, ".$field.")VALUES (:purchaseorder_id, :value)");
 		$stmt->bindParam(':value', $value);
 		$stmt->bindParam(':purchaseorder_id', $purchaseorder_id);
 		$stmt->execute();
@@ -313,7 +316,7 @@ class USER
        {
            $new_password = password_hash($password, PASSWORD_DEFAULT);
    
-           $stmt = $this->db->prepare("INSERT INTO user(username,password,role,status) 
+           $stmt = $this->db->prepare("INSERT INTO ihis_User(username,password,role,status) 
                                                        VALUES(:username, :password, :role, 'active')");
               
            $stmt->bindparam(":username", $username);
@@ -335,7 +338,7 @@ class USER
         $role = "";
         $status = "";
         
-        $stmt = $this->db->prepare("INSERT INTO user(username,password,role,status) VALUES(:username, :password, :role, :status)");
+        $stmt = $this->db->prepare("INSERT INTO ihis_User(username,password,role,status) VALUES(:username, :password, :role, :status)");
         $stmt->bindparam(":username", $username);
         $stmt->bindparam(":password", $password);
         $stmt->bindparam(":role", $role);
@@ -358,7 +361,7 @@ class USER
 	public function getRenewals() {
 		//Retrieves the user list
 		//Returns an array of users
-		$stmt = $this->db->prepare("SELECT * from renewal");
+		$stmt = $this->db->prepare("SELECT * from nehr_Renewal");
 		$stmt->execute();
 		return $stmt->fetchAll();
 	}
@@ -369,7 +372,7 @@ class USER
 		//[0]: Result of retrieving. True if successful, False if failed
 		//[1]: Array of user information
 		$result = array(false, false);
-		$stmt = $this->db->prepare("SELECT * from renewal where renewal_ID=:renewal_ID");
+		$stmt = $this->db->prepare("SELECT * from nehr_Renewal where renewal_ID=:renewal_ID");
 		$stmt->bindParam(':renewal_ID', $renewal_ID);
 		$stmt->execute();
 		if ($stmt->rowCount() == 1) {
@@ -386,7 +389,7 @@ class USER
     {
        try
        {
-          $stmt = $this->db->prepare("SELECT * FROM user WHERE username = :username AND status='active' LIMIT 1");
+          $stmt = $this->db->prepare("SELECT * FROM ihis_User WHERE username = :username AND status='active' LIMIT 1");
           $stmt->bindparam(":username", $username);
 		  $stmt->execute();
           $userRow=$stmt->fetch(PDO::FETCH_ASSOC);
@@ -418,7 +421,7 @@ class USER
 	   //Returns true / false
 	   try
        {
-          $stmt = $this->db->prepare("SELECT * FROM user WHERE username = :username AND status='active' LIMIT 1");
+          $stmt = $this->db->prepare("SELECT * FROM ihis_User WHERE username = :username AND status='active' LIMIT 1");
           $stmt->bindparam(":username", $_SESSION['username']);
 		  $stmt->execute();
           $userRow=$stmt->fetch(PDO::FETCH_ASSOC);
@@ -441,7 +444,7 @@ class USER
 		//Changes the password of the current user logged in.
 		//Check for the same password must be finished prior to this (This has no checks!)
 		$new_password = password_hash($newpassword, PASSWORD_DEFAULT);
-		$stmt = $this->db->prepare("UPDATE user SET password=:password where username=:username AND status='active'");
+		$stmt = $this->db->prepare("UPDATE ihis_User SET password=:password where username=:username AND status='active'");
 		$stmt->bindParam(':username', $_SESSION['username']);
 		$stmt->bindParam(':password', $new_password);
 		$stmt->execute();
@@ -451,7 +454,7 @@ class USER
 	public function getLog() {
 		//Retrieves the log list
 		//Returns an array of the logs
-		$stmt = $this->db->prepare("SELECT * FROM log ORDER BY time DESC");
+		$stmt = $this->db->prepare("SELECT * FROM ihis_Log ORDER BY time DESC");
 		$stmt->execute();
 		return $stmt->fetchAll();
 	}
@@ -459,7 +462,7 @@ class USER
 	public function getUsers() {
 		//Retrieves the user list
 		//Returns an array of users
-		$stmt = $this->db->prepare("SELECT username, role, status, user_ID FROM user");
+		$stmt = $this->db->prepare("SELECT username, role, status, user_ID FROM ihis_User");
 		$stmt->execute();
 		return $stmt->fetchAll();
 	}
@@ -471,7 +474,7 @@ class USER
 		//[0]: Result of retrieving. True if successful, False if failed
 		//[1]: Array of user information
 		$result = array(false, false);
-		$stmt = $this->db->prepare("SELECT * from user where user_ID=:user_ID");
+		$stmt = $this->db->prepare("SELECT * from ihis_User where user_ID=:user_ID");
 		$stmt->bindParam(':user_ID', $user_ID);
 		$stmt->execute();
 		if ($stmt->rowCount() == 1) {
@@ -488,14 +491,14 @@ class USER
 		//[0]: Result of retrieving. True if successful, False if failed
 		//[1]: Array of user information
 		$result = array(false, false);
-		$stmt = $this->db->prepare("SELECT 	asset.*, software.*
-			FROM asset_version INNER JOIN software, asset 
+		$stmt = $this->db->prepare("SELECT 	nehr_Asset.*, nehr_Software.*
+			FROM nehr_Asset_version INNER JOIN nehr_Software, nehr_Asset 
 			WHERE 
-            asset_version.asset_tag = :asset_tag AND
-            asset_version.asset_tag = software.asset_tag AND
-            asset_version.asset_tag = asset.asset_tag AND
-            asset_version.current_version = asset.version AND
-            asset_version.current_version = software.version");
+            nehr_Asset_version.asset_tag = :asset_tag AND
+            nehr_Asset_version.asset_tag = nehr_Software.asset_tag AND
+            nehr_Asset_version.asset_tag = nehr_Asset.asset_tag AND
+            nehr_Asset_version.current_version = nehr_Asset.version AND
+            nehr_Asset_version.current_version = nehr_Software.version");
 		$stmt->bindParam(':asset_tag', $asset_tag);
 		$stmt->execute();
 		if ($stmt->rowCount() == 1) {
@@ -512,13 +515,13 @@ class USER
 		//[0]: Result of retrieving. True if successful, False if failed
 		//[1]: Array of user information
 		$result = array(false, false);
-		$stmt = $this->db->prepare("SELECT 	asset.*, software.*
-			FROM asset_version INNER JOIN software, asset 
+		$stmt = $this->db->prepare("SELECT 	nehr_Asset.*, nehr_Software.*
+			FROM nehr_Asset_version INNER JOIN nehr_Software, nehr_Asset 
 			WHERE 
-            asset_version.asset_tag = :asset_tag AND
-            asset_version.asset_tag = software.asset_tag AND
-            asset_version.asset_tag = asset.asset_tag AND
-            software.version = asset.version");
+            nehr_Asset_version.asset_tag = :asset_tag AND
+            nehr_Asset_version.asset_tag = nehr_Software.asset_tag AND
+            nehr_Asset_version.asset_tag = nehr_Asset.asset_tag AND
+            nehr_Software.version = nehr_Asset.version");
 		$stmt->bindParam(':asset_tag', $asset_tag);
 		$stmt->execute();
 		if ($stmt->rowCount() >= 1) {
@@ -534,14 +537,14 @@ class USER
 		//[0]: Result of retrieving. True if successful, False if failed
 		//[1]: Array of user information
 		$result = array(false, false);
-		$stmt = $this->db->prepare("SELECT 	asset.*, hardware.*
-			FROM asset_version INNER JOIN hardware, asset 
+		$stmt = $this->db->prepare("SELECT 	nehr_Asset.*, nehr_Hardware.*
+			FROM nehr_Asset_version INNER JOIN nehr_Hardware, nehr_Asset 
 			WHERE 
-            asset_version.asset_tag = :asset_tag AND
-            asset_version.asset_tag = hardware.asset_tag AND
-            asset_version.asset_tag = asset.asset_tag AND
-			asset_version.current_version 	= asset.version AND
-            asset_version.current_version = hardware.version");
+            nehr_Asset_version.asset_tag = :asset_tag AND
+            nehr_Asset_version.asset_tag = nehr_Hardware.asset_tag AND
+            nehr_Asset_version.asset_tag = nehr_Asset.asset_tag AND
+			nehr_Asset_version.current_version 	= nehr_Asset.version AND
+            nehr_Asset_version.current_version = nehr_Hardware.version");
 		$stmt->bindParam(':asset_tag', $asset_tag);
 		$stmt->execute();
 		if ($stmt->rowCount() == 1) {
@@ -553,28 +556,28 @@ class USER
 	
 	public function getParents($asset_ID) {
 		$result = null;
-		$stmt = $this->db->prepare("SELECT 	asset.*, hardware.*
-			FROM asset_version INNER JOIN hardware, asset 
+		$stmt = $this->db->prepare("SELECT 	nehr_Asset.*, nehr_Hardware.*
+			FROM nehr_Asset_version INNER JOIN nehr_Hardware, nehr_Asset 
 			WHERE 
-            asset.asset_ID = :asset_ID AND
-            asset_version.asset_tag = hardware.asset_tag AND
-            asset_version.asset_tag = asset.asset_tag AND
-			asset_version.current_version 	= asset.version AND
-            asset_version.current_version = hardware.version");
+            nehr_Asset.asset_ID = :asset_ID AND
+            nehr_Asset_version.asset_tag = nehr_Hardware.asset_tag AND
+            nehr_Asset_version.asset_tag = nehr_Asset.asset_tag AND
+			nehr_Asset_version.current_version 	= nehr_Asset.version AND
+            nehr_Asset_version.current_version = nehr_Hardware.version");
 		$stmt->bindParam(':asset_ID', $asset_ID);
 		$stmt->execute();
 		if ($stmt->rowCount() > 0) {
 			$result['hardware'] = $stmt->fetchAll();
 		}
 		
-		$stmt = $this->db->prepare("SELECT 	asset.*, software.*
-			FROM asset_version INNER JOIN software, asset 
+		$stmt = $this->db->prepare("SELECT 	nehr_Asset.*, nehr_Software.*
+			FROM nehr_Asset_version INNER JOIN nehr_Software, nehr_Asset 
 			WHERE 
-            asset.asset_ID = :asset_ID AND
-            asset_version.asset_tag = software.asset_tag AND
-            asset_version.asset_tag = asset.asset_tag AND
-			asset_version.current_version 	= asset.version AND
-            asset_version.current_version = software.version");
+            nehr_Asset.asset_ID = :asset_ID AND
+            nehr_Asset_version.asset_tag = nehr_Software.asset_tag AND
+            nehr_Asset_version.asset_tag = nehr_Asset.asset_tag AND
+			nehr_Asset_version.current_version 	= nehr_Asset.version AND
+            nehr_Asset_version.current_version = nehr_Software.version");
 		$stmt->bindParam(':asset_ID', $asset_ID);
 		$stmt->execute();
 		if ($stmt->rowCount() > 0) {
@@ -590,13 +593,13 @@ class USER
 		//[0]: Result of retrieving. True if successful, False if failed
 		//[1]: Array of user information
 		$result = array(false, false);
-		$stmt = $this->db->prepare("SELECT 	asset.*, hardware.*
-			FROM asset_version INNER JOIN hardware, asset 
+		$stmt = $this->db->prepare("SELECT 	nehr_Asset.*, nehr_Hardware.*
+			FROM nehr_Asset_version INNER JOIN nehr_Hardware, nehr_Asset 
 			WHERE 
-            asset_version.asset_tag = :asset_tag AND
-            asset_version.asset_tag = hardware.asset_tag AND
-            asset_version.asset_tag = asset.asset_tag AND
-            asset.version = hardware.version");
+            nehr_Asset_version.asset_tag = :asset_tag AND
+            nehr_Asset_version.asset_tag = nehr_Hardware.asset_tag AND
+            nehr_Asset_version.asset_tag = nehr_Asset.asset_tag AND
+            nehr_Asset.version = nehr_Hardware.version");
 		$stmt->bindParam(':asset_tag', $asset_tag);
 		$stmt->execute();
 		if ($stmt->rowCount() >= 1) {
@@ -606,6 +609,45 @@ class USER
 		return $result;
 	}
     
+	public function getGPCAssetVersions($asset_tag) {
+		//Get the details of an asset with asset_ID=$asset_ID
+		//Return format
+		//Array: {true/false, array of user information}
+		//[0]: Result of retrieving. True if successful, False if failed
+		//[1]: Array of user information
+		$result = array(false, false);
+		$stmt = $this->db->prepare("SELECT * from gpc_Asset 
+		WHERE 
+		gpc_Asset.gpc_asset_tag = :asset_tag");
+		$stmt->bindParam(':asset_tag', $asset_tag);
+		$stmt->execute();
+		if ($stmt->rowCount() >= 1) {
+			$result[0] = true;
+			$result[1] = $stmt->fetchAll();
+		}
+		return $result;
+	}
+	public function getGPCAsset($asset_tag) {
+		//Get the details of an asset with asset_ID=$asset_ID
+		//Return format
+		//Array: {true/false, array of user information}
+		//[0]: Result of retrieving. True if successful, False if failed
+		//[1]: Array of user information
+		$result = array(false, false);
+		$stmt = $this->db->prepare("SELECT * from gpc_Asset 
+		INNER JOIN gpc_Asset_version
+		WHERE 
+		gpc_Asset.gpc_asset_tag = :asset_tag AND 
+		gpc_Asset.gpc_asset_tag = gpc_Asset_version.gpc_asset_tag AND
+		gpc_Asset.gpc_version = gpc_Asset_version.current_version");
+		$stmt->bindParam(':asset_tag', $asset_tag);
+		$stmt->execute();
+		if ($stmt->rowCount() == 1) {
+			$result[0] = true;
+			$result[1] = $stmt->fetch();
+		}
+		return $result;
+	}
 	public function editUser($source, $candidate) {
 		//Updates the user based on the infomration provided
 		//There must be at least one item changed 
@@ -615,7 +657,7 @@ class USER
 		
 		$sql = $this->prepareEditSQL($this->userFields, $source, $candidate);
 		if ($sql[0] != "") {
-			$sql[0] 				= "UPDATE user SET".$sql[0]." WHERE user_ID =:user_ID";
+			$sql[0] 				= "UPDATE ihis_User SET".$sql[0]." WHERE user_ID =:user_ID";
 			$sql[1][':user_ID'] 	= $source['user_ID'];
 			
 			$stmt					= $this->db->prepare($sql[0]);
@@ -623,10 +665,10 @@ class USER
 		}
 				
 		if ($source['username'] == $candidate['username']) {
-			$this->savelog($_SESSION['username'], "edited user {$source['username']}");
+			$this->savelog($_SESSION['username'], "edited nehr_User {$source['username']}");
 		}
 		else {
-			$this->savelog($_SESSION['username'], "edited user {$source['username']} to {$candidate['username']}");
+			$this->savelog($_SESSION['username'], "edited nehr_User {$source['username']} to {$candidate['username']}");
 		}
 	}
 	
@@ -679,19 +721,19 @@ class USER
 	
 	public function getDistinct() {
 		$result = array();
-		$stmt = $this->db->prepare("SELECT DISTINCT asset.purchaseorder_id FROM asset, asset_version WHERE asset.version = asset_version.current_version AND asset.asset_tag = asset_version.asset_tag UNION SELECT purchaseorder_id from renewal");
+		$stmt = $this->db->prepare("SELECT DISTINCT nehr_Asset.purchaseorder_id FROM nehr_Asset, nehr_Asset_version WHERE nehr_Asset.version = nehr_Asset_version.current_version AND nehr_Asset.asset_tag = nehr_Asset_version.asset_tag UNION SELECT purchaseorder_id from nehr_Renewal");
 		$stmt->execute();
 		$result[0] = $stmt->fetchAll();
 		
-		$stmt = $this->db->prepare("SELECT DISTINCT asset.release_version FROM asset, asset_version WHERE asset.version = asset_version.current_version AND asset.asset_tag = asset_version.asset_tag ORDER BY release_version");
+		$stmt = $this->db->prepare("SELECT DISTINCT nehr_Asset.release_version FROM nehr_Asset, nehr_Asset_version WHERE nehr_Asset.version = nehr_Asset_version.current_version AND nehr_Asset.asset_tag = nehr_Asset_version.asset_tag ORDER BY release_version");
 		$stmt->execute();
 		$result[1] = $stmt->fetchAll();
 		
-		$stmt = $this->db->prepare("SELECT DISTINCT asset.crtrno FROM asset, asset_version WHERE asset.version = asset_version.current_version AND asset.asset_tag = asset_version.asset_tag ORDER BY crtrno");
+		$stmt = $this->db->prepare("SELECT DISTINCT nehr_Asset.crtrno FROM nehr_Asset, nehr_Asset_version WHERE nehr_Asset.version = nehr_Asset_version.current_version AND nehr_Asset.asset_tag = nehr_Asset_version.asset_tag ORDER BY crtrno");
 		$stmt->execute();
 		$result[2] = $stmt->fetchAll();
 		
-		$stmt = $this->db->prepare("SELECT DISTINCT asset.asset_ID FROM asset, asset_version WHERE asset.version = asset_version.current_version AND asset.asset_tag = asset_version.asset_tag ORDER BY asset_ID");
+		$stmt = $this->db->prepare("SELECT DISTINCT nehr_Asset.asset_ID FROM nehr_Asset, nehr_Asset_version WHERE nehr_Asset.version = nehr_Asset_version.current_version AND nehr_Asset.asset_tag = nehr_Asset_version.asset_tag ORDER BY asset_ID");
 		$stmt->execute();
 		$result[3] = $stmt->fetchAll();
 		
@@ -723,9 +765,9 @@ class USER
 	public function generateReport($type, $filter) {
 		  $result = array();
 		  $entry = '%'.$filter.'%';
-		  $stmt = $this->db->prepare("SELECT * FROM asset, asset_version WHERE ".$type." LIKE :filter AND
-		  asset_version.asset_tag = asset.asset_tag AND
-		  asset_version.current_version 	= asset.version");
+		  $stmt = $this->db->prepare("SELECT * FROM nehr_Asset, nehr_Asset_version WHERE ".$type." LIKE :filter AND
+		  nehr_Asset_version.asset_tag 			= nehr_Asset.asset_tag AND
+		  nehr_Asset_version.current_version 	= nehr_Asset.version");
 		  $stmt->bindparam(":filter", $entry);
 		  $stmt->execute();
 		  
@@ -733,7 +775,7 @@ class USER
 		  $result['asset'] = $stmt->fetchAll();
 		  
 		  if ($type == 'purchaseorder_id') {
-			  $stmt = $this->db->prepare("SELECT * FROM renewal WHERE ".$type." LIKE :filter");
+			  $stmt = $this->db->prepare("SELECT * FROM nehr_Renewal WHERE ".$type." LIKE :filter");
 			  $stmt->bindparam(":filter", $entry);
 			  $stmt->execute();
 			  $result['renewal'] = $stmt->fetchAll();	
@@ -743,26 +785,26 @@ class USER
     
 	public function downloadReport($type, $filter) {
 		  $entry = '%'.$filter.'%';
-		  $stmt = $this->db->prepare("SELECT 	asset.*, hardware.*
-			FROM asset_version INNER JOIN hardware, asset 
+		  $stmt = $this->db->prepare("SELECT 	nehr_Asset.*, nehr_Hardware.*
+			FROM nehr_Asset_version INNER JOIN nehr_Hardware, nehr_Asset 
 			WHERE 
-            asset_version.asset_tag = hardware.asset_tag AND
-            asset_version.asset_tag = asset.asset_tag AND
-			asset_version.current_version 	= asset.version AND
-            asset_version.current_version = hardware.version AND
+            nehr_Asset_version.asset_tag = nehr_Hardware.asset_tag AND
+            nehr_Asset_version.asset_tag = nehr_Asset.asset_tag AND
+			nehr_Asset_version.current_version 	= nehr_Asset.version AND
+            nehr_Asset_version.current_version = nehr_Hardware.version AND
 			$type LIKE :filter");
 		  $stmt->bindparam(":filter", $entry);
 		  $stmt->execute();
 		  
 		  $result['hardware'] = $stmt->fetchAll();
 		  
-		  $stmt = $this->db->prepare("SELECT 	asset.*, software.*
-			FROM asset_version INNER JOIN software, asset 
+		  $stmt = $this->db->prepare("SELECT 	nehr_Asset.*, nehr_Software.*
+			FROM nehr_Asset_version INNER JOIN nehr_Software, nehr_Asset 
 			WHERE 
-            asset_version.asset_tag = software.asset_tag AND
-            asset_version.asset_tag = asset.asset_tag AND
-			asset_version.current_version 	= asset.version AND
-            asset_version.current_version = software.version AND
+            nehr_Asset_version.asset_tag = nehr_Software.asset_tag AND
+            nehr_Asset_version.asset_tag = nehr_Asset.asset_tag AND
+			nehr_Asset_version.current_version 	= nehr_Asset.version AND
+            nehr_Asset_version.current_version = nehr_Software.version AND
 			$type LIKE :filter");
 		  $stmt->bindparam(":filter", $entry);
 		  $stmt->execute();
@@ -770,7 +812,7 @@ class USER
 		  $result['software'] = $stmt->fetchAll();
 		  
 		  if ($type == 'purchaseorder_id') {
-			  $stmt = $this->db->prepare("SELECT * FROM renewal WHERE ".$type." LIKE :filter");
+			  $stmt = $this->db->prepare("SELECT * FROM nehr_Renewal WHERE ".$type." LIKE :filter");
 			  $stmt->bindparam(":filter", $entry);
 			  $stmt->execute();
 			  $result['renewal'] = $stmt->fetchAll();
@@ -810,14 +852,14 @@ class USER
 	}
 	
 	public function getCurrentVersion($asset_tag) {
-		$stmt = $this->db->prepare("SELECT current_version FROM asset_version where asset_tag=:asset_tag");
+		$stmt = $this->db->prepare("SELECT current_version FROM nehr_Asset_version where asset_tag=:asset_tag");
 		$stmt->bindparam(":asset_tag", $asset_tag);
 		$stmt->execute();
 		return $stmt->fetch();
 	}
 	
 	public function getChildren($asset) {
-		$stmt = $this->db->prepare("SELECT 	* from renewal where parent_ID=:parent_ID");
+		$stmt = $this->db->prepare("SELECT 	* from nehr_Renewal where parent_ID=:parent_ID");
 		$stmt->bindparam(":parent_ID", $asset['asset_ID']);
 		$stmt->execute();
 		foreach($stmt->fetchAll() as $child) {
@@ -843,10 +885,10 @@ class USER
 		$sql = "";
 		if ($purchaseorder['exists'] == 1) {
 		
-			$sql = "UPDATE purchaseorder SET filecontent=:filecontent, filename=:filename, filesize=:filesize, filetype=:filetype where purchaseorder_id=:purchaseorder_id";
+			$sql = "UPDATE nehr_Purchaseorder SET filecontent=:filecontent, filename=:filename, filesize=:filesize, filetype=:filetype where purchaseorder_id=:purchaseorder_id";
 		}
 		else {
-			$sql = "INSERT INTO purchaseorder (purchaseorder_id, filecontent, filename, filesize, filetype)VALUES (:purchaseorder_id, :filecontent, :filename, :filesize, :filetype)";
+			$sql = "INSERT INTO nehr_Purchaseorder (purchaseorder_id, filecontent, filename, filesize, filetype)VALUES (:purchaseorder_id, :filecontent, :filename, :filesize, :filetype)";
 		}
 		
 		$stmt = $this->db->prepare($sql);
@@ -860,14 +902,14 @@ class USER
 	}
 	
 	public function getPurchaseOrderFile($purchaseorder_id) {
-		$stmt = $this->db->prepare("SELECT purchaseorder_id, filename, filecontent, filesize, filetype FROM purchaseorder WHERE purchaseorder_id=:purchaseorder_id");
+		$stmt = $this->db->prepare("SELECT purchaseorder_id, filename, filecontent, filesize, filetype FROM nehr_Purchaseorder WHERE purchaseorder_id=:purchaseorder_id");
 		$stmt->bindParam(':purchaseorder_id', $purchaseorder_id);
 		$stmt->execute();
 		return $stmt->fetch();
 	}
 	
 	public function deletePurchaseOrderFile($purchaseorder_id) {
-		$sql = "UPDATE purchaseorder SET filecontent=NULL, filename=NULL, filesize=NULL, filetype=NULL where purchaseorder_id=:purchaseorder_id";
+		$sql = "UPDATE nehr_Purchaseorder SET filecontent=NULL, filename=NULL, filesize=NULL, filetype=NULL where purchaseorder_id=:purchaseorder_id";
 		$stmt = $this->db->prepare($sql);
 		$stmt->bindParam(':purchaseorder_id', $purchaseorder_id);
 		$stmt->execute();
@@ -947,7 +989,7 @@ class USER
 	public function addRenewal($renewal) {
        try
        {
-			$stmt = $this->db->prepare("INSERT INTO renewal(asset_ID,parent_ID,purchaseorder_id,startdate,expiry_date) 
+			$stmt = $this->db->prepare("INSERT INTO nehr_Renewal(asset_ID,parent_ID,purchaseorder_id,startdate,expiry_date) 
                                                        VALUES(:asset_ID,:parent_ID,:purchaseorder_id,:startdate,:expiry_date)");
 			
 			$stmt->bindparam(":asset_ID", 			$renewal['asset_ID']);
@@ -985,7 +1027,7 @@ class USER
 	public function editRenewal($renewal) {
        try
        {
-			$stmt = $this->db->prepare("UPDATE renewal
+			$stmt = $this->db->prepare("UPDATE nehr_Renewal
 										SET asset_ID	=:asset_ID,
 										parent_ID		=:parent_ID,
 										purchaseorder_id=:purchaseorder_id,
@@ -1050,33 +1092,91 @@ class USER
 			:gpc_Lastedited
 			)
 			");
-			$stmt->bindParam(':gpc_Environment',	$asset['gpc_Environment']);
-			$stmt->bindParam(':gpc_Tier', 			$asset['gpc_Tier']);
-			$stmt->bindParam(':gpc_Phase', 			$asset['gpc_Phase']);
-			$stmt->bindParam(':gpc_Item', 			$asset['gpc_Item']);
-			$stmt->bindParam(':gpc_Remarks', 		$asset['gpc_Remarks']);
-			$stmt->bindParam(':gpc_Ami', 			$asset['gpc_Ami']);
-			$stmt->bindParam(':gpc_Startdate', 		$asset['gpc_Startdate']);
-			$stmt->bindParam(':gpc_Expirydate', 	$asset['gpc_Expirydate']);
-			$stmt->bindParam(':gpc_halb', 			$asset['gpc_halb']);
-			$stmt->bindParam(':gpc_quantity',		$asset['gpc_quantity']);
-			$stmt->bindParam(':gpc_Application', 	$asset['gpc_Application']);
-			$stmt->bindParam(':gpc_Data', 			$asset['gpc_Data']);
-			$stmt->bindParam(':gpc_IOPS',			$asset['gpc_IOPS']);
-			$stmt->bindParam(':gpc_Backup', 		$asset['gpc_Backup']);
-			$stmt->bindParam(':gpc_OS', 			$asset['gpc_OS']);
-			$stmt->bindParam(':gpc_Y1_Qt',			$asset['gpc_Y1_Qt']);
-			$stmt->bindParam(':gpc_Y2_Qt', 			$asset['gpc_Y2_Qt']);
-			$stmt->bindParam(':gpc_Y1_Ops',			$asset['gpc_Y1_Ops']);
-			$stmt->bindParam(':gpc_Y2_Ops', 		$asset['gpc_Y2_Ops']);
-			$stmt->bindParam(':gpc_Gwgc', 			$asset['gpc_Gwgc']);
-			$stmt->bindParam(':gpc_Lastedited',		$asset['gpc_Lastedited']);
+		$stmt->bindParam(':gpc_Environment',	$asset['gpc_Environment']);
+		$stmt->bindParam(':gpc_Tier', 			$asset['gpc_Tier']);
+		$stmt->bindParam(':gpc_Phase', 			$asset['gpc_Phase']);
+		$stmt->bindParam(':gpc_Item', 			$asset['gpc_Item']);
+		$stmt->bindParam(':gpc_Remarks', 		$asset['gpc_Remarks']);
+		$stmt->bindParam(':gpc_Ami', 			$asset['gpc_Ami']);
+		$stmt->bindParam(':gpc_Startdate', 		$asset['gpc_Startdate']);
+		$stmt->bindParam(':gpc_Expirydate', 	$asset['gpc_Expirydate']);
+		$stmt->bindParam(':gpc_halb', 			$asset['gpc_halb']);
+		$stmt->bindParam(':gpc_quantity',		$asset['gpc_quantity']);
+		$stmt->bindParam(':gpc_Application', 	$asset['gpc_Application']);
+		$stmt->bindParam(':gpc_Data', 			$asset['gpc_Data']);
+		$stmt->bindParam(':gpc_IOPS',			$asset['gpc_IOPS']);
+		$stmt->bindParam(':gpc_Backup', 		$asset['gpc_Backup']);
+		$stmt->bindParam(':gpc_OS', 			$asset['gpc_OS']);
+		$stmt->bindParam(':gpc_Y1_Qt',			$asset['gpc_Y1_Qt']);
+		$stmt->bindParam(':gpc_Y2_Qt', 			$asset['gpc_Y2_Qt']);
+		$stmt->bindParam(':gpc_Y1_Ops',			$asset['gpc_Y1_Ops']);
+		$stmt->bindParam(':gpc_Y2_Ops', 		$asset['gpc_Y2_Ops']);
+		$stmt->bindParam(':gpc_Gwgc', 			$asset['gpc_Gwgc']);
+		$stmt->bindParam(':gpc_Lastedited',		$asset['gpc_Lastedited']);
+		
+		date_default_timezone_set('Asia/Singapore');
+		$asset['gpc_Lastedited'] = date("Y-m-d H:i:s");
+		$stmt->execute();
+					
+		$this->savelog($_SESSION['username'], "created GPC asset".$asset['gpc_Item']);
+	}
+	
+	public function editGPCAsset($asset) {
+		$stmt = $this->db->prepare("UPDATE gpc_Asset_version SET current_version=:version 
+									WHERE gpc_asset_tag=:gpc_asset_tag");
+		$stmt->bindParam(':gpc_asset_tag', $asset['gpc_asset_tag']);
+		$stmt->bindParam(':version', $asset['gpc_version']);
+		$stmt->execute();
+		
+		$stmt = $this->db->prepare("
+			INSERT INTO gpc_Asset 
+			(
+			gpc_asset_tag, gpc_version,
+			gpc_Environment, gpc_Tier, gpc_Phase, gpc_Item, gpc_Remarks,
+			gpc_Ami, gpc_Startdate, gpc_Expirydate, gpc_halb, gpc_quantity,
+			gpc_Application, gpc_Data, gpc_IOPS, gpc_Backup, gpc_OS, 
+			gpc_Y1_Qt, gpc_Y2_Qt, gpc_Y1_Ops, gpc_Y2_Ops, gpc_Gwgc, 
+			gpc_Lastedited
+			)
+			VALUES (
+			:gpc_asset_tag, :gpc_version,
+			:gpc_Environment, :gpc_Tier, :gpc_Phase, :gpc_Item, :gpc_Remarks,
+			:gpc_Ami, :gpc_Startdate, :gpc_Expirydate, :gpc_halb, :gpc_quantity,
+			:gpc_Application, :gpc_Data, :gpc_IOPS, :gpc_Backup, :gpc_OS,
+			:gpc_Y1_Qt, :gpc_Y2_Qt, :gpc_Y1_Ops, :gpc_Y2_Ops, :gpc_Gwgc,
+			:gpc_Lastedited
+			)
+			");
 			
-			date_default_timezone_set('Asia/Singapore');
-			$asset['gpc_Lastedited'] = date("Y-m-d H:i:s");
-			$stmt->execute();
-						
-			$this->savelog($_SESSION['username'], "created GPC asset".$asset['gpc_Item']);
+		$stmt->bindParam(':gpc_asset_tag',		$asset['gpc_asset_tag']);
+		$stmt->bindParam(':gpc_version',		$asset['gpc_version']);
+		$stmt->bindParam(':gpc_Environment',	$asset['gpc_Environment']);
+		$stmt->bindParam(':gpc_Tier', 			$asset['gpc_Tier']);
+		$stmt->bindParam(':gpc_Phase', 			$asset['gpc_Phase']);
+		$stmt->bindParam(':gpc_Item', 			$asset['gpc_Item']);
+		$stmt->bindParam(':gpc_Remarks', 		$asset['gpc_Remarks']);
+		$stmt->bindParam(':gpc_Ami', 			$asset['gpc_Ami']);
+		$stmt->bindParam(':gpc_Startdate', 		$asset['gpc_Startdate']);
+		$stmt->bindParam(':gpc_Expirydate', 	$asset['gpc_Expirydate']);
+		$stmt->bindParam(':gpc_halb', 			$asset['gpc_halb']);
+		$stmt->bindParam(':gpc_quantity',		$asset['gpc_quantity']);
+		$stmt->bindParam(':gpc_Application', 	$asset['gpc_Application']);
+		$stmt->bindParam(':gpc_Data', 			$asset['gpc_Data']);
+		$stmt->bindParam(':gpc_IOPS',			$asset['gpc_IOPS']);
+		$stmt->bindParam(':gpc_Backup', 		$asset['gpc_Backup']);
+		$stmt->bindParam(':gpc_OS', 			$asset['gpc_OS']);
+		$stmt->bindParam(':gpc_Y1_Qt',			$asset['gpc_Y1_Qt']);
+		$stmt->bindParam(':gpc_Y2_Qt', 			$asset['gpc_Y2_Qt']);
+		$stmt->bindParam(':gpc_Y1_Ops',			$asset['gpc_Y1_Ops']);
+		$stmt->bindParam(':gpc_Y2_Ops', 		$asset['gpc_Y2_Ops']);
+		$stmt->bindParam(':gpc_Gwgc', 			$asset['gpc_Gwgc']);
+		$stmt->bindParam(':gpc_Lastedited',		$asset['gpc_Lastedited']);
+		
+		date_default_timezone_set('Asia/Singapore');
+		$asset['gpc_Lastedited'] = date("Y-m-d H:i:s");
+		$stmt->execute();
+					
+		$this->savelog($_SESSION['username'], "edited GPC asset".$asset['gpc_Item']);
 	}
 	
 	public function printAssetRow($asset) {
@@ -1116,7 +1216,7 @@ class USER
 	}
 	
 	public function getHeaders($type) {
-		if ($type == 'renewal') {
+		if ($type == 'nehr_Renewal') {
 			$sql = "SELECT DISTINCT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
 					WHERE TABLE_NAME=:type 
 					AND 
@@ -1125,9 +1225,9 @@ class USER
 					TABLE_SCHEMA='ams'
 					";
 		}
-		else if ($type == 'hardware' or $type == 'software') {
+		else if ($type == 'nehr_Hardware' or $type == 'nehr_Software') {
 			$sql = "SELECT DISTINCT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
-					WHERE (TABLE_NAME= 'asset' or TABLE_NAME = :type)
+					WHERE (TABLE_NAME= 'nehr_Asset' or TABLE_NAME = :type)
 					AND  
 					NOT (COLUMN_NAME='asset_tag' or COLUMN_NAME='version' or COLUMN_NAME='lastedited')
 					AND

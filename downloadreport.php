@@ -23,7 +23,6 @@
 	else {
 		header('Location: generatereport.php');
 	}
-	
 	$objPHPExcel = new PHPExcel();
 	$ActiveSheetIndex = 0;
 	if (sizeof($result['hardware']) > 0) {
@@ -33,7 +32,7 @@
 		$objPHPExcel->setActiveSheetIndex($ActiveSheetIndex);
 		$objPHPExcel->getActiveSheet()->setTitle('Hardware');
 		
-		$headers = $user->getHeaders('hardware');
+		$headers = $user->getHeaders('nehr_Hardware');
 		$rownumber = 1;
 	
 		foreach ($headers as $key=>$data) {
@@ -63,8 +62,7 @@
 		$objPHPExcel->setActiveSheetIndex($ActiveSheetIndex);
 		$objPHPExcel->getActiveSheet()->setTitle('Software');
 		$rownumber = 1;
-		$headers = $user->getHeaders('software');
-		
+		$headers = $user->getHeaders('nehr_Software');
 		foreach ($headers as $key=>$data) {
 			$objPHPExcel->getActiveSheet()->SetCellValue(chr($key + 65).$rownumber, $data['COLUMN_NAME']);
 			$objPHPExcel->getActiveSheet()->getColumnDimension(chr($key + 65))->setAutoSize(true);
@@ -90,7 +88,7 @@
 		$objPHPExcel->setActiveSheetIndex($ActiveSheetIndex);
 		$objPHPExcel->getActiveSheet()->setTitle('Renewals');
 		$rownumber = 1;
-		$headers = $user->getHeaders('renewal');
+		$headers = $user->getHeaders('nehr_Renewal');
 		
 		foreach ($headers as $key=>$data) {
 			$objPHPExcel->getActiveSheet()->SetCellValue(chr($key + 65).$rownumber, $data['COLUMN_NAME']);

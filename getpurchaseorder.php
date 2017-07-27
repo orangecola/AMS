@@ -84,7 +84,7 @@
 
 		<?php } ?>
 	</form>
-	<? if (isset($result['hardware']) or isset($result['software'])) {?>
+	<?php if (isset($result['hardware']) or isset($result['software'])) {?>
 		<h3>Assets</h3>
 		<table id="datatable" class="table table-striped table-bordered">
                       <thead>

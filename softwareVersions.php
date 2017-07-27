@@ -9,7 +9,7 @@
 	}
 	
 	$result = $user->getSoftwareVersions($_GET['id']);
-	$options = $user->getOptions();
+	$options = $user->getOptions('nehr_Options', ['currency', 'releaseversion', 'status', 'vendor', 'procured_from', 'shortname', 'purpose', 'contracttype']);
 	
 	if (!$result[0]) {
 		header('Location: adminassetlist.php');
@@ -141,6 +141,7 @@
 		document.getElementsByName("description")[0].innerHTML = versions[p1]["description"];
 		document.getElementsByName("quantity")[0].value = versions[p1]["quantity"];
 		document.getElementsByName("price")[0].value = versions[p1]["price"];
+		document.getElementsByName("currency")[0].value = versions[p1]["currency"];
 		document.getElementsByName("crtrno")[0].value = versions[p1]["crtrno"];
 		document.getElementsByName("pono")[0].value = versions[p1]["purchaseorder_id"];
 		document.getElementsByName("release")[0].value = versions[p1]["release_version"];

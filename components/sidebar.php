@@ -100,7 +100,8 @@
 								echo '<li id="adduser.php"><a href="adduser.php">Add User</a></li>' ; 
 								echo '<li id="bulkadduser.php"><a href="bulkadduser.php">Bulk Add Users</a></li>' ;
 								echo '<li id="userlist.php"><a href="userlist.php">Edit User</a></li>' ;
-								echo '<li id="adminassetlist.php"><a href="adminassetlist.php">Previous Versions</a></li>' ;
+								echo '<li id="adminassetlist.php"><a href="adminassetlist.php">NEHR Previous Versions</a></li>' ;
+								echo '<li id="admingpc_assetlist.php"><a href="admingpc_assetlist.php">GPC Previous Versions</a></li>' ;
 								echo '<li id="options_nehr.php"><a href="options_nehr.php">NEHR Asset options list</a></li>';
 								echo '<li id="options_gpc.php"><a href="options_gpc.php">GPC Asset options list</a></li>';
 								echo '<li id="logs.php"><a href="logs.php">Logs</a></li>';

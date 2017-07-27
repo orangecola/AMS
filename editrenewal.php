@@ -116,6 +116,7 @@
 	document.getElementsByName("expiry_date")[0].value = <?php echo json_encode($result[1]['expiry_date']);?>;
 	}
 	resetFields();
+	validator.message.empty = 'Mandatory Field';
 </script>
 <!-- /page content -->
 <?php

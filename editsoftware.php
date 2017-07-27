@@ -41,7 +41,6 @@
 		$candidate['contract_type']			= trim($_POST['contracttype']);
 		$candidate['start_date']			= trim($_POST['startdate']);
 		$candidate['license_explanation']	= trim($_POST['license']);
-		$candidate['verification']			= trim($_POST['verification']);
 		
 		$same = true;
 		//Similarility Check
@@ -77,7 +76,7 @@
 				$DateError = 1;
 		}
 		
-		if ($NoChanges == 0 and $DateError == 0 and $NumberError == 0 and $ParentError == 0) {
+		if ($NoChanges == 0 and $DateError == 0 and $NumberError == 0) {
 			$candidate['version'] = $result[1]['version'] + 1;
 			$candidate['asset_tag'] = $result[1]['asset_tag'];
 			$user->editSoftware($candidate);
@@ -144,7 +143,7 @@
 				<div class="item form-group">
 				<div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
 				  <a class="btn btn-primary" href="assetlist.php">Cancel</a>
-				  <button type="button" class="btn btn-primary" onclick="reset()">Discard Changes</button>
+				  <button type="button" class="btn btn-primary" onclick="resetFields()">Discard Changes</button>
 				  <button type="submit" class="btn btn-success">Submit</button>
 				</div>
 				
@@ -160,7 +159,7 @@
 
 <?php require ('components/footer.php');?>
 <script>
-		function reset() {
+		function resetFields() {
 			document.getElementById("demo-form2").reset();
 			document.getElementsByName("assetid")[0].value = <?php echo json_encode($result[1]['asset_ID']);?>;
 			document.getElementsByName("description")[0].innerHTML = <?php echo json_encode($result[1]['description']);?>;
@@ -173,7 +172,7 @@
 			document.getElementsByName("startdate")[0].value = <?php echo json_encode($result[1]['start_date']);?>;
 			document.getElementsByName("license")[0].value = <?php echo json_encode($result[1]['license_explanation']);?>;
 		}
-		reset();
+		resetFields();
 
 		//Change "Select Option" To Saved Fields
 		document.getElementsByName("release")[0].children[0].innerHTML 		= <?php echo json_encode($result[1]['release_version'].' (No Change)');?>;
@@ -192,5 +191,7 @@
 		document.getElementsByName("purpose")[0].children[0].value			= <?php echo json_encode($result[1]['purpose']);?>;
 		document.getElementsByName("contracttype")[0].children[0].innerHTML	= <?php echo json_encode($result[1]['contract_type'].' (No Change)');?>;
 		document.getElementsByName("contracttype")[0].children[0].value		= <?php echo json_encode($result[1]['contract_type']);?>;
+		
+		validator.message.empty = 'Mandatory Field';
 </script>  
 <?php require ('components/closing.php');

@@ -20,13 +20,14 @@
   <div class="item form-group">
 	<label class="control-label col-md-3 col-sm-3 col-xs-12" for="vendor">Price<span class="required">*</span></label>
 	<div class="col-md-6 col-sm-6 col-xs-12">
-	  <input type="number" class="form-control col-md-7 col-xs-12 required" placeholder="Numbers only" name="price">
+	  <input type="number" class="form-control col-md-7 col-xs-12" required="required" placeholder="Numbers only" name="price">
 	</div>
   </div>
   <div class="item form-group">
 	<label class="control-label col-md-3 col-sm-3 col-xs-12">Currency<span class="required">*</span></label>
 	<div class="col-md-6 col-sm-6 col-xs-12">
 	  <select class="form-control required" name="currency">
+		<option value="">Select Option</option>
 		<?php 
 			foreach($options['currency'] as $row) {
 				echo '<option value="'.$row['nehr_Options_Name'].'">'.$row['nehr_Options_Name'].'</option>';

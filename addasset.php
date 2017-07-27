@@ -23,7 +23,6 @@
 		$asset['release_version']	= trim($_POST['release']);
 		$asset['expirydate']		= trim($_POST['expirydate']);
 		$asset['remarks']			= trim($_POST['remarks']);
-		$asset['parent']			= trim($_POST['parent']);
 		$asset['status'] 			= trim($_POST['status']);
 		$asset['version']			= 1;
 		
@@ -141,7 +140,7 @@
 		  
 		  ?>
 			<br />
-			<form id="demo-form2" enctype="multipart/form-data" class="form-horizontal form-label-left" method="post">
+			<form novalidate id="demo-form2" enctype="multipart/form-data" class="form-horizontal form-label-left" method="post">
 			  <?php require 'components/asset.php'; ?>
 
 			<!-- Tabs -->
@@ -245,6 +244,6 @@
 		document.getElementsByName("replacing")[0].removeAttribute("disabled");
 	};
 	software();
-	
+	validator.message.empty = 'Mandatory Field';
 </script>
 <?php require 'components/closing.php'?>

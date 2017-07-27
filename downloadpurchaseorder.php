@@ -8,7 +8,10 @@
 	header("Content-length: " . $result['filesize']);
 	header("Content-type: " . $result['filetype']);
 	header("Content-Disposition: attachment; filename=".$result['filename']);
-	echo $result['filecontent'];
+	$download = stripslashes($result['filecontent']);
+	ob_clean();
+	flush();
+	echo $download;
 	}
 	else {
 		header("Location: purchaseorder.php");

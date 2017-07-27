@@ -1,5 +1,9 @@
 <?php 
 	include_once('components/config.php');
+	if(!($_SESSION['role'] == 'admin'))
+	  {
+		 header('Location: logout.php');
+	  }
 	include('components/sidebar.php');
 			
 	$asset = $user->getGPCAssetList();
@@ -7,7 +11,7 @@
 	function printAssetRow($asset) {
 		echo '<tr>';
 		echo "<td>";
-		echo "<a href=\"editgpc_asset.php?id=".htmlentities($asset['gpc_asset_tag'])."\" class=\"btn btn-info btn-xs\"><i class='fa fa-edit'></i>Edit</a>";
+		echo "<a href=\"gpc_assetversions.php?id=".htmlentities($asset['gpc_asset_tag'])."\" class=\"btn btn-info btn-xs\"><i class='fa fa-edit'></i>Versions</a>";
 		echo "</td>";
 		echo "<td>".htmlentities($asset['gpc_Environment'])."</td>";
 		echo "<td>".htmlentities($asset['gpc_Tier'])."</td>";
@@ -33,7 +37,7 @@
 	}
 ?>
 <script>
-	document.getElementById('gpcassetlist.php').setAttribute("class", "current-page");
+	document.getElementById('admingpc_assetlist.php').setAttribute("class", "current-page");
 </script>
 
 <!-- page content -->
