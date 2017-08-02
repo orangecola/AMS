@@ -3,8 +3,8 @@ class USER
 {
     private $db;
 	public $softwareFields 		= array('vendor', 'procured_from', 'shortname', 'purpose', 'contract_type', 'start_date', 'license_explanation');
-	public $assetFields 		= array('asset_ID', 'description', 'quantity', 'price', 'currency', 'crtrno', 'purchaseorder_id', 'release_version', 'expirydate', 'remarks', 'status');
-	public $hardwareFields 		= array('class', 'brand', 'audit_date', 'component', 'label', 'serial', 'location', 'replacing', 'excelsheet'); 
+	public $assetFields 		= array('asset_ID', 'description', 'quantity', 'crtrno', 'purchaseorder_id', 'release_version', 'expirydate', 'remarks', 'status');
+	public $hardwareFields 		= array('IHiS_Asset_ID', 'CR359 / CR506', 'CR560', 'POST-CR560', 'price', 'currency', 'class', 'brand', 'audit_date', 'component', 'label', 'serial', 'location', 'replacing', 'excelsheet'); 
 	public $userFields 			= array('username', 'password', 'role', 'status');
 	function __construct($DB_con)
     {
@@ -39,21 +39,20 @@ class USER
 		return ($number !== FALSE);
 	}
 	
-	public function addasset($asset) {
+	public function addAsset($asset) {
+		
 		$stmt = $this->db->prepare("INSERT INTO nehr_Asset_version(current_version) VALUES (:version)");
 		$stmt->bindParam(':version', $asset['version']);
 		$stmt->execute();
 		
 		$stmt = $this->db->prepare("INSERT INTO 
 			nehr_Asset(
-			asset_tag, asset_ID, description, quantity, price, currency, purchaseorder_id, release_version, expirydate, remarks, crtrno, status, version, lastedited
+			asset_tag, asset_ID, description, quantity, purchaseorder_id, release_version, expirydate, remarks, crtrno, status, version, lastedited
 			) VALUES (
-			LAST_INSERT_ID(), :asset_ID, :description, :quantity, :price, :currency, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :status, :version, :lastedited)");
+			LAST_INSERT_ID(), :asset_ID, :description, :quantity, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :status, :version, :lastedited)");
 		$stmt->bindParam(':asset_ID', 			$asset['asset_ID']);
 		$stmt->bindParam(':description', 		$asset['description']);
 		$stmt->bindParam(':quantity', 			$asset['quantity']);
-		$stmt->bindParam(':price', 				$asset['price']);
-		$stmt->bindParam(':currency',			$asset['currency']);
 		$stmt->bindParam(':purchaseorder_id', 	$asset['purchaseorder_id']);
 		$stmt->bindParam(':release_version', 	$asset['release_version']);
 		$stmt->bindParam(':expirydate', 		$asset['expirydate']);
@@ -91,17 +90,26 @@ class USER
 	public function addHardware($asset) {
 		$this->addAsset($asset);
 		
-		$stmt = $this->db->prepare("INSERT INTO nehr_Hardware(asset_tag, class, brand, audit_date, component, label, serial, location, replacing, version, excelsheet) VALUES (LAST_INSERT_ID(), :class, :brand, :audit_date, :component, :label, :serial, :location, :replacing, :version, :excelsheet)");
-		$stmt->bindParam(':class', 		$asset['class']);
-		$stmt->bindParam(':brand', 		$asset['brand']);
-		$stmt->bindParam(':audit_date', $asset['audit_date']);
-		$stmt->bindParam(':component', 	$asset['component']);
-		$stmt->bindParam(':label', 		$asset['label']);
-		$stmt->bindParam(':serial', 	$asset['serial']);
-		$stmt->bindParam(':location', 	$asset['location']);
-		$stmt->bindParam(':replacing', 	$asset['replacing']);
-		$stmt->bindParam(':excelsheet', $asset['excelsheet']);
-		$stmt->bindParam(':version',	$asset['version']);
+		$stmt = $this->db->prepare("INSERT INTO nehr_Hardware(asset_tag, `IHiS_Asset_ID`, `CR359 / CR506`,	`CR560`, `POST-CR560`, price, currency, class, brand, audit_date, component, label, serial, location, replacing, version, excelsheet) 
+		VALUES 
+		(LAST_INSERT_ID(), :IHiS_Asset_ID, :CR359, :CR560, :POSTCR560, :price, :currency, :class, :brand, :audit_date, :component, :label, :serial, :location, :replacing, :version, :excelsheet)");
+		
+		$stmt->bindParam(':IHiS_Asset_ID', 	$asset['IHiS_Asset_ID']);
+		$stmt->bindParam(':CR359', 			$asset['CR359 / CR506']);
+		$stmt->bindParam(':CR560', 			$asset['CR560']);
+		$stmt->bindParam(':POSTCR560', 		$asset['POST-CR560']);
+		$stmt->bindParam(':price', 			$asset['price']);
+		$stmt->bindParam(':currency',		$asset['currency']);
+		$stmt->bindParam(':class', 			$asset['class']);
+		$stmt->bindParam(':brand', 			$asset['brand']);
+		$stmt->bindParam(':audit_date', 	$asset['audit_date']);
+		$stmt->bindParam(':component', 		$asset['component']);
+		$stmt->bindParam(':label', 			$asset['label']);
+		$stmt->bindParam(':serial', 		$asset['serial']);
+		$stmt->bindParam(':location', 		$asset['location']);
+		$stmt->bindParam(':replacing', 		$asset['replacing']);
+		$stmt->bindParam(':excelsheet', 	$asset['excelsheet']);
+		$stmt->bindParam(':version',		$asset['version']);
 		$stmt->execute();
 		$this->savelog($_SESSION['username'], "created hardware asset ".$asset['asset_ID']." version ".$asset['version']);
 	}
@@ -125,13 +133,13 @@ class USER
 	}
 	
 	public function editasset($asset) {
-		$stmt = $this->db->prepare("INSERT INTO nehr_Asset(asset_tag, asset_ID, description, quantity, price, currency, purchaseorder_id, release_version, expirydate, remarks, crtrno, version, status, lastedited) VALUES (:asset_tag, :asset_ID, :description, :quantity, :price, :currency, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :version, :status, :lastedited)");
+		$stmt = $this->db->prepare("INSERT INTO nehr_Asset(asset_tag, asset_ID, description, quantity,  purchaseorder_id, release_version, expirydate, remarks, crtrno, version, status, lastedited) 
+		VALUES 
+		(:asset_tag, :asset_ID, :description, :quantity, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :version, :status, :lastedited)");
 		$stmt->bindParam(':asset_tag',			$asset['asset_tag']);
 		$stmt->bindParam(':asset_ID', 			$asset['asset_ID']);
 		$stmt->bindParam(':description', 		$asset['description']);
 		$stmt->bindParam(':quantity', 			$asset['quantity']);
-		$stmt->bindParam(':price', 				$asset['price']);
-		$stmt->bindParam(':currency',			$asset['currency']);
 		$stmt->bindParam(':purchaseorder_id', 	$asset['purchaseorder_id']);
 		$stmt->bindParam(':release_version', 	$asset['release_version']);
 		$stmt->bindParam(':expirydate', 		$asset['expirydate']);
@@ -139,6 +147,8 @@ class USER
 		$stmt->bindParam(':crtrno', 			$asset['crtrno']);
 		$stmt->bindParam(':version',			$asset['version']);
 		$stmt->bindParam(':status', 			$asset['status']);
+		
+		
 		date_default_timezone_set('Asia/Singapore');
 		$time = date("Y-m-d H:i:s");
 		$stmt->bindParam(':lastedited',			$time);
@@ -169,18 +179,28 @@ class USER
 	public function editHardware($asset) {
 		$this->editAsset($asset);
 		
-		$stmt = $this->db->prepare("INSERT INTO nehr_Hardware(asset_tag, class, brand, audit_date, component, label, serial, location, replacing, version, excelsheet) VALUES (:asset_tag, :class, :brand, :audit_date, :component, :label, :serial, :location, :replacing, :version, :excelsheet)");
+		$stmt = $this->db->prepare("INSERT INTO nehr_Hardware(asset_tag, `IHiS_Asset_ID`, `CR359 / CR506`,	`CR560`, `POST-CR560`, price, currency, class, brand, audit_date, component, label, serial, location, replacing, version, excelsheet) 
+		VALUES 
+		(:asset_tag, :IHiS_Asset_ID, :CR359, :CR560, :POSTCR560, :price, :currency, :class, :brand, :audit_date, :component, :label, :serial, :location, :replacing, :version, :excelsheet)");
 		$stmt->bindParam(':asset_tag',	$asset['asset_tag']);
-		$stmt->bindParam(':class', 		$asset['class']);
-		$stmt->bindParam(':brand', 		$asset['brand']);
-		$stmt->bindParam(':audit_date', $asset['audit_date']);
-		$stmt->bindParam(':component', 	$asset['component']);
-		$stmt->bindParam(':label', 		$asset['label']);
-		$stmt->bindParam(':serial', 	$asset['serial']);
-		$stmt->bindParam(':location', 	$asset['location']);
-		$stmt->bindParam(':replacing', 	$asset['replacing']);
-		$stmt->bindParam(':excelsheet', $asset['excelsheet']);
-		$stmt->bindParam(':version',	$asset['version']);
+		
+		$stmt->bindParam(':IHiS_Asset_ID', 	$asset['IHiS_Asset_ID']);
+		$stmt->bindParam(':CR359', 			$asset['CR359 / CR506']);
+		$stmt->bindParam(':CR560', 			$asset['CR560']);
+		$stmt->bindParam(':POSTCR560', 		$asset['POST-CR560']);
+		$stmt->bindParam(':price', 			$asset['price']);
+		$stmt->bindParam(':currency',		$asset['currency']);
+		$stmt->bindParam(':class', 			$asset['class']);
+		$stmt->bindParam(':brand', 			$asset['brand']);
+		$stmt->bindParam(':audit_date', 	$asset['audit_date']);
+		$stmt->bindParam(':component', 		$asset['component']);
+		$stmt->bindParam(':label', 			$asset['label']);
+		$stmt->bindParam(':serial', 		$asset['serial']);
+		$stmt->bindParam(':location', 		$asset['location']);
+		$stmt->bindParam(':replacing', 		$asset['replacing']);
+		$stmt->bindParam(':excelsheet', 	$asset['excelsheet']);
+		$stmt->bindParam(':version',		$asset['version']);
+		
 		$stmt->execute();
 		$this->savelog($_SESSION['username'], "edited hardware asset ".$asset['asset_ID']." (version ".$asset['version'].")");
 	}
@@ -928,7 +948,6 @@ class USER
 		echo				"<h4>Asset Information</h4>";
 		echo				"<p>Description			: ".htmlentities($asset['description'])			."</p>";
 		echo				"<p>Quantity			: ".htmlentities($asset['quantity'])			."</p>";
-		echo				"<p>Price				: ".htmlentities($asset['price']) . " " 		. htmlentities($asset['currency'])	."</p>";
 		echo				"<p>CR / TR No			: ".htmlentities($asset['crtrno'])				."</p>";
 		echo				"<p>Purchase Order ID	: ".htmlentities($asset['purchaseorder_id'])	."</p>";
 		echo				"<p>Release Version		: ".htmlentities($asset['release_version']) 	."</p>";
@@ -964,6 +983,11 @@ class USER
 	public function printHardwareModal($hardware) {
 		$this->printAssetModal($hardware);
 		echo				"<h4>Hardware Information</h4>";
+		echo				"<p>Price				: ".htmlentities($hardware['price']) . " " 		. htmlentities($hardware['currency'])	."</p>";
+		echo				"<p>IHiS_Asset_ID		: ".htmlentities($hardware['IHiS_Asset_ID']) 	."</p>";
+		echo				"<p>CR359/CR506			: ".htmlentities($hardware['CR359 / CR506']) 	."</p>";
+		echo				"<p>CR560				: ".htmlentities($hardware['CR560']) 			."</p>";
+		echo				"<p>Post-CR560			: ".htmlentities($hardware['POST-CR560']) 		."</p>";
 		echo				"<p>Class				: ".htmlentities($hardware['class']) 			."</p>";
 		echo				"<p>Brand				: ".htmlentities($hardware['brand']) 			."</p>";
 		echo				"<p>Audit Date			: ".htmlentities($hardware['audit_date']) 		."</p>";
@@ -971,6 +995,7 @@ class USER
 		echo 				"<p>Label				: ".htmlentities($hardware['label']) 			."</p>";
 		echo				"<p>Serial				: ".htmlentities($hardware['serial']) 			."</p>";
 		echo				"<p>Location 			: ".htmlentities($hardware['location']) 		."</p>";
+		echo				"<p>Excel Sheet 		: ".htmlentities($hardware['excelsheet']) 		."</p>";
 		echo				"<p>RMA					: ".htmlentities($hardware['replacing']) 		."</p>";
 		echo				"<h4>Children Information</h4>";
 		echo				"<div class='row'>";
@@ -1182,11 +1207,11 @@ class USER
 	public function printAssetRow($asset) {
 				echo "<td style='width: 59%'>".htmlentities($asset['description'])			."</td>";
 				echo "<td>".htmlentities($asset['quantity'])			."</td>";
-				echo "<td>".htmlentities($asset['price'])			." ".htmlentities($asset['currency'])."</td>";
 				echo "<td>".htmlentities($asset['crtrno'])				."</td>";
 				echo "<td>".htmlentities($asset['purchaseorder_id'])	."</td>";
 				echo "<td>".htmlentities($asset['release_version'])		."</td>";
 				echo "<td>".htmlentities($asset['expirydate'])			."</td>";
+				echo "<td>".htmlentities($asset['status'])			."</td>";
 	}
 	
 	public function printRenewalRow($row) {

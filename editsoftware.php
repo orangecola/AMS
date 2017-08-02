@@ -25,8 +25,6 @@
 		$candidate['asset_ID'] 				= trim($_POST['assetid']);
 		$candidate['description']			= trim($_POST['description']);
 		$candidate['quantity']				= trim($_POST['quantity']);
-		$candidate['price']					= trim($_POST['price']);
-		$candidate['currency']				= trim($_POST['currency']);
 		$candidate['crtrno']				= trim($_POST['crtrno']);
 		$candidate['purchaseorder_id']		= trim($_POST['pono']);
 		$candidate['release_version']		= trim($_POST['release']);
@@ -67,7 +65,7 @@
 		
 		//Check price if it is integer / double
 		//Check quantity if it is an integer
-		if (!(($user->validatesAsInt($candidate['price']) or $user->validatesAsDouble($candidate['price'])) and $user->validatesAsInt($candidate['quantity']))) {
+		if (!($user->validatesAsInt($candidate['quantity']))) {
 			$NumberError = 1;
 		}
 		
@@ -142,7 +140,7 @@
 			  ?>
 				<div class="item form-group">
 				<div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-				  <a class="btn btn-primary" href="assetlist.php">Cancel</a>
+				  <a class="btn btn-primary" href="softwarelist.php">Cancel</a>
 				  <button type="button" class="btn btn-primary" onclick="resetFields()">Discard Changes</button>
 				  <button type="submit" class="btn btn-success">Submit</button>
 				</div>
@@ -164,12 +162,12 @@
 			document.getElementsByName("assetid")[0].value = <?php echo json_encode($result[1]['asset_ID']);?>;
 			document.getElementsByName("description")[0].innerHTML = <?php echo json_encode($result[1]['description']);?>;
 			document.getElementsByName("quantity")[0].value = <?php echo json_encode($result[1]['quantity']);?>;
-			document.getElementsByName("price")[0].value = <?php echo json_encode($result[1]['price']);?>;
 			document.getElementsByName("crtrno")[0].value = <?php echo json_encode($result[1]['crtrno']);?>;
 			document.getElementsByName("pono")[0].value = <?php echo json_encode($result[1]['purchaseorder_id']);?>;
 			document.getElementsByName("expirydate")[0].value = <?php echo json_encode($result[1]['expirydate']);?>;
 			document.getElementsByName("remarks")[0].innerHTML = <?php echo json_encode($result[1]['remarks']);?>;
 			document.getElementsByName("startdate")[0].value = <?php echo json_encode($result[1]['start_date']);?>;
+			document.getElementsByName("status")[0].value = <?php echo json_encode($result[1]['status']);?>;
 			document.getElementsByName("license")[0].value = <?php echo json_encode($result[1]['license_explanation']);?>;
 		}
 		resetFields();
@@ -177,10 +175,6 @@
 		//Change "Select Option" To Saved Fields
 		document.getElementsByName("release")[0].children[0].innerHTML 		= <?php echo json_encode($result[1]['release_version'].' (No Change)');?>;
 		document.getElementsByName("release")[0].children[0].value 			= <?php echo json_encode($result[1]['release_version']);?>;
-		document.getElementsByName("currency")[0].children[0].innerHTML 	= <?php echo json_encode($result[1]['currency'].' (No Change)');?>;
-		document.getElementsByName("currency")[0].children[0].value 		= <?php echo json_encode($result[1]['currency']);?>;
-		document.getElementsByName("status")[0].children[0].innerHTML		= <?php echo json_encode($result[1]['status'].' (No Change)');?>;
-		document.getElementsByName("status")[0].children[0].value			= <?php echo json_encode($result[1]['status']);?>;
 		document.getElementsByName("vendor")[0].children[0].innerHTML		= <?php echo json_encode($result[1]['vendor'].' (No Change)');?>;
 		document.getElementsByName("vendor")[0].children[0].value			= <?php echo json_encode($result[1]['vendor']);?>;
 		document.getElementsByName("procure")[0].children[0].innerHTML		= <?php echo json_encode($result[1]['procured_from'].' (No Change)');?>;

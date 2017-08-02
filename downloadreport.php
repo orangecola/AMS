@@ -20,6 +20,10 @@
 		$header = 'CR / TR No ' . $_GET['crtrno'];
 		$result = $user->downloadReport('crtrno', $_GET['crtrno']);
 	}
+	else if (isset($_GET['everything'])) {
+		$header = 'Asset Register';
+		$result = $user->downloadReport('nehr_Asset.asset_tag', '%');
+	}
 	else {
 		header('Location: generatereport.php');
 	}

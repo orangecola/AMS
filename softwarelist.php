@@ -53,11 +53,11 @@
 				  <th>Asset ID</th>
 				  <th>Description</th>
 				  <th>Quantity</th>
-				  <th>Price</th>
 				  <th>CR / TR Number</th>
 				  <th>PO Number</th>
 				  <th>Release version</th>
 				  <th>Expiry Date</th>
+				  <th>Status</th>
 				  <th>Vendor</th>
 				  <th>Procured From</th>
 				  <th>Short Name</th>

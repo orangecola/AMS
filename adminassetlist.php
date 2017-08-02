@@ -63,11 +63,11 @@
 				  <th>Type</th>
 				  <th>Description</th>
 				  <th>Qty</th>
-				  <th>Price</th>
 				  <th>CR / TR Number</th>
 				  <th>PO Number</th>
 				  <th>Release version</th>
-				  <th>Expiry Date</th>				  
+				  <th>Expiry Date</th>
+				  <th>Status</th>
 				</tr>
 			  </thead>
 			  <tbody>

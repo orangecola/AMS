@@ -91,7 +91,7 @@
 			  </div>';}
 		  ?>
 			<br />
-			<form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post">
+			<form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post" novalidate>
 				<?php require 'components/renewal.php' ?>
 			  
 			  <div class="item form-group">
@@ -106,7 +106,8 @@
 		</div>
 	  </div>
 	</div>
-
+  </div>
+</div>
 <script>
 	function resetFields() {
 	document.getElementsByName("assetid")[0].value =	<?php echo json_encode($result[1]['asset_ID']);?>;

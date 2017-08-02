@@ -77,9 +77,14 @@
 							echo "<td>".htmlentities($row['asset_ID'])		."</td>";
 							echo "<td>".htmlentities($row['description'])	."</td>";
 							echo "<td>".htmlentities($row['expirydate'])	."</td>";
-							echo "<td>$".htmlentities($row['price'])		."</td>";
+							if (isset($row['price'])) {
+								echo "<td>$".htmlentities($row['price'])		."</td>";
+								$total += $row['price'];
+							}
+							else {
+								echo "<td>NA</td>";
+							}
 							echo '</tr>';
-							$total += $row['price'];
 						}
 						if (isset($result['renewal'])) {
 							foreach($result['renewal'] as $row) {
@@ -116,7 +121,7 @@
 			  </div>
 			  <!-- /.row -->
 			  <!-- this row will not appear when printing -->
-			  <div class="row no-print">
+			  <div class="row hidden-print">
 				<div class="col-xs-12">
 				  <button class="btn btn-default" onclick="window.print();"><i class="fa fa-print"></i> Print</button>
 				  <a class="btn btn-default" href="downloadreport.php?<?php

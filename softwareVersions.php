@@ -140,8 +140,6 @@
 		document.getElementsByName("assetid")[0].value = versions[p1]["asset_ID"];
 		document.getElementsByName("description")[0].innerHTML = versions[p1]["description"];
 		document.getElementsByName("quantity")[0].value = versions[p1]["quantity"];
-		document.getElementsByName("price")[0].value = versions[p1]["price"];
-		document.getElementsByName("currency")[0].value = versions[p1]["currency"];
 		document.getElementsByName("crtrno")[0].value = versions[p1]["crtrno"];
 		document.getElementsByName("pono")[0].value = versions[p1]["purchaseorder_id"];
 		document.getElementsByName("release")[0].value = versions[p1]["release_version"];
@@ -162,14 +160,12 @@
 	document.getElementsByName("assetid")[0].disabled = true;
 	document.getElementsByName("description")[0].disabled = true;
 	document.getElementsByName("quantity")[0].disabled = true;
-	document.getElementsByName("price")[0].disabled = true;
 	document.getElementsByName("crtrno")[0].disabled = true;
 	document.getElementsByName("pono")[0].disabled = true;
 	document.getElementsByName("release")[0].disabled = true;
 	document.getElementsByName("expirydate")[0].disabled = true;
 	document.getElementsByName("status")[0].disabled = true;
 	document.getElementsByName("remarks")[0].disabled = true;
-	document.getElementsByName("currency")[0].disabled = true;
 	document.getElementsByName("vendor")[0].disabled = true;
 	document.getElementsByName("procure")[0].disabled = true;
 	document.getElementsByName("shortname")[0].disabled = true;

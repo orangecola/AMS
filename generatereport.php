@@ -81,6 +81,7 @@
 			  </div>
 			  <div class="item form-group">
 				<div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+				  <a class="btn btn-default" href="downloadreport.php?everything=1"><i class="fa fa-download"></i> Download Full Asset Register</a>
 				  <button type="submit" class="btn btn-success">Submit</button>
 				</div>
 			  </div>

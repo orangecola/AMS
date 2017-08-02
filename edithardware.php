@@ -6,7 +6,7 @@
 	$Success=0;
 	$ParentError = 0;
 	$distinct = $user->getDistinct();
-	$options = $user->getOptions('nehr_Options', ['currency', 'releaseversion', 'status', 'class', 'brand']);;
+	$options = $user->getOptions('nehr_Options', ['currency', 'releaseversion', 'status', 'class', 'brand']);
 	
 	foreach($distinct[3] as &$value) {
 		$value = $value[0];
@@ -18,7 +18,7 @@
 	$result = $user->getHardware($_GET['id']);
 	
 	if (!$result[0]) {
-		header('Location: assetlist.php');
+		header('Location: hardwarelist.php');
 	}
 	
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -31,18 +31,24 @@
 		$candidate['purchaseorder_id']	= trim($_POST['pono']);
 		$candidate['release_version']	= trim($_POST['release']);
 		$candidate['expirydate']		= trim($_POST['expirydate']);
+		$candidate['status'] 			= trim($_POST['status']);
 		$candidate['remarks']			= trim($_POST['remarks']);
 		
-		$candidate['class']				= trim($_POST['class']);
-		$candidate['brand']				= trim($_POST['brand']);
-		$candidate['audit_date']		= trim($_POST['auditdate']);
-		$candidate['component']			= trim($_POST['component']);
-		$candidate['label']				= trim($_POST['label']);
-		$candidate['serial']			= trim($_POST['serial']);
-		$candidate['location']			= trim($_POST['location']);
-		$candidate['status']			= trim($_POST['status']);
-		$candidate['replacing']			= trim($_POST['replacing']);
-		$candidate['excelsheet']		= trim($_POST['excelsheet']);
+		$candidate['price']			= trim($_POST['price']);
+		$candidate['currency']		= trim($_POST['currency']);
+		$candidate['IHiS_Asset_ID']	= trim($_POST['IHiS_Asset_ID']);
+		$candidate['CR359 / CR506']	= trim($_POST['CR359']);
+		$candidate['CR560']			= trim($_POST['CR560']);
+		$candidate['POST-CR560']	= trim($_POST['POST-CR560']);
+		$candidate['class'] 		= trim($_POST['class']);
+		$candidate['brand']			= trim($_POST['brand']);
+		$candidate['audit_date'] 	= trim($_POST['auditdate']);
+		$candidate['component']		= trim($_POST['component']);
+		$candidate['label']			= trim($_POST['label']);
+		$candidate['serial'] 		= trim($_POST['serial']);
+		$candidate['location'] 		= trim($_POST['location']);
+		$candidate['excelsheet'] 	= trim($_POST['excelsheet']);
+		$candidate['replacing']		= trim($_POST['replacing']);
 		$same = true;
 		//Similarility Check
 		foreach ($user->assetFields as $value) {
@@ -188,8 +194,13 @@
 				document.getElementsByName("crtrno")[0].value = <?php echo json_encode($result[1]['crtrno']);?>;
 				document.getElementsByName("pono")[0].value = <?php echo json_encode($result[1]['purchaseorder_id']);?>;
 				document.getElementsByName("expirydate")[0].value = <?php echo json_encode($result[1]['expirydate']);?>;
+				document.getElementsByName("status")[0].value = <?php echo json_encode($result[1]['status']);?>;
 				document.getElementsByName("remarks")[0].innerHTML = <?php echo json_encode($result[1]['remarks']);?>;
 				
+				document.getElementsByName("IHiS_Asset_ID")[0].value = <?php echo json_encode($result[1]['IHiS_Asset_ID']);?>;
+				document.getElementsByName("CR359")[0].value = <?php echo json_encode($result[1]['CR359 / CR506']);?>;
+				document.getElementsByName("CR560")[0].value = <?php echo json_encode($result[1]['CR560']);?>;
+				document.getElementsByName("POST-CR560")[0].value = <?php echo json_encode($result[1]['POST-CR560']);?>;
 				document.getElementsByName("auditdate")[0].value = <?php echo json_encode($result[1]['audit_date']);?>;
 				document.getElementsByName("component")[0].value = <?php echo json_encode($result[1]['component']);?>;
 				document.getElementsByName("label")[0].value = <?php echo json_encode($result[1]['label']);?>;
@@ -205,8 +216,6 @@
 	document.getElementsByName("release")[0].children[0].value 			= <?php echo json_encode($result[1]['release_version']);?>;
 	document.getElementsByName("currency")[0].children[0].innerHTML 	= <?php echo json_encode($result[1]['currency'].' (No Change)');?>;
 	document.getElementsByName("currency")[0].children[0].value 		= <?php echo json_encode($result[1]['currency']);?>;
-	document.getElementsByName("status")[0].children[0].innerHTML		= <?php echo json_encode($result[1]['status'].' (No Change)');?>;
-	document.getElementsByName("status")[0].children[0].value			= <?php echo json_encode($result[1]['status']);?>;
 	document.getElementsByName("class")[0].children[0].innerHTML		= <?php echo json_encode($result[1]['class'].' (No Change)');?>;
 	document.getElementsByName("class")[0].children[0].value			= <?php echo json_encode($result[1]['class']);?>;
 	document.getElementsByName("brand")[0].children[0].innerHTML		= <?php echo json_encode($result[1]['brand'].' (No Change)');?>;

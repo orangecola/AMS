@@ -9,7 +9,8 @@
 	}
 	
 	$result = $user->getHardwareVersions($_GET['id']);
-	$options = $user->getOptions();
+	$options = $user->getOptions('nehr_Options', ['currency', 'releaseversion', 'status', 'class', 'brand']);
+	
 	if (!$result[0]) {
 		header('Location: adminassetlist.php');
 	}
@@ -59,6 +60,7 @@
 			echo "versions[{$row['version']}] = ".json_encode($row).";";
 		}
 	?>
+	console.log(versions);
 </script>
 <!-- page content -->
 <div class="right_col" role="main">
@@ -138,13 +140,18 @@
 		document.getElementsByName("assetid")[0].value = versions[p1]["asset_ID"];
 		document.getElementsByName("description")[0].innerHTML = versions[p1]["description"];
 		document.getElementsByName("quantity")[0].value = versions[p1]["quantity"];
-		document.getElementsByName("price")[0].value = versions[p1]["price"];
 		document.getElementsByName("crtrno")[0].value = versions[p1]["crtrno"];
 		document.getElementsByName("pono")[0].value = versions[p1]["purchaseorder_id"];
 		document.getElementsByName("release")[0].value = versions[p1]["release_version"];
 		document.getElementsByName("expirydate")[0].value = versions[p1]["expirydate"];
 		document.getElementsByName("remarks")[0].innerHTML = versions[p1]["remarks"];
 		
+		document.getElementsByName("price")[0].value = versions[p1]["price"];
+		document.getElementsByName("currency")[0].value = versions[p1]["currency"];
+		document.getElementsByName("IHiS_Asset_ID")[0].value = versions[p1]["IHiS_Asset_ID"];
+		document.getElementsByName("CR359")[0].value = versions[p1]["CR359 / CR506"];
+		document.getElementsByName("CR560")[0].value = versions[p1]["CR560"];
+		document.getElementsByName("POST-CR560")[0].value = versions[p1]["POST-CR560"];
 		document.getElementsByName("class")[0].value = versions[p1]["class"];
 		document.getElementsByName("brand")[0].value = versions[p1]["brand"];
 		document.getElementsByName("auditdate")[0].value = versions[p1]["audit_date"];
@@ -156,7 +163,6 @@
 		document.getElementsByName("replacing")[0].value = versions[p1]["replacing"];
 		document.getElementsByName("excelsheet")[0].value = versions[p1]["excelsheet"];
 	}
-	document.getElementsByTagName("BODY")[0].setAttribute("class", "nav-md");
 	
 	document.getElementsByName("assetid")[0].disabled = true;
 	document.getElementsByName("description")[0].disabled = true;
@@ -178,6 +184,10 @@
 	document.getElementsByName("location")[0].disabled = true;
 	document.getElementsByName("replacing")[0].disabled = true;
 	document.getElementsByName("excelsheet")[0].disabled = true;
+	document.getElementsByName("IHiS_Asset_ID")[0].disabled = true;
+	document.getElementsByName("CR359")[0].disabled = true;
+	document.getElementsByName("CR560")[0].disabled = true;
+	document.getElementsByName("POST-CR560")[0].disabled = true;
 	
 </script>    
 <!-- /page content -->

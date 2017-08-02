@@ -12,12 +12,9 @@
 	}
 	
 	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-		
 		$asset['asset_ID'] 			= trim($_POST['assetid']);
 		$asset['description'] 		= trim($_POST['description']);
 		$asset['quantity'] 			= trim($_POST['quantity']);
-		$asset['price']				= trim($_POST['price']);
-		$asset['currency']			= trim($_POST['currency']);
 		$asset['crtrno']	 		= trim($_POST['crtrno']);
 		$asset['purchaseorder_id'] 	= trim($_POST['pono']);
 		$asset['release_version']	= trim($_POST['release']);
@@ -46,6 +43,12 @@
 		
 		
 		else if (isset($_POST['hardware'])) {
+			$asset['price']			= trim($_POST['price']);
+			$asset['currency']		= trim($_POST['currency']);
+			$asset['IHiS_Asset_ID']	= trim($_POST['IHiS_Asset_ID']);
+			$asset['CR359 / CR506']	= trim($_POST['CR359']);
+			$asset['CR560']			= trim($_POST['CR560']);
+			$asset['POST-CR560']	= trim($_POST['POST-CR560']);
 			$asset['class'] 		= trim($_POST['class']);
 			$asset['brand']			= trim($_POST['brand']);
 			$asset['audit_date'] 	= trim($_POST['auditdate']);
@@ -53,20 +56,13 @@
 			$asset['label']			= trim($_POST['label']);
 			$asset['serial'] 		= trim($_POST['serial']);
 			$asset['location'] 		= trim($_POST['location']);
+			$asset['excelsheet'] 	= trim($_POST['excelsheet']);
 			$asset['replacing']		= trim($_POST['replacing']);
-			
-			if (!(in_array($asset['replacing'], $distinct[3])) and $asset['replacing'] != "") {
-				$ParentError = 1;
-			}
-		}
 		
+		}
 		
 		if (!($user->check_date($asset['expirydate']))) {
 				$DateError = 1;
-		}
-		
-		if (!(in_array($asset['parent'], $distinct[3])) and $asset['parent'] != "") {
-				$ParentError = 1;
 		}
 		
 		if (in_array($asset['asset_ID'], $distinct[3])) {

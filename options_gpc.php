@@ -70,7 +70,7 @@
 			echo '
 			<form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" method="post">
 				<td><input type="text" placeholder="Field to add" required="required" class="form-control"  name="value"></td>
-				<input type="hidden" name="add" value="'.$row['gpc_Options_Type'].'">
+				<input type="hidden" name="add" value="'$option'">
 				<td><button type="submit" class="btn btn-success btn-xs"><i class="fa fa-save"></i> Add</button></td>
 			</form>
 			</tr>

@@ -12,6 +12,11 @@
 		echo "</td>";
 		echo "<td>".htmlentities($hardware['asset_ID'])."</td>";
 		$GLOBALS['user']->printAssetRow($hardware);
+		echo "<td>".htmlentities($hardware['price'])			." ".htmlentities($hardware['currency'])."</td>";
+		echo "<td>".htmlentities($hardware['IHiS_Asset_ID'])."</td>";
+		echo "<td>".htmlentities($hardware['CR359 / CR506'])."</td>";
+		echo "<td>".htmlentities($hardware['CR560'])."</td>";
+		echo "<td>".htmlentities($hardware['POST-CR560'])."</td>";
 		echo "<td>".htmlentities($hardware['class'])."</td>";
 		echo "<td>".htmlentities($hardware['brand'])."</td>";
 		echo "<td>".htmlentities($hardware['audit_date'])."</td>";
@@ -54,11 +59,16 @@
 				  <th>Asset ID</th>
 				  <th>Description</th>
 				  <th>Quantity</th>
-				  <th>Price</th>
 				  <th>CR / TR Number</th>
 				  <th>PO Number</th>
 				  <th>Release version</th>
 				  <th>Expiry Date</th>
+				  <th>Status</th>
+				  <th>Price</th>
+				  <th>IHiS_Asset_ID</th>
+				  <th>CR359/CR506</th>
+				  <th>CR560</th>
+				  <th>Post-CR560</th>
 				  <th>Class</th>
 				  <th>Brand</th>
 				  <th>Audit Date</th>
