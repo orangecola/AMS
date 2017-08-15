@@ -31,6 +31,7 @@
 		$candidate['expirydate']			= trim($_POST['expirydate']);
 		$candidate['remarks']				= trim($_POST['remarks']);
 		$candidate['status']				= trim($_POST['status']);
+		$candidate['poc']					= trim($_POST['poc']);
 		
 		$candidate['vendor']				= trim($_POST['vendor']);
 		$candidate['procured_from']			= trim($_POST['procure']);
@@ -169,6 +170,7 @@
 			document.getElementsByName("startdate")[0].value = <?php echo json_encode($result[1]['start_date']);?>;
 			document.getElementsByName("status")[0].value = <?php echo json_encode($result[1]['status']);?>;
 			document.getElementsByName("license")[0].value = <?php echo json_encode($result[1]['license_explanation']);?>;
+			document.getElementsByName("poc")[0].value = <?php echo json_encode($result[1]['poc']);?>;
 		}
 		resetFields();
 

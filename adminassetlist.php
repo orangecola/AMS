@@ -68,6 +68,7 @@
 				  <th>Release version</th>
 				  <th>Expiry Date</th>
 				  <th>Status</th>
+				  <th>Point of Contact</th>
 				</tr>
 			  </thead>
 			  <tbody>

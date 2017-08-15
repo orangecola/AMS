@@ -146,6 +146,7 @@
 		document.getElementsByName("expirydate")[0].value = versions[p1]["expirydate"];
 		document.getElementsByName("status")[0].value = versions[p1]["status"];
 		document.getElementsByName("remarks")[0].innerHTML = versions[p1]["remarks"];
+		document.getElementsByName("poc")[0].value = versions[p1]["poc"];
 		
 		document.getElementsByName("vendor")[0].value = versions[p1]["vendor"];
 		document.getElementsByName("procure")[0].value = versions[p1]["procured_from"];
@@ -166,6 +167,7 @@
 	document.getElementsByName("expirydate")[0].disabled = true;
 	document.getElementsByName("status")[0].disabled = true;
 	document.getElementsByName("remarks")[0].disabled = true;
+	document.getElementsByName("poc")[0].disabled = true;
 	document.getElementsByName("vendor")[0].disabled = true;
 	document.getElementsByName("procure")[0].disabled = true;
 	document.getElementsByName("shortname")[0].disabled = true;

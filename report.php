@@ -17,6 +17,10 @@
 		$header = 'CR / TR No ' . $_POST['crtrno'];
 		$result = $user->generateReport('crtrno', $_POST['crtrno']);
 	}
+	else if (isset($_POST['expirydate'])) {
+		$header = 'Expiring before ' . $_POST['expirydate'];
+		$result = $user->generateReport('expirydate', $_POST['expirydate']);
+	}
 	else {
 		header('Location: generatereport.php');
 	}
@@ -133,6 +137,9 @@
 					}
 					else if (isset($_POST['crtrno'])) {
 						echo 'crtrno='. $_POST['crtrno'];
+					}
+					else if (isset($_POST['expirydate'])) {
+						echo 'expirydate='. $_POST['expirydate'];
 					};
 				  ?>"><i class="fa fa-download"></i> Download Report</a>
 				</div>

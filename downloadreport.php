@@ -20,6 +20,10 @@
 		$header = 'CR / TR No ' . $_GET['crtrno'];
 		$result = $user->downloadReport('crtrno', $_GET['crtrno']);
 	}
+	else if (isset($_GET['expirydate'])) {
+		$header = 'Expiring before ' . $_GET['expirydate'];
+		$result = $user->downloadReport('expirydate', $_GET['expirydate']);
+	}
 	else if (isset($_GET['everything'])) {
 		$header = 'Asset Register';
 		$result = $user->downloadReport('nehr_Asset.asset_tag', '%');
@@ -29,7 +33,7 @@
 	}
 	$objPHPExcel = new PHPExcel();
 	$ActiveSheetIndex = 0;
-	if (sizeof($result['hardware']) > 0) {
+	if (isset($result['hardware']) and sizeof($result['hardware']) > 0) {
 		if ($ActiveSheetIndex > 0) {
 			$objPHPExcel->createSheet();
 		}
@@ -59,7 +63,7 @@
 		$ActiveSheetIndex++;
 	}
 	
-	if (sizeof($result['software']) > 0) {
+	if (isset($result['software']) and sizeof($result['software']) > 0) {
 		if ($ActiveSheetIndex > 0) {
 			$objPHPExcel->createSheet();
 		}
@@ -85,7 +89,7 @@
 		}
 	}
 	
-	if (sizeof($result['renewal']) > 0) {
+	if (isset($result['renewal']) and sizeof($result['renewal']) > 0) {
 		if ($ActiveSheetIndex > 0) {
 			$objPHPExcel->createSheet();
 		}
@@ -126,5 +130,4 @@
 	header("Content-Type: application/force-download");
 	header("Content-Type: application/download");
 	$objWriter->save('php://output');
-	
 ?>

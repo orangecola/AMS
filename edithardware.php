@@ -33,10 +33,12 @@
 		$candidate['expirydate']		= trim($_POST['expirydate']);
 		$candidate['status'] 			= trim($_POST['status']);
 		$candidate['remarks']			= trim($_POST['remarks']);
+		$candidate['poc']				= trim($_POST['poc']);
 		
 		$candidate['price']			= trim($_POST['price']);
 		$candidate['currency']		= trim($_POST['currency']);
 		$candidate['IHiS_Asset_ID']	= trim($_POST['IHiS_Asset_ID']);
+		$candidate['IHiS_Invoice']	= trim($_POST['IHiS_Invoice']);
 		$candidate['CR359 / CR506']	= trim($_POST['CR359']);
 		$candidate['CR560']			= trim($_POST['CR560']);
 		$candidate['POST-CR560']	= trim($_POST['POST-CR560']);
@@ -196,8 +198,10 @@
 				document.getElementsByName("expirydate")[0].value = <?php echo json_encode($result[1]['expirydate']);?>;
 				document.getElementsByName("status")[0].value = <?php echo json_encode($result[1]['status']);?>;
 				document.getElementsByName("remarks")[0].innerHTML = <?php echo json_encode($result[1]['remarks']);?>;
+				document.getElementsByName("poc")[0].value = <?php echo json_encode($result[1]['poc']);?>;
 				
 				document.getElementsByName("IHiS_Asset_ID")[0].value = <?php echo json_encode($result[1]['IHiS_Asset_ID']);?>;
+				document.getElementsByName("IHiS_Invoice")[0].value = <?php echo json_encode($result[1]['IHiS_Invoice']);?>;
 				document.getElementsByName("CR359")[0].value = <?php echo json_encode($result[1]['CR359 / CR506']);?>;
 				document.getElementsByName("CR560")[0].value = <?php echo json_encode($result[1]['CR560']);?>;
 				document.getElementsByName("POST-CR560")[0].value = <?php echo json_encode($result[1]['POST-CR560']);?>;

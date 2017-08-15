@@ -3,7 +3,7 @@ class USER
 {
     private $db;
 	public $softwareFields 		= array('vendor', 'procured_from', 'shortname', 'purpose', 'contract_type', 'start_date', 'license_explanation');
-	public $assetFields 		= array('asset_ID', 'description', 'quantity', 'crtrno', 'purchaseorder_id', 'release_version', 'expirydate', 'remarks', 'status');
+	public $assetFields 		= array('asset_ID', 'description', 'quantity', 'crtrno', 'purchaseorder_id', 'release_version', 'expirydate', 'remarks', 'status', 'poc');
 	public $hardwareFields 		= array('IHiS_Asset_ID', 'CR359 / CR506', 'CR560', 'POST-CR560', 'price', 'currency', 'class', 'brand', 'audit_date', 'component', 'label', 'serial', 'location', 'replacing', 'excelsheet'); 
 	public $userFields 			= array('username', 'password', 'role', 'status');
 	function __construct($DB_con)
@@ -47,9 +47,9 @@ class USER
 		
 		$stmt = $this->db->prepare("INSERT INTO 
 			nehr_Asset(
-			asset_tag, asset_ID, description, quantity, purchaseorder_id, release_version, expirydate, remarks, crtrno, status, version, lastedited
+			asset_tag, asset_ID, description, quantity, purchaseorder_id, release_version, expirydate, remarks, crtrno, status, version, lastedited, poc
 			) VALUES (
-			LAST_INSERT_ID(), :asset_ID, :description, :quantity, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :status, :version, :lastedited)");
+			LAST_INSERT_ID(), :asset_ID, :description, :quantity, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :status, :version, :lastedited, :poc)");
 		$stmt->bindParam(':asset_ID', 			$asset['asset_ID']);
 		$stmt->bindParam(':description', 		$asset['description']);
 		$stmt->bindParam(':quantity', 			$asset['quantity']);
@@ -60,6 +60,7 @@ class USER
 		$stmt->bindParam(':crtrno', 			$asset['crtrno']);
 		$stmt->bindParam(':version',			$asset['version']);
 		$stmt->bindParam(':status',				$asset['status']);
+		$stmt->bindParam(':poc',				$asset['poc']);
 		date_default_timezone_set('Asia/Singapore');
 		$time = date("Y-m-d H:i:s");
 		$stmt->bindParam(':lastedited',			$time);
@@ -90,11 +91,12 @@ class USER
 	public function addHardware($asset) {
 		$this->addAsset($asset);
 		
-		$stmt = $this->db->prepare("INSERT INTO nehr_Hardware(asset_tag, `IHiS_Asset_ID`, `CR359 / CR506`,	`CR560`, `POST-CR560`, price, currency, class, brand, audit_date, component, label, serial, location, replacing, version, excelsheet) 
+		$stmt = $this->db->prepare("INSERT INTO nehr_Hardware(asset_tag, `IHiS_Asset_ID`, IHiS_Invoice, `CR359 / CR506`,	`CR560`, `POST-CR560`, price, currency, class, brand, audit_date, component, label, serial, location, replacing, version, excelsheet) 
 		VALUES 
-		(LAST_INSERT_ID(), :IHiS_Asset_ID, :CR359, :CR560, :POSTCR560, :price, :currency, :class, :brand, :audit_date, :component, :label, :serial, :location, :replacing, :version, :excelsheet)");
+		(LAST_INSERT_ID(), :IHiS_Asset_ID, :IHiS_Invoice, :CR359, :CR560, :POSTCR560, :price, :currency, :class, :brand, :audit_date, :component, :label, :serial, :location, :replacing, :version, :excelsheet)");
 		
 		$stmt->bindParam(':IHiS_Asset_ID', 	$asset['IHiS_Asset_ID']);
+		$stmt->bindParam(':IHiS_Invoice', 	$asset['IHiS_Invoice']);
 		$stmt->bindParam(':CR359', 			$asset['CR359 / CR506']);
 		$stmt->bindParam(':CR560', 			$asset['CR560']);
 		$stmt->bindParam(':POSTCR560', 		$asset['POST-CR560']);
@@ -133,9 +135,9 @@ class USER
 	}
 	
 	public function editasset($asset) {
-		$stmt = $this->db->prepare("INSERT INTO nehr_Asset(asset_tag, asset_ID, description, quantity,  purchaseorder_id, release_version, expirydate, remarks, crtrno, version, status, lastedited) 
+		$stmt = $this->db->prepare("INSERT INTO nehr_Asset(asset_tag, asset_ID, description, quantity,  purchaseorder_id, release_version, expirydate, remarks, crtrno, version, status, lastedited, poc) 
 		VALUES 
-		(:asset_tag, :asset_ID, :description, :quantity, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :version, :status, :lastedited)");
+		(:asset_tag, :asset_ID, :description, :quantity, :purchaseorder_id, :release_version, :expirydate, :remarks, :crtrno, :version, :status, :lastedited, :poc)");
 		$stmt->bindParam(':asset_tag',			$asset['asset_tag']);
 		$stmt->bindParam(':asset_ID', 			$asset['asset_ID']);
 		$stmt->bindParam(':description', 		$asset['description']);
@@ -147,7 +149,7 @@ class USER
 		$stmt->bindParam(':crtrno', 			$asset['crtrno']);
 		$stmt->bindParam(':version',			$asset['version']);
 		$stmt->bindParam(':status', 			$asset['status']);
-		
+		$stmt->bindParam(':poc',				$asset['poc']);
 		
 		date_default_timezone_set('Asia/Singapore');
 		$time = date("Y-m-d H:i:s");
@@ -179,12 +181,13 @@ class USER
 	public function editHardware($asset) {
 		$this->editAsset($asset);
 		
-		$stmt = $this->db->prepare("INSERT INTO nehr_Hardware(asset_tag, `IHiS_Asset_ID`, `CR359 / CR506`,	`CR560`, `POST-CR560`, price, currency, class, brand, audit_date, component, label, serial, location, replacing, version, excelsheet) 
+		$stmt = $this->db->prepare("INSERT INTO nehr_Hardware(asset_tag, `IHiS_Asset_ID`, IHiS_Invoice, `CR359 / CR506`,	`CR560`, `POST-CR560`, price, currency, class, brand, audit_date, component, label, serial, location, replacing, version, excelsheet) 
 		VALUES 
-		(:asset_tag, :IHiS_Asset_ID, :CR359, :CR560, :POSTCR560, :price, :currency, :class, :brand, :audit_date, :component, :label, :serial, :location, :replacing, :version, :excelsheet)");
+		(:asset_tag, :IHiS_Asset_ID, :IHiS_Invoice, :CR359, :CR560, :POSTCR560, :price, :currency, :class, :brand, :audit_date, :component, :label, :serial, :location, :replacing, :version, :excelsheet)");
 		$stmt->bindParam(':asset_tag',	$asset['asset_tag']);
 		
 		$stmt->bindParam(':IHiS_Asset_ID', 	$asset['IHiS_Asset_ID']);
+		$stmt->bindParam(':IHiS_Invoice', 	$asset['IHiS_Invoice']);
 		$stmt->bindParam(':CR359', 			$asset['CR359 / CR506']);
 		$stmt->bindParam(':CR560', 			$asset['CR560']);
 		$stmt->bindParam(':POSTCR560', 		$asset['POST-CR560']);
@@ -783,27 +786,71 @@ class USER
 		return $result;
 	}
 	public function generateReport($type, $filter) {
-		  $result = array();
-		  $entry = '%'.$filter.'%';
-		  $stmt = $this->db->prepare("SELECT * FROM nehr_Asset, nehr_Asset_version WHERE ".$type." LIKE :filter AND
-		  nehr_Asset_version.asset_tag 			= nehr_Asset.asset_tag AND
-		  nehr_Asset_version.current_version 	= nehr_Asset.version");
-		  $stmt->bindparam(":filter", $entry);
-		  $stmt->execute();
-		  
-		  $this->savelog($_SESSION['username'], "generated report for $type $filter");
-		  $result['asset'] = $stmt->fetchAll();
-		  
-		  if ($type == 'purchaseorder_id') {
-			  $stmt = $this->db->prepare("SELECT * FROM nehr_Renewal WHERE ".$type." LIKE :filter");
+		$result = array();
+		if ($type == 'expirydate') {
+			  $stmt = $this->db->prepare("SELECT * FROM nehr_Asset 
+			  WHERE str_to_date(expirydate, '%m/%d/%Y') <= str_to_date(:expirydate, '%m/%d/%Y')
+			  AND NOT status='Decommissioned'");
+			  $stmt->bindparam(":expirydate", $filter);
+			  $stmt->execute();
+			  
+			  $this->savelog($_SESSION['username'], "generated report for $type $filter");
+			  $result['asset'] = $stmt->fetchAll();
+		}
+		else {
+			  $entry = '%'.$filter.'%';
+			  $stmt = $this->db->prepare("SELECT * FROM nehr_Asset, nehr_Asset_version WHERE ".$type." LIKE :filter AND
+			  nehr_Asset_version.asset_tag 			= nehr_Asset.asset_tag AND
+			  nehr_Asset_version.current_version 	= nehr_Asset.version");
 			  $stmt->bindparam(":filter", $entry);
 			  $stmt->execute();
-			  $result['renewal'] = $stmt->fetchAll();	
-		  }  
+			  
+			  $this->savelog($_SESSION['username'], "generated report for $type $filter");
+			  $result['asset'] = $stmt->fetchAll();
+			  
+			  if ($type == 'purchaseorder_id') {
+				  $stmt = $this->db->prepare("SELECT * FROM nehr_Renewal WHERE ".$type." LIKE :filter");
+				  $stmt->bindparam(":filter", $entry);
+				  $stmt->execute();
+				  $result['renewal'] = $stmt->fetchAll();	
+			  } 
+		}		  
 		  return $result;
 	}
     
 	public function downloadReport($type, $filter) {
+		echo $filter;
+		$result = array();
+		if ($type == 'expirydate') {
+			  $stmt = $this->db->prepare("SELECT nehr_Asset.*, nehr_Hardware.*
+			  FROM nehr_Asset_version INNER JOIN nehr_Hardware, nehr_Asset  
+			  WHERE
+			  nehr_Asset_version.asset_tag = nehr_Hardware.asset_tag AND
+			  nehr_Asset_version.asset_tag = nehr_Asset.asset_tag AND
+			  nehr_Asset_version.current_version 	= nehr_Asset.version AND
+			  nehr_Asset_version.current_version = nehr_Hardware.version AND
+			  str_to_date(expirydate, '%m/%d/%Y') <= str_to_date(:expirydate, '%m/%d/%Y')
+			  AND NOT status='Decommissioned'");
+			  $stmt->bindparam(":expirydate", $filter);
+			  $stmt->execute();
+			  
+			  $result['hardware'] = $stmt->fetchAll();
+			  
+			  $stmt = $this->db->prepare("SELECT nehr_Asset.*, nehr_Software.*
+			  FROM nehr_Asset_version INNER JOIN nehr_Software, nehr_Asset 
+			  WHERE
+			  nehr_Asset_version.asset_tag = nehr_Software.asset_tag AND
+              nehr_Asset_version.asset_tag = nehr_Asset.asset_tag AND
+			  nehr_Asset_version.current_version 	= nehr_Asset.version AND
+              nehr_Asset_version.current_version = nehr_Software.version AND
+			  str_to_date(expirydate, '%m/%d/%Y') <= str_to_date(:expirydate, '%m/%d/%Y')
+			  AND NOT status='Decommissioned'");
+			  $stmt->bindparam(":expirydate", $filter);
+			  $stmt->execute();
+			  
+			  $result['software'] = $stmt->fetchAll();
+		}
+		else {
 		  $entry = '%'.$filter.'%';
 		  $stmt = $this->db->prepare("SELECT 	nehr_Asset.*, nehr_Hardware.*
 			FROM nehr_Asset_version INNER JOIN nehr_Hardware, nehr_Asset 
@@ -837,6 +884,7 @@ class USER
 			  $stmt->execute();
 			  $result['renewal'] = $stmt->fetchAll();
 		  }
+		}
 		  return $result;
 	}
     public function addOption($table, $type, $value) {
@@ -954,6 +1002,7 @@ class USER
 		echo				"<p>Expiry Date			: ".htmlentities($asset['expirydate']) 			."</p>";
 		echo				"<p>Status				: ".htmlentities($asset['status'])				."</p>";
 		echo				"<p>Remarks				: ".htmlentities($asset['remarks']) 			."</p>";
+		echo				"<p>Point of Contact 	: ".htmlentities($asset['poc']) 				."</p>";
 	}
 	
 	public function printSoftwareModal($software) {
@@ -984,7 +1033,8 @@ class USER
 		$this->printAssetModal($hardware);
 		echo				"<h4>Hardware Information</h4>";
 		echo				"<p>Price				: ".htmlentities($hardware['price']) . " " 		. htmlentities($hardware['currency'])	."</p>";
-		echo				"<p>IHiS_Asset_ID		: ".htmlentities($hardware['IHiS_Asset_ID']) 	."</p>";
+		echo				"<p>IHiS Asset ID		: ".htmlentities($hardware['IHiS_Asset_ID']) 	."</p>";
+		echo				"<p>IHiS Invoice		: ".htmlentities($hardware['IHiS_Invoice']) 	."</p>";
 		echo				"<p>CR359/CR506			: ".htmlentities($hardware['CR359 / CR506']) 	."</p>";
 		echo				"<p>CR560				: ".htmlentities($hardware['CR560']) 			."</p>";
 		echo				"<p>Post-CR560			: ".htmlentities($hardware['POST-CR560']) 		."</p>";
@@ -1212,6 +1262,7 @@ class USER
 				echo "<td>".htmlentities($asset['release_version'])		."</td>";
 				echo "<td>".htmlentities($asset['expirydate'])			."</td>";
 				echo "<td>".htmlentities($asset['status'])			."</td>";
+				echo "<td>".htmlentities($asset['poc'])			."</td>";
 	}
 	
 	public function printRenewalRow($row) {

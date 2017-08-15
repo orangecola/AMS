@@ -58,6 +58,7 @@
 				  <th>Release version</th>
 				  <th>Expiry Date</th>
 				  <th>Status</th>
+				  <th>POC</th>
 				  <th>Vendor</th>
 				  <th>Procured From</th>
 				  <th>Short Name</th>

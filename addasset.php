@@ -21,6 +21,7 @@
 		$asset['expirydate']		= trim($_POST['expirydate']);
 		$asset['remarks']			= trim($_POST['remarks']);
 		$asset['status'] 			= trim($_POST['status']);
+		$asset['poc'] 				= trim($_POST['poc']);
 		$asset['version']			= 1;
 		
 		if (isset($_POST['software']) and isset($_POST['hardware'])) {
@@ -46,6 +47,7 @@
 			$asset['price']			= trim($_POST['price']);
 			$asset['currency']		= trim($_POST['currency']);
 			$asset['IHiS_Asset_ID']	= trim($_POST['IHiS_Asset_ID']);
+			$asset['IHiS_Invoice']	= trim($_POST['IHiS_Invoice']);
 			$asset['CR359 / CR506']	= trim($_POST['CR359']);
 			$asset['CR560']			= trim($_POST['CR560']);
 			$asset['POST-CR560']	= trim($_POST['POST-CR560']);

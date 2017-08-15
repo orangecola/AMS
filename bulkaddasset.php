@@ -36,8 +36,9 @@
 				$asset[$row]['expirydate']			= $sheet->getCell('G'.$row)->getValue();
 				$asset[$row]['status']				= $sheet->getCell('H'.$row)->getValue();
 				$asset[$row]['remarks']				= $sheet->getCell('I'.$row)->getValue();
+				$asset[$row]['poc']					= $sheet->getCell('J'.$row)->getValue();
 				
-				//Check price
+				//Check quantity
 				if (!($user->validatesAsInt($asset[$row]['quantity']))) {
 					$errorRow['number'][] = $row;
 				}
@@ -53,21 +54,22 @@
 				}	
 				
 				if ($type == 'hardware') {
-					$asset[$row]['IHiS_Asset_ID']	= $sheet->getCell('J'.$row)->getValue();
-					$asset[$row]['CR359 / CR506']	= $sheet->getCell('K'.$row)->getValue();
-					$asset[$row]['CR560']			= $sheet->getCell('L'.$row)->getValue();
-					$asset[$row]['POST-CR560']		= $sheet->getCell('M'.$row)->getValue();
-					$asset[$row]['price']			= $sheet->getCell('N'.$row)->getCalculatedValue();
-					$asset[$row]['currency']		= $sheet->getCell('O'.$row)->getValue();
-					$asset[$row]['class']			= $sheet->getCell('P'.$row)->getValue();
-					$asset[$row]['brand']			= $sheet->getCell('Q'.$row)->getValue();
-					$asset[$row]['audit_date']		= $sheet->getCell('R'.$row)->getValue();
-					$asset[$row]['component']		= $sheet->getCell('S'.$row)->getValue();
-					$asset[$row]['label']			= $sheet->getCell('T'.$row)->getValue();
-					$asset[$row]['serial']			= $sheet->getCell('U'.$row)->getValue();
-					$asset[$row]['location']		= $sheet->getCell('V'.$row)->getValue();
-					$asset[$row]['replacing']		= $sheet->getCell('W'.$row)->getValue();
-					$asset[$row]['excelsheet']		= $sheet->getCell('X'.$row)->getValue();
+					$asset[$row]['IHiS_Asset_ID']	= $sheet->getCell('K'.$row)->getValue();
+					$asset[$row]['IHiS_Invoice']	= $sheet->getCell('L'.$row)->getValue();
+					$asset[$row]['CR359 / CR506']	= $sheet->getCell('M'.$row)->getValue();
+					$asset[$row]['CR560']			= $sheet->getCell('N'.$row)->getValue();
+					$asset[$row]['POST-CR560']		= $sheet->getCell('O'.$row)->getValue();
+					$asset[$row]['price']			= $sheet->getCell('P'.$row)->getCalculatedValue();
+					$asset[$row]['currency']		= $sheet->getCell('Q'.$row)->getValue();
+					$asset[$row]['class']			= $sheet->getCell('R'.$row)->getValue();
+					$asset[$row]['brand']			= $sheet->getCell('S'.$row)->getValue();
+					$asset[$row]['audit_date']		= $sheet->getCell('T'.$row)->getValue();
+					$asset[$row]['component']		= $sheet->getCell('U'.$row)->getValue();
+					$asset[$row]['label']			= $sheet->getCell('V'.$row)->getValue();
+					$asset[$row]['serial']			= $sheet->getCell('W'.$row)->getValue();
+					$asset[$row]['location']		= $sheet->getCell('X'.$row)->getValue();
+					$asset[$row]['replacing']		= $sheet->getCell('Y'.$row)->getValue();
+					$asset[$row]['excelsheet']		= $sheet->getCell('Z'.$row)->getValue();
 					$asset[$row]['version']			= 1;
 					//Ensure non null values
 					foreach ($asset[$row] as $key=>$value) {
@@ -78,9 +80,9 @@
 							$errorRow['null'][] = $row.$key;
 						}
 					}
-					//if (!($user->validatesAsInt($asset[$row]['price']) or $user->validatesAsDouble($asset[$row]['price']))) {
-					//	$errorRow['number'][] = $row;
-					//}
+					if (!($user->validatesAsInt($asset[$row]['price']) or $user->validatesAsDouble($asset[$row]['price']))) {
+						$errorRow['number'][] = $row;
+					}
 					//Ensure that if the replacing field is entered, the parent exists in the system
 					//if ($asset[$row]['replacing'] != "") {
 					//	if (!(in_array($asset[$row]['replacing'], $distinct[3]))) {
@@ -89,16 +91,16 @@
 					//}
 				}
 				else if ($type == 'software') {
-					$asset[$row]['vendor']				= $sheet->getCell('J'.$row)->getValue();
-					$asset[$row]['procured_from']		= $sheet->getCell('K'.$row)->getValue();
-					$asset[$row]['shortname']			= $sheet->getCell('L'.$row)->getValue();
-					$asset[$row]['purpose']				= $sheet->getCell('M'.$row)->getValue();
-					$asset[$row]['contract_type']		= $sheet->getCell('N'.$row)->getValue();
-					$asset[$row]['start_date']			= $sheet->getCell('O'.$row)->getValue();
-					$asset[$row]['license_explanation']	= $sheet->getCell('P'.$row)->getValue();
+					$asset[$row]['vendor']				= $sheet->getCell('K'.$row)->getValue();
+					$asset[$row]['procured_from']		= $sheet->getCell('L'.$row)->getValue();
+					$asset[$row]['shortname']			= $sheet->getCell('M'.$row)->getValue();
+					$asset[$row]['purpose']				= $sheet->getCell('N'.$row)->getValue();
+					$asset[$row]['contract_type']		= $sheet->getCell('O'.$row)->getValue();
+					$asset[$row]['start_date']			= $sheet->getCell('P'.$row)->getValue();
+					$asset[$row]['license_explanation']	= $sheet->getCell('Q'.$row)->getValue();
 					$asset[$row]['version']				= 1;
 					
-					if (PHPExcel_Shared_Date::isDateTime($sheet->getCell('O'.$row))) {
+					if (PHPExcel_Shared_Date::isDateTime($sheet->getCell('P'.$row))) {
 						$asset[$row]['start_date'] = date('m/d/Y', PHPExcel_Shared_Date::ExcelToPHP($asset[$row]['start_date']));
 					}
 					

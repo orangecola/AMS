@@ -14,6 +14,7 @@
 		$GLOBALS['user']->printAssetRow($hardware);
 		echo "<td>".htmlentities($hardware['price'])			." ".htmlentities($hardware['currency'])."</td>";
 		echo "<td>".htmlentities($hardware['IHiS_Asset_ID'])."</td>";
+		echo "<td>".htmlentities($hardware['IHiS_Invoice'])."</td>";
 		echo "<td>".htmlentities($hardware['CR359 / CR506'])."</td>";
 		echo "<td>".htmlentities($hardware['CR560'])."</td>";
 		echo "<td>".htmlentities($hardware['POST-CR560'])."</td>";
@@ -64,8 +65,10 @@
 				  <th>Release version</th>
 				  <th>Expiry Date</th>
 				  <th>Status</th>
+				  <th>POC</th>
 				  <th>Price</th>
-				  <th>IHiS_Asset_ID</th>
+				  <th>IHiS Asset ID</th>
+				  <th>IHiS Invoice</th>
 				  <th>CR359/CR506</th>
 				  <th>CR560</th>
 				  <th>Post-CR560</th>

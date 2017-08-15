@@ -145,10 +145,12 @@
 		document.getElementsByName("release")[0].value = versions[p1]["release_version"];
 		document.getElementsByName("expirydate")[0].value = versions[p1]["expirydate"];
 		document.getElementsByName("remarks")[0].innerHTML = versions[p1]["remarks"];
+		document.getElementsByName("poc")[0].value = versions[p1]["poc"];
 		
 		document.getElementsByName("price")[0].value = versions[p1]["price"];
 		document.getElementsByName("currency")[0].value = versions[p1]["currency"];
 		document.getElementsByName("IHiS_Asset_ID")[0].value = versions[p1]["IHiS_Asset_ID"];
+		document.getElementsByName("IHiS_Invoice")[0].value = versions[p1]["IHiS_Invoice"];
 		document.getElementsByName("CR359")[0].value = versions[p1]["CR359 / CR506"];
 		document.getElementsByName("CR560")[0].value = versions[p1]["CR560"];
 		document.getElementsByName("POST-CR560")[0].value = versions[p1]["POST-CR560"];
@@ -174,6 +176,7 @@
 	document.getElementsByName("expirydate")[0].disabled = true;
 	document.getElementsByName("status")[0].disabled = true;
 	document.getElementsByName("remarks")[0].disabled = true;
+	document.getElementsByName("poc")[0].disabled = true;
 	document.getElementsByName("currency")[0].disabled = true;
 	document.getElementsByName("class")[0].disabled = true;
 	document.getElementsByName("brand")[0].disabled = true;
@@ -185,6 +188,7 @@
 	document.getElementsByName("replacing")[0].disabled = true;
 	document.getElementsByName("excelsheet")[0].disabled = true;
 	document.getElementsByName("IHiS_Asset_ID")[0].disabled = true;
+	document.getElementsByName("IHiS_Invoice")[0].disabled = true;
 	document.getElementsByName("CR359")[0].disabled = true;
 	document.getElementsByName("CR560")[0].disabled = true;
 	document.getElementsByName("POST-CR560")[0].disabled = true;
