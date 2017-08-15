@@ -53,7 +53,7 @@ CREATE TABLE `ihis_Log` (
   `time` text NOT NULL,
   `log` text NOT NULL,
   PRIMARY KEY (`log_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=5145 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=6482 DEFAULT CHARSET=latin1;
 
 
 CREATE TABLE `ihis_User` (
@@ -79,6 +79,7 @@ CREATE TABLE `nehr_Asset` (
   `expirydate` text,
   `status` text,
   `remarks` text,
+  `poc` text,
   KEY `asset_tag` (`asset_tag`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -87,13 +88,14 @@ CREATE TABLE `nehr_Asset_version` (
   `asset_tag` int(11) NOT NULL AUTO_INCREMENT,
   `current_version` int(11) NOT NULL,
   PRIMARY KEY (`asset_tag`)
-) ENGINE=InnoDB AUTO_INCREMENT=3467 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=4768 DEFAULT CHARSET=latin1;
 
 
 CREATE TABLE `nehr_Hardware` (
   `asset_tag` int(11) NOT NULL,
   `version` int(11) NOT NULL,
-  `IHiS_Asset_ID` varchar(20) DEFAULT NULL,
+  `IHiS_Asset_ID` text,
+  `IHiS_Invoice` text,
   `CR359 / CR506` varchar(20) DEFAULT NULL,
   `CR560` varchar(20) DEFAULT NULL,
   `POST-CR560` varchar(20) DEFAULT NULL,
@@ -158,4 +160,4 @@ CREATE TABLE `nehr_Software` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
--- 2017-08-02 06:18:54
+-- 2017-08-15 04:20:43
